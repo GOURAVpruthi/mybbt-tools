@@ -1,0 +1,15 @@
+name: Keep Alive - Ping mybbt.co.in
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # Har 10 minute mein ping
+  workflow_dispatch:         # Manual run bhi ho sakta hai
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Site
+        run: |
+          curl -s https://mybbt-tools.onrender.com > /dev/null
+          echo "✅ Site pinged successfully!"
