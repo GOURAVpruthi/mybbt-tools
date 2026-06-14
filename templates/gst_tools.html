@@ -1,0 +1,449 @@
+{% extends "base.html" %}
+{% block title %}GST Tools — Corporate Tools Suite{% endblock %}
+{% block page_id %}gst-tools{% endblock %}
+{% block topbar_title %}GST Tools{% endblock %}
+{% block topbar_breadcrumb %}<span>GST</span> › Complete GST Processing Suite{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>🧾 GST Tools Suite</h1>
+  <p>Upload files downloaded from GST Portal — get professional consolidated Excel reports instantly. All tools use your original processing engine.</p>
+</div>
+
+<!-- Tabs -->
+<div id="tabs-container">
+  <div class="tabs" style="flex-wrap:wrap;gap:6px">
+    <button class="tab-btn active" data-tab="tab-gstr1">📋 GSTR-1</button>
+    <button class="tab-btn" data-tab="tab-gstr2b">🔄 GSTR-2B</button>
+    <button class="tab-btn" data-tab="tab-gstr3b">📝 GSTR-3B</button>
+    <button class="tab-btn" data-tab="tab-gstr9">📑 GSTR-9/9C</button>
+    <button class="tab-btn" data-tab="tab-taxcomp">⚖️ Tax Comparison</button>
+    <button class="tab-btn" data-tab="tab-ecrrs">📊 ECRRS</button>
+    <button class="tab-btn" data-tab="tab-ledgers">📒 Ledgers</button>
+    <button class="tab-btn" data-tab="tab-portal">🌐 Portal Links</button>
+  </div>
+
+  <!-- ══ GSTR-1 ══════════════════════════════════════════════════════════ -->
+  <div class="tab-content active" id="tab-gstr1">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2>GSTR-1 PDF → Consolidated Excel</h2>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Upload GSTR-1 PDFs downloaded from GST Portal → get state-wise / month-wise Excel report</div>
+        </div>
+        <span class="badge badge-primary">Multi-PDF Support</span>
+      </div>
+      <div class="card-body">
+        <div class="info-box" style="background:var(--surface-2);border-left:3px solid var(--primary);padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:20px;font-size:13px">
+          📌 <strong>How to use:</strong> GST Portal → Returns → GSTR-1 → View Filed Returns → Download PDF → Upload here
+        </div>
+        <div class="form-group">
+          <label class="form-label">📂 Upload GSTR-1 PDFs (one or multiple months)</label>
+          <div class="upload-zone" id="gstr1-zone" style="padding:30px">
+            <input type="file" id="gstr1-input" accept=".pdf" multiple>
+            <div style="font-size:36px;margin-bottom:10px">📋</div>
+            <p style="font-size:14px;font-weight:600">Drop GSTR-1 PDFs here or click to browse</p>
+            <small style="color:var(--text-light)">Multiple files supported • All months will be consolidated</small>
+          </div>
+          <div id="gstr1-selected" style="display:none;margin-top:10px" class="badge badge-success"></div>
+        </div>
+        <div id="gstr1-progress" class="progress-bar" style="display:none"><div class="progress-fill"></div></div>
+        <button class="btn btn-primary btn-lg" id="gstr1-btn" disabled style="width:100%;margin-top:16px">📋 Generate Consolidated Excel</button>
+        <div class="result-box" id="gstr1-result"></div>
+
+        <div style="margin-top:20px;background:var(--surface-2);padding:16px;border-radius:var(--radius-sm);font-size:13px">
+          <strong>Output Excel contains:</strong>
+          <ul style="margin:8px 0 0 16px;line-height:2">
+            <li>📊 Sheet 1 — Consolidated (all tables 4A to 15, state-wise, month-wise)</li>
+            <li>📊 Sheet 2 — State-Month Totals (liability summary per return)</li>
+            <li>📊 Sheet 3 — Processing Log (OK / FAIL status per file)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GSTR-2B ═════════════════════════════════════════════════════════ -->
+  <div class="tab-content" id="tab-gstr2b">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2>GSTR-2B Excel → Consolidated Report</h2>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Upload GSTR-2B Excel files from GST Portal → consolidated ITC register</div>
+        </div>
+        <span class="badge badge-warning">Multi-file Support</span>
+      </div>
+      <div class="card-body">
+        <div class="info-box" style="background:var(--surface-2);border-left:3px solid #f59e0b;padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:20px;font-size:13px">
+          📌 <strong>How to use:</strong> GST Portal → Returns → GSTR-2B → Download Excel file → Upload here
+        </div>
+        <div class="form-group">
+          <label class="form-label">📂 Upload GSTR-2B Excel Files (multiple months)</label>
+          <div class="upload-zone" id="gstr2b-zone" style="padding:30px">
+            <input type="file" id="gstr2b-input" accept=".xlsx,.xls" multiple>
+            <div style="font-size:36px;margin-bottom:10px">🔄</div>
+            <p style="font-size:14px;font-weight:600">Drop GSTR-2B Excel files here</p>
+            <small style="color:var(--text-light)">Multiple months supported • Auto-deduplication included</small>
+          </div>
+          <div id="gstr2b-selected" style="display:none;margin-top:10px" class="badge badge-success"></div>
+        </div>
+        <div id="gstr2b-progress" class="progress-bar" style="display:none"><div class="progress-fill"></div></div>
+        <button class="btn btn-primary btn-lg" id="gstr2b-btn" disabled style="width:100%;margin-top:16px">🔄 Consolidate GSTR-2B</button>
+        <div class="result-box" id="gstr2b-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GSTR-3B ═════════════════════════════════════════════════════════ -->
+  <div class="tab-content" id="tab-gstr3b">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2>GSTR-3B PDF → Consolidated Excel</h2>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Extract all sections from GSTR-3B PDFs → professional Excel report</div>
+        </div>
+        <span class="badge badge-success">Multi-PDF Support</span>
+      </div>
+      <div class="card-body">
+        <div class="info-box" style="background:var(--surface-2);border-left:3px solid #22c55e;padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:20px;font-size:13px">
+          📌 <strong>How to use:</strong> GST Portal → Returns → GSTR-3B → View Filed Returns → Download PDF → Upload here
+        </div>
+        <div class="form-group">
+          <label class="form-label">📂 Upload GSTR-3B PDFs</label>
+          <div class="upload-zone" id="gstr3b-zone" style="padding:30px">
+            <input type="file" id="gstr3b-input" accept=".pdf" multiple>
+            <div style="font-size:36px;margin-bottom:10px">📝</div>
+            <p style="font-size:14px;font-weight:600">Drop GSTR-3B PDFs here</p>
+            <small style="color:var(--text-light)">All sections extracted — 3.1, 3.2, 4, 5, 5.1, 6</small>
+          </div>
+          <div id="gstr3b-selected" style="display:none;margin-top:10px" class="badge badge-success"></div>
+        </div>
+        <div id="gstr3b-progress" class="progress-bar" style="display:none"><div class="progress-fill"></div></div>
+        <button class="btn btn-primary btn-lg" id="gstr3b-btn" disabled style="width:100%;margin-top:16px">📝 Generate GSTR-3B Excel</button>
+        <div class="result-box" id="gstr3b-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GSTR-9/9C ═══════════════════════════════════════════════════════ -->
+  <div class="tab-content" id="tab-gstr9">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2>GSTR-9 / 9C PDF → Consolidated Excel</h2>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Annual Return PDFs → structured Excel with all tables</div>
+        </div>
+        <span class="badge badge-primary">Annual Return</span>
+      </div>
+      <div class="card-body">
+        <div class="info-box" style="background:var(--surface-2);border-left:3px solid var(--primary);padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:20px;font-size:13px">
+          📌 <strong>How to use:</strong> GST Portal → Returns → Annual Returns → GSTR-9 / GSTR-9C → Download PDF → Upload here
+        </div>
+        <div class="form-group">
+          <label class="form-label">📂 Upload GSTR-9 or GSTR-9C PDFs</label>
+          <div class="upload-zone" id="gstr9-zone" style="padding:30px">
+            <input type="file" id="gstr9-input" accept=".pdf" multiple>
+            <div style="font-size:36px;margin-bottom:10px">📑</div>
+            <p style="font-size:14px;font-weight:600">Drop GSTR-9 / 9C PDFs here</p>
+            <small style="color:var(--text-light)">Supports both GSTR-9 and GSTR-9C • Multiple GSTINs</small>
+          </div>
+          <div id="gstr9-selected" style="display:none;margin-top:10px" class="badge badge-success"></div>
+        </div>
+        <div id="gstr9-progress" class="progress-bar" style="display:none"><div class="progress-fill"></div></div>
+        <button class="btn btn-primary btn-lg" id="gstr9-btn" disabled style="width:100%;margin-top:16px">📑 Generate Annual Return Excel</button>
+        <div class="result-box" id="gstr9-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAX COMPARISON ══════════════════════════════════════════════════ -->
+  <div class="tab-content" id="tab-taxcomp">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2>Tax Liability & ITC Comparison</h2>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">GSTR-1 vs GSTR-3B comparison Excel from portal → consolidated multi-sheet report</div>
+        </div>
+        <span class="badge badge-warning">Comparison Tool</span>
+      </div>
+      <div class="card-body">
+        <div class="info-box" style="background:var(--surface-2);border-left:3px solid #f59e0b;padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:20px;font-size:13px">
+          📌 <strong>How to use:</strong> GST Portal → Returns → Tax Liability & ITC Comparison → Download Excel → Upload here
+        </div>
+        <div class="form-group">
+          <label class="form-label">📂 Upload Tax Comparison Excel Files</label>
+          <div class="upload-zone" id="taxcomp-zone" style="padding:30px">
+            <input type="file" id="taxcomp-input" accept=".xlsx,.xls" multiple>
+            <div style="font-size:36px;margin-bottom:10px">⚖️</div>
+            <p style="font-size:14px;font-weight:600">Drop Tax Comparison Excel files here</p>
+            <small style="color:var(--text-light)">All 8 sheets extracted: Tax Liability Summary, Comparison Summary, ITC, RCM etc.</small>
+          </div>
+          <div id="taxcomp-selected" style="display:none;margin-top:10px" class="badge badge-success"></div>
+        </div>
+        <div id="taxcomp-progress" class="progress-bar" style="display:none"><div class="progress-fill"></div></div>
+        <button class="btn btn-primary btn-lg" id="taxcomp-btn" disabled style="width:100%;margin-top:16px">⚖️ Consolidate Comparison</button>
+        <div class="result-box" id="taxcomp-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ECRRS ═══════════════════════════════════════════════════════════ -->
+  <div class="tab-content" id="tab-ecrrs">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2>ECRRS — Electronic Credit Reversal & Reclaim</h2>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Process ECRRS CSV files from GST Portal</div>
+        </div>
+        <span class="badge badge-primary">CSV → Excel</span>
+      </div>
+      <div class="card-body">
+        <div class="info-box" style="background:var(--surface-2);border-left:3px solid var(--primary);padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:20px;font-size:13px">
+          📌 <strong>How to use:</strong> GST Portal → Services → Ledgers → ECRRS → Download CSV → Upload here
+        </div>
+        <div class="form-group">
+          <label class="form-label">📂 Upload ECRRS CSV Files</label>
+          <div class="upload-zone" id="ecrrs-zone" style="padding:30px">
+            <input type="file" id="ecrrs-input" accept=".csv" multiple>
+            <div style="font-size:36px;margin-bottom:10px">📊</div>
+            <p style="font-size:14px;font-weight:600">Drop ECRRS CSV files here</p>
+            <small style="color:var(--text-light)">Auto-deduplication by GSTIN included</small>
+          </div>
+          <div id="ecrrs-selected" style="display:none;margin-top:10px" class="badge badge-success"></div>
+        </div>
+        <div id="ecrrs-progress" class="progress-bar" style="display:none"><div class="progress-fill"></div></div>
+        <button class="btn btn-primary btn-lg" id="ecrrs-btn" disabled style="width:100%;margin-top:16px">📊 Process ECRRS</button>
+        <div class="result-box" id="ecrrs-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ LEDGERS ══════════════════════════════════════════════════════════ -->
+  <div class="tab-content" id="tab-ledgers">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2>GST Ledgers — Credit & Cash</h2>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Electronic Credit Ledger + Electronic Cash Ledger CSV consolidation</div>
+        </div>
+        <span class="badge badge-success">2 Tools</span>
+      </div>
+      <div class="card-body">
+        <div class="tabs" style="margin-bottom:20px">
+          <button class="tab-btn active" data-tab="tab-credit-ledger">📒 Credit Ledger (ECL)</button>
+          <button class="tab-btn" data-tab="tab-cash-ledger">💵 Cash Ledger</button>
+        </div>
+
+        <!-- Credit Ledger -->
+        <div class="tab-content active" id="tab-credit-ledger">
+          <div class="info-box" style="background:var(--surface-2);border-left:3px solid #22c55e;padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:20px;font-size:13px">
+            📌 GST Portal → Services → Ledgers → Electronic Credit Ledger → Download CSV
+          </div>
+          <div class="form-group">
+            <label class="form-label">📂 Upload ECL CSV Files</label>
+            <div class="upload-zone" id="ecl-zone" style="padding:30px">
+              <input type="file" id="ecl-input" accept=".csv" multiple>
+              <div style="font-size:36px;margin-bottom:10px">📒</div>
+              <p style="font-size:14px;font-weight:600">Drop Credit Ledger CSV files here</p>
+              <small style="color:var(--text-light)">IGST / CGST / SGST / CESS balance analysis included</small>
+            </div>
+            <div id="ecl-selected" style="display:none;margin-top:10px" class="badge badge-success"></div>
+          </div>
+          <div id="ecl-progress" class="progress-bar" style="display:none"><div class="progress-fill"></div></div>
+          <button class="btn btn-primary btn-lg" id="ecl-btn" disabled style="width:100%;margin-top:16px">📒 Process Credit Ledger</button>
+          <div class="result-box" id="ecl-result"></div>
+        </div>
+
+        <!-- Cash Ledger -->
+        <div class="tab-content" id="tab-cash-ledger">
+          <div class="info-box" style="background:var(--surface-2);border-left:3px solid #6c63ff;padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:20px;font-size:13px">
+            📌 GST Portal → Services → Ledgers → Electronic Cash Ledger → Download CSV
+          </div>
+          <div class="form-group">
+            <label class="form-label">📂 Upload Cash Ledger CSV Files</label>
+            <div class="upload-zone" id="cash-zone" style="padding:30px">
+              <input type="file" id="cash-input" accept=".csv" multiple>
+              <div style="font-size:36px;margin-bottom:10px">💵</div>
+              <p style="font-size:14px;font-weight:600">Drop Cash Ledger CSV files here</p>
+              <small style="color:var(--text-light)">Tax / Interest / Penalty / Fee / Other balance tracking</small>
+            </div>
+            <div id="cash-selected" style="display:none;margin-top:10px" class="badge badge-success"></div>
+          </div>
+          <div id="cash-progress" class="progress-bar" style="display:none"><div class="progress-fill"></div></div>
+          <button class="btn btn-primary btn-lg" id="cash-btn" disabled style="width:100%;margin-top:16px">💵 Process Cash Ledger</button>
+          <div class="result-box" id="cash-result"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PORTAL LINKS ════════════════════════════════════════════════════ -->
+  <div class="tab-content" id="tab-portal">
+    <div class="card">
+      <div class="card-header">
+        <h2>🌐 GST Portal Quick Links</h2>
+      </div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">
+          {% set links = [
+            ('🏠 GST Portal Home','https://www.gst.gov.in','Open portal home'),
+            ('🔐 GST Login','https://services.gst.gov.in/services/login','Login to GST portal'),
+            ('📋 GSTR-1 Filing','https://services.gst.gov.in/services/auth/quicklinks/GSTR1','File outward supplies'),
+            ('🔄 GSTR-2B View','https://services.gst.gov.in/services/auth/quicklinks/GSTR2B','View auto-drafted ITC'),
+            ('📝 GSTR-3B Filing','https://services.gst.gov.in/services/auth/quicklinks/GSTR3B','File monthly summary'),
+            ('📑 Annual Returns','https://services.gst.gov.in/services/auth/quicklinks/GSTR9','GSTR-9 / 9C'),
+            ('📊 E-Ledgers','https://services.gst.gov.in/services/auth/quicklinks/Ledger','Credit / Cash / Liability'),
+            ('⚖️ Tax Comparison','https://services.gst.gov.in/services/auth/quicklinks/taxlialityItcMismatch','GSTR-1 vs 3B mismatch'),
+            ('📄 ITC 04','https://services.gst.gov.in/services/auth/quicklinks/ITC04','Job work returns'),
+            ('🔍 Taxpayer Search','https://www.gst.gov.in/commonpage/search','Search GSTIN'),
+          ] %}
+          {% for label, url, desc in links %}
+          <a href="{{ url }}" target="_blank" rel="noopener"
+             style="display:block;padding:16px;background:var(--surface-2);border-radius:var(--radius-sm);text-decoration:none;color:var(--text-primary);border:1px solid var(--border-color);transition:all 0.2s"
+             onmouseover="this.style.borderColor='var(--primary)';this.style.transform='translateY(-2px)'"
+             onmouseout="this.style.borderColor='var(--border-color)';this.style.transform='translateY(0)'">
+            <div style="font-weight:600;margin-bottom:4px">{{ label }}</div>
+            <div style="font-size:12px;color:var(--text-muted)">{{ desc }}</div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Generic multi-file GST tool setup ─────────────────────────────────────
+function setupGSTTool(cfg) {
+  const zone = document.getElementById(cfg.zone);
+  const input = document.getElementById(cfg.input);
+  const btn   = document.getElementById(cfg.btn);
+  const sel   = document.getElementById(cfg.sel);
+  const res   = document.getElementById(cfg.res);
+  const prog  = document.getElementById(cfg.prog);
+  let files   = [];
+
+  if (!zone || !input || !btn) return;
+
+  // Drag & drop
+  zone.addEventListener('click', () => input.click());
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag-over');
+    addFiles(Array.from(e.dataTransfer.files));
+  });
+  input.addEventListener('change', () => addFiles(Array.from(input.files)));
+
+  function addFiles(newFiles) {
+    const allowed = cfg.accept || [];
+    const filtered = newFiles.filter(f => {
+      if (!allowed.length) return true;
+      return allowed.some(ext => f.name.toLowerCase().endsWith('.' + ext));
+    });
+    files = files.concat(filtered);
+    updateUI();
+  }
+
+  function updateUI() {
+    if (files.length > 0) {
+      sel.style.display = 'inline-block';
+      sel.textContent = `✅ ${files.length} file(s) selected: ${files.map(f => f.name).join(', ')}`;
+      btn.disabled = false;
+    } else {
+      sel.style.display = 'none';
+      btn.disabled = true;
+    }
+  }
+
+  btn.addEventListener('click', async () => {
+    if (!files.length) return;
+    const fd = new FormData();
+    files.forEach(f => fd.append('files', f));
+    if (cfg.extraData) cfg.extraData(fd);
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Processing...';
+    if (prog) { prog.style.display = 'block'; prog.querySelector('.progress-fill').style.width = '60%'; }
+
+    try {
+      const resp = await fetch(cfg.api, { method: 'POST', body: fd });
+      const data = await resp.json();
+      if (prog) prog.style.display = 'none';
+      btn.disabled = false;
+      btn.innerHTML = cfg.btnLabel || 'Process';
+
+      if (data.success) {
+        let html = `<div class="alert alert-success">
+          <strong>✅ ${data.message || 'Done!'}</strong>
+          ${data.ok !== undefined ? `<br>Processed: ${data.ok}/${data.total} PDFs` : ''}
+          ${data.files_processed !== undefined ? `<br>Files: ${data.files_processed}` : ''}
+          ${(data.errors && data.errors.length) ? `<br><span style="color:#f59e0b">⚠ ${data.errors.length} error(s): ${data.errors.join('; ')}</span>` : ''}
+          <br><br>
+          <a href="/api/gst/download/${data.filename}" class="btn btn-primary btn-sm">⬇ Download Excel Report</a>
+        </div>`;
+        if (data.logs && data.logs.length) {
+          html += `<details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--text-muted)">View processing log</summary>
+            <div style="background:var(--surface-2);padding:10px;font-size:11px;font-family:monospace;border-radius:4px;max-height:150px;overflow-y:auto;margin-top:6px">${data.logs.join('<br>')}</div>
+          </details>`;
+        }
+        res.innerHTML = html; res.style.display = 'block';
+        // Reset
+        files = []; updateUI(); input.value = '';
+      } else {
+        res.innerHTML = `<div class="alert alert-error"><strong>❌ Error:</strong> ${data.error}</div>`;
+        res.style.display = 'block';
+      }
+    } catch(err) {
+      if (prog) prog.style.display = 'none';
+      btn.disabled = false;
+      btn.innerHTML = cfg.btnLabel || 'Process';
+      res.innerHTML = `<div class="alert alert-error">Network error: ${err.message}</div>`;
+      res.style.display = 'block';
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // GSTR-1
+  setupGSTTool({ zone:'gstr1-zone', input:'gstr1-input', btn:'gstr1-btn', sel:'gstr1-selected',
+    res:'gstr1-result', prog:'gstr1-progress', api:'/api/gst/gstr1', accept:['pdf'],
+    btnLabel:'📋 Generate Consolidated Excel' });
+
+  // GSTR-2B
+  setupGSTTool({ zone:'gstr2b-zone', input:'gstr2b-input', btn:'gstr2b-btn', sel:'gstr2b-selected',
+    res:'gstr2b-result', prog:'gstr2b-progress', api:'/api/gst/gstr2b', accept:['xlsx','xls'],
+    btnLabel:'🔄 Consolidate GSTR-2B' });
+
+  // GSTR-3B
+  setupGSTTool({ zone:'gstr3b-zone', input:'gstr3b-input', btn:'gstr3b-btn', sel:'gstr3b-selected',
+    res:'gstr3b-result', prog:'gstr3b-progress', api:'/api/gst/gstr3b', accept:['pdf'],
+    btnLabel:'📝 Generate GSTR-3B Excel' });
+
+  // GSTR-9/9C
+  setupGSTTool({ zone:'gstr9-zone', input:'gstr9-input', btn:'gstr9-btn', sel:'gstr9-selected',
+    res:'gstr9-result', prog:'gstr9-progress', api:'/api/gst/gstr9', accept:['pdf'],
+    btnLabel:'📑 Generate Annual Return Excel' });
+
+  // Tax Comparison
+  setupGSTTool({ zone:'taxcomp-zone', input:'taxcomp-input', btn:'taxcomp-btn', sel:'taxcomp-selected',
+    res:'taxcomp-result', prog:'taxcomp-progress', api:'/api/gst/tax-comparison', accept:['xlsx','xls'],
+    btnLabel:'⚖️ Consolidate Comparison' });
+
+  // ECRRS
+  setupGSTTool({ zone:'ecrrs-zone', input:'ecrrs-input', btn:'ecrrs-btn', sel:'ecrrs-selected',
+    res:'ecrrs-result', prog:'ecrrs-progress', api:'/api/gst/ecrrs', accept:['csv'],
+    btnLabel:'📊 Process ECRRS' });
+
+  // Credit Ledger
+  setupGSTTool({ zone:'ecl-zone', input:'ecl-input', btn:'ecl-btn', sel:'ecl-selected',
+    res:'ecl-result', prog:'ecl-progress', api:'/api/gst/credit-ledger', accept:['csv'],
+    btnLabel:'📒 Process Credit Ledger' });
+
+  // Cash Ledger
+  setupGSTTool({ zone:'cash-zone', input:'cash-input', btn:'cash-btn', sel:'cash-selected',
+    res:'cash-result', prog:'cash-progress', api:'/api/gst/cash-ledger', accept:['csv'],
+    btnLabel:'💵 Process Cash Ledger' });
+});
+</script>
+{% endblock %}

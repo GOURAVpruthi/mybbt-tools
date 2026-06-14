@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+{% block title %}File Manager — Corporate Tools Suite{% endblock %}
+{% block page_id %}file-manager{% endblock %}
+{% block topbar_title %}File Manager{% endblock %}
+{% block topbar_breadcrumb %}<span>File Tools</span> › File Manager & Collector{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>📁 File Manager & Collector</h1>
+  <p>Upload any files, preview, filter by type, individually download, or batch download as ZIP.</p>
+</div>
+
+<!-- ── Stats Bar ───────────────────────────────────────────────────────── -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px" id="fm-stats-bar">
+  <div class="card" style="padding:16px;text-align:center;margin:0">
+    <div style="font-size:24px;font-weight:700;color:var(--primary)" id="stat-total">0</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Total Files</div>
+  </div>
+  <div class="card" style="padding:16px;text-align:center;margin:0">
+    <div style="font-size:24px;font-weight:700;color:#22c55e" id="stat-pdfs">0</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:2px">PDFs</div>
+  </div>
+  <div class="card" style="padding:16px;text-align:center;margin:0">
+    <div style="font-size:24px;font-weight:700;color:#f59e0b" id="stat-excel">0</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Excel / CSV</div>
+  </div>
+  <div class="card" style="padding:16px;text-align:center;margin:0">
+    <div style="font-size:24px;font-weight:700;color:#6c63ff" id="stat-size">0 B</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Total Size</div>
+  </div>
+</div>
+
+<!-- ── Upload Zone ─────────────────────────────────────────────────────── -->
+<div class="card" style="margin-bottom:20px">
+  <div class="card-header">
+    <h2>⬆ Upload Files</h2>
+    <span class="badge badge-primary">All formats • Multiple files</span>
+  </div>
+  <div class="card-body">
+
+    <!-- Tabs: File / Folder / Local Path -->
+    <div class="tabs" style="margin-bottom:20px">
+      <button class="tab-btn active" data-tab="tab-upload-files">📄 Select Files</button>
+      <button class="tab-btn" data-tab="tab-upload-folder">📁 Select Folder</button>
+      <button class="tab-btn" data-tab="tab-upload-path">📂 Local Folder Path</button>
+    </div>
+
+    <!-- Tab 1: Normal file upload -->
+    <div class="tab-content active" id="tab-upload-files">
+      <div class="upload-zone" id="fm-drop-zone" style="padding:36px">
+        <input type="file" id="fm-file-input" multiple>
+        <div style="font-size:42px;margin-bottom:10px">📂</div>
+        <h3 style="margin:0 0 6px">Drop files here or click to browse</h3>
+        <p style="color:var(--text-muted);font-size:13px">All file types supported &bull; Up to 100MB per file &bull; Multiple files at once</p>
+      </div>
+    </div>
+
+    <!-- Tab 2: Folder upload (browser folder picker) -->
+    <div class="tab-content" id="tab-upload-folder">
+      <div class="upload-zone" id="fm-folder-zone" style="padding:36px;cursor:pointer" onclick="document.getElementById('fm-folder-input').click()">
+        <input type="file" id="fm-folder-input" multiple webkitdirectory style="display:none">
+        <div style="font-size:42px;margin-bottom:10px">🗂️</div>
+        <h3 style="margin:0 0 6px">Click to Select a Folder</h3>
+        <p style="color:var(--text-muted);font-size:13px">Folder ke andar ki saari files upload ho jayengi &bull; Sub-folders bhi</p>
+        <div style="margin-top:12px;background:var(--surface-2);display:inline-block;padding:8px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:600">📁 Browse Folder</div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Direct local folder path (localhost only) -->
+    <div class="tab-content" id="tab-upload-path">
+      <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:20px">
+        <div style="font-size:13px;color:#f59e0b;margin-bottom:14px;background:#fef3c7;padding:10px 14px;border-radius:6px;border-left:3px solid #f59e0b">
+          ⚡ <strong>Localhost feature</strong> — Server aapke computer se seedha folder read karega. Domain pe deploy karne ke baad yeh feature available nahi hoga.
+        </div>
+        <div class="form-group">
+          <label class="form-label">📂 Local Folder Path</label>
+          <div style="display:flex;gap:10px">
+            <input type="text" id="local-path-input"
+              placeholder="C:\Users\hp\Downloads\GST Files"
+              style="flex:1;padding:10px 14px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--surface-1);color:var(--text-primary);font-size:14px;font-family:monospace">
+            <button class="btn btn-primary" id="local-path-btn" onclick="importLocalPath()">
+              📂 Import Folder
+            </button>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:8px">
+            Examples: &nbsp;
+            <code style="background:var(--surface-2);padding:2px 6px;border-radius:4px">C:\Users\hp\Desktop\GST</code> &nbsp;
+            <code style="background:var(--surface-2);padding:2px 6px;border-radius:4px">C:\Downloads\GSTR1_PDFs</code>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:14px">
+          <label class="form-label">Filter by Extension (optional)</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="ext-all" checked onchange="toggleAllExts(this)"> All files</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" class="ext-chk" value="pdf"> PDF</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" class="ext-chk" value="xlsx"> Excel (.xlsx)</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" class="ext-chk" value="xls"> Excel (.xls)</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" class="ext-chk" value="csv"> CSV</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" class="ext-chk" value="docx"> Word</label>
+          </div>
+        </div>
+        <div style="margin-top:6px">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+            <input type="checkbox" id="include-subfolders"> Include sub-folders (recursive)
+          </label>
+        </div>
+        <div id="local-path-result" style="margin-top:14px"></div>
+      </div>
+    </div>
+
+    <!-- Shared progress + result -->
+    <div id="fm-upload-progress" style="display:none;margin-top:14px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text-muted)">Uploading... <span id="fm-upload-pct">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="fm-progress-fill" style="width:0%"></div></div>
+    </div>
+    <div id="fm-upload-result" style="margin-top:12px"></div>
+  </div>
+</div>
+
+
+<!-- ── File List ──────────────────────────────────────────────────────── -->
+<div class="card">
+  <div class="card-header" style="flex-wrap:wrap;gap:10px">
+    <div>
+      <h2>📋 File Collection</h2>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:2px" id="fm-count">Loading...</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <!-- Filter -->
+      <select id="fm-filter-type" style="font-size:13px;padding:6px 10px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--surface-2);color:var(--text-primary);cursor:pointer">
+        <option value="">All Types</option>
+        <option value="PDF">PDF only</option>
+        <option value="Excel">Excel only</option>
+        <option value="CSV">CSV only</option>
+        <option value="Word">Word only</option>
+        <option value="Image">Images only</option>
+      </select>
+      <!-- Search -->
+      <input type="text" id="fm-search" placeholder="🔍 Search filename..." style="font-size:13px;padding:6px 12px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--surface-2);color:var(--text-primary);width:180px">
+      <button class="btn btn-secondary btn-sm" onclick="refreshFileList()">🔄 Refresh</button>
+      <button class="btn btn-primary btn-sm" id="fm-download-zip" onclick="downloadZip()">
+        ⬇ Download All as ZIP
+      </button>
+      <button class="btn btn-sm" style="background:#ef4444;color:#fff" id="fm-clear-all" onclick="clearAllFiles()">🗑 Clear All</button>
+    </div>
+  </div>
+  <div class="card-body" style="padding:0">
+    <div id="fm-file-list" style="min-height:200px"></div>
+  </div>
+</div>
+
+<style>
+.fm-table { width:100%; border-collapse:collapse; font-size:13px }
+.fm-table th { background:var(--surface-2); padding:10px 14px; text-align:left; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); border-bottom:2px solid var(--border-color) }
+.fm-table td { padding:10px 14px; border-bottom:1px solid var(--border-color); vertical-align:middle }
+.fm-table tr:last-child td { border-bottom:none }
+.fm-table tr:hover td { background:var(--surface-2) }
+.fm-table tr.hidden { display:none }
+.file-icon { font-size:20px; margin-right:6px }
+.file-type-badge { display:inline-block; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:600 }
+.type-pdf   { background:#fee2e2; color:#dc2626 }
+.type-excel { background:#d1fae5; color:#059669 }
+.type-csv   { background:#d1fae5; color:#059669 }
+.type-word  { background:#dbeafe; color:#2563eb }
+.type-image { background:#f3e8ff; color:#7c3aed }
+.type-file  { background:var(--surface-2); color:var(--text-muted) }
+.fm-action-btn { background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:4px; font-size:13px; transition:background .15s }
+.fm-action-btn:hover { background:var(--surface-2) }
+</style>
+
+<script>
+let allFiles = [];
+
+// ── Icons by type ──────────────────────────────────────────────────────────
+function fileIcon(ext) {
+  const m = { pdf:'📄', xlsx:'📊', xls:'📊', csv:'📊', doc:'📝', docx:'📝',
+               jpg:'🖼️', jpeg:'🖼️', png:'🖼️', gif:'🖼️', zip:'📦', rar:'📦',
+               txt:'📃', ppt:'📊', pptx:'📊', py:'🐍', js:'🟨', html:'🌐' };
+  return m[ext] || '📁';
+}
+
+function typeClass(type) {
+  return 'type-' + type.toLowerCase().replace(/[^a-z]/g,'') || 'type-file';
+}
+
+// ── Load file list from server ─────────────────────────────────────────────
+async function refreshFileList() {
+  try {
+    const r = await fetch('/api/files/list');
+    const data = await r.json();
+    allFiles = data.files || [];
+    renderFileList();
+    updateStats();
+  } catch(e) {
+    document.getElementById('fm-file-list').innerHTML =
+      '<div style="padding:40px;text-align:center;color:var(--text-muted)">⚠ Could not load files</div>';
+  }
+}
+
+// ── Render file list with filter/search ───────────────────────────────────
+function renderFileList() {
+  const search = (document.getElementById('fm-search').value || '').toLowerCase();
+  const typeFilter = document.getElementById('fm-filter-type').value;
+
+  const filtered = allFiles.filter(f => {
+    const matchSearch = !search || f.name.toLowerCase().includes(search);
+    const matchType   = !typeFilter || f.type === typeFilter;
+    return matchSearch && matchType;
+  });
+
+  const el = document.getElementById('fm-file-list');
+
+  if (filtered.length === 0) {
+    el.innerHTML = `<div style="padding:60px;text-align:center">
+      <div style="font-size:48px;margin-bottom:12px">📂</div>
+      <h3 style="color:var(--text-muted);font-weight:500">${allFiles.length === 0 ? 'No files uploaded yet' : 'No files match your filter'}</h3>
+      <p style="color:var(--text-light);font-size:13px">${allFiles.length === 0 ? 'Upload files using the zone above' : 'Try changing the filter or search'}</p>
+    </div>`;
+    document.getElementById('fm-count').textContent = 'No files';
+    return;
+  }
+
+  document.getElementById('fm-count').textContent =
+    `${filtered.length} file${filtered.length !== 1 ? 's' : ''}${typeFilter || search ? ' (filtered)' : ''}`;
+
+  el.innerHTML = `<table class="fm-table">
+    <thead><tr>
+      <th style="width:40%">File Name</th>
+      <th>Type</th>
+      <th>Size</th>
+      <th>Modified</th>
+      <th style="text-align:right">Actions</th>
+    </tr></thead>
+    <tbody>
+    ${filtered.map(f => `<tr>
+      <td>
+        <span class="file-icon">${fileIcon(f.ext)}</span>
+        <span style="font-weight:500">${f.name}</span>
+      </td>
+      <td><span class="file-type-badge ${typeClass(f.type)}">${f.type}</span></td>
+      <td style="color:var(--text-muted)">${f.size_str}</td>
+      <td style="color:var(--text-muted);font-size:12px">${f.modified}</td>
+      <td style="text-align:right;white-space:nowrap">
+        <a href="/api/files/download/${encodeURIComponent(f.name)}" class="fm-action-btn" title="Download">⬇</a>
+        <button class="fm-action-btn" title="Delete" onclick="deleteFile('${f.name.replace(/'/g,"\\'")}')">🗑</button>
+      </td>
+    </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+// ── Stats bar ─────────────────────────────────────────────────────────────
+function updateStats() {
+  const pdfs  = allFiles.filter(f => f.type === 'PDF').length;
+  const excel = allFiles.filter(f => f.type === 'Excel' || f.type === 'CSV').length;
+  const totalBytes = allFiles.reduce((s, f) => s + f.size, 0);
+
+  document.getElementById('stat-total').textContent = allFiles.length;
+  document.getElementById('stat-pdfs').textContent  = pdfs;
+  document.getElementById('stat-excel').textContent = excel;
+  document.getElementById('stat-size').textContent  = formatSize(totalBytes);
+}
+
+function formatSize(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+  return (b/1024/1024).toFixed(1) + ' MB';
+}
+
+// ── Folder input (webkitdirectory) ───────────────────────────────────────
+const folderInput = document.getElementById('fm-folder-input');
+if (folderInput) {
+  folderInput.addEventListener('change', () => uploadFiles(folderInput.files));
+}
+const folderZone = document.getElementById('fm-folder-zone');
+if (folderZone) {
+  folderZone.addEventListener('dragover', e => { e.preventDefault(); folderZone.classList.add('drag-over'); });
+  folderZone.addEventListener('dragleave', () => folderZone.classList.remove('drag-over'));
+  folderZone.addEventListener('drop', e => {
+    e.preventDefault(); folderZone.classList.remove('drag-over');
+    uploadFiles(e.dataTransfer.files);
+  });
+}
+
+// ── Local path import ────────────────────────────────────────────────────
+function toggleAllExts(chk) {
+  document.querySelectorAll('.ext-chk').forEach(c => c.checked = false);
+}
+function getSelectedExts() {
+  if (document.getElementById('ext-all') && document.getElementById('ext-all').checked) return [];
+  return Array.from(document.querySelectorAll('.ext-chk:checked')).map(c => c.value);
+}
+
+async function importLocalPath() {
+  const path = document.getElementById('local-path-input').value.trim();
+  if (!path) { alert('Folder path daalo!'); return; }
+  const recursive = document.getElementById('include-subfolders').checked;
+  const exts = getSelectedExts();
+  const btn = document.getElementById('local-path-btn');
+  const resEl = document.getElementById('local-path-result');
+
+  btn.textContent = '⏳ Importing...'; btn.disabled = true;
+  resEl.innerHTML = '';
+
+  try {
+    const r = await fetch('/api/files/import-path', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path, recursive, extensions: exts })
+    });
+    const data = await r.json();
+    if (data.success) {
+      resEl.innerHTML = `<div class="alert alert-success">
+        ✅ <strong>${data.imported} file(s) imported</strong> from <code>${path}</code>
+        ${data.skipped ? `<br><small style="color:var(--text-muted)">${data.skipped} file(s) skipped (extension filter)</small>` : ''}
+        ${data.files && data.files.length ? '<br><small>' + data.files.slice(0,8).join(', ') + (data.files.length > 8 ? ` ...+${data.files.length-8} more` : '') + '</small>' : ''}
+      </div>`;
+      refreshFileList();
+    } else {
+      resEl.innerHTML = `<div class="alert alert-error">❌ ${data.error}</div>`;
+    }
+  } catch(e) {
+    resEl.innerHTML = `<div class="alert alert-error">❌ Error: ${e.message}</div>`;
+  }
+  btn.textContent = '📂 Import Folder'; btn.disabled = false;
+}
+
+// Enter key on path input
+document.getElementById('local-path-input') && document.getElementById('local-path-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') importLocalPath();
+});
+
+// ── Upload (files or folder) ──────────────────────────────────────────────
+const dropZone = document.getElementById('fm-drop-zone');
+const fileInput = document.getElementById('fm-file-input');
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  uploadFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', () => uploadFiles(fileInput.files));
+
+async function uploadFiles(fileList) {
+  if (!fileList.length) return;
+  const fd = new FormData();
+  Array.from(fileList).forEach(f => fd.append('files', f));
+
+  const progEl = document.getElementById('fm-upload-progress');
+  const fillEl = document.getElementById('fm-progress-fill');
+  const pctEl  = document.getElementById('fm-upload-pct');
+  const resEl  = document.getElementById('fm-upload-result');
+
+  progEl.style.display = 'block';
+  fillEl.style.width = '0%'; fillEl.style.transition = 'none';
+
+  try {
+    // Animate progress bar
+    let pct = 0;
+    const anim = setInterval(() => {
+      pct = Math.min(pct + 8, 85);
+      fillEl.style.width = pct + '%';
+      pctEl.textContent = pct + '%';
+    }, 120);
+
+    const r = await fetch('/api/files/upload', { method: 'POST', body: fd });
+    const data = await r.json();
+
+    clearInterval(anim);
+    fillEl.style.width = '100%'; pctEl.textContent = '100%';
+
+    setTimeout(() => { progEl.style.display = 'none'; fillEl.style.width = '0%'; }, 800);
+
+    if (data.success) {
+      resEl.innerHTML = `<div class="alert alert-success" style="margin:0">
+        ✅ <strong>${data.uploaded} file(s) uploaded successfully!</strong>
+        ${data.files ? '<br><small>' + data.files.join(', ') + '</small>' : ''}
+      </div>`;
+      refreshFileList();
+      fileInput.value = '';
+    } else {
+      resEl.innerHTML = `<div class="alert alert-error" style="margin:0">❌ ${data.error}</div>`;
+    }
+  } catch(err) {
+    progEl.style.display = 'none';
+    resEl.innerHTML = `<div class="alert alert-error" style="margin:0">❌ Upload failed: ${err.message}</div>`;
+  }
+  setTimeout(() => resEl.innerHTML = '', 5000);
+}
+
+// ── Download ZIP ───────────────────────────────────────────────────────────
+async function downloadZip() {
+  if (!allFiles.length) { alert('No files to download!'); return; }
+  const btn = document.getElementById('fm-download-zip');
+  btn.textContent = '⏳ Creating ZIP...'; btn.disabled = true;
+  try {
+    const r = await fetch('/api/files/download-zip', { method: 'POST' });
+    if (r.ok) {
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'collected_files.zip'; a.click();
+      URL.revokeObjectURL(url);
+    } else { alert('Failed to create ZIP'); }
+  } catch(e) { alert('Error: ' + e.message); }
+  btn.textContent = '⬇ Download All as ZIP'; btn.disabled = false;
+}
+
+// ── Delete file ────────────────────────────────────────────────────────────
+async function deleteFile(name) {
+  if (!confirm(`Delete "${name}"?`)) return;
+  try {
+    const r = await fetch(`/api/files/delete/${encodeURIComponent(name)}`, { method: 'DELETE' });
+    const data = await r.json();
+    if (data.success) refreshFileList();
+    else alert('Error: ' + data.error);
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ── Clear all ─────────────────────────────────────────────────────────────
+async function clearAllFiles() {
+  if (!allFiles.length) { alert('No files to clear!'); return; }
+  if (!confirm(`Delete ALL ${allFiles.length} file(s)? This cannot be undone.`)) return;
+  try {
+    const r = await fetch('/api/files/clear', { method: 'DELETE' });
+    const data = await r.json();
+    if (data.success) refreshFileList();
+    else alert('Error: ' + data.error);
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ── Filter & search live ───────────────────────────────────────────────────
+document.getElementById('fm-filter-type').addEventListener('change', renderFileList);
+document.getElementById('fm-search').addEventListener('input', renderFileList);
+
+// ── Load on page start ────────────────────────────────────────────────────
+refreshFileList();
+</script>
+{% endblock %}

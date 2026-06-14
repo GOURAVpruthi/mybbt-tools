@@ -1,0 +1,846 @@
+{% extends "base.html" %}
+{% block title %}PDF Tools — Corporate Tools Suite{% endblock %}
+{% block page_id %}pdf-tools{% endblock %}
+{% block topbar_title %}PDF Tools{% endblock %}
+{% block topbar_breadcrumb %}<span>Tools</span> › Complete PDF Toolkit{% endblock %}
+
+{% macro tool_upload(id, accept, multi) %}
+<div class="upload-zone-sm" id="{{ id }}-zone" onclick="document.getElementById('{{ id }}-input').click()">
+  <input type="file" id="{{ id }}-input" accept=".{{ accept }}" {% if multi %}multiple{% endif %} style="display:none">
+  <div style="font-size:28px;margin-bottom:8px">📄</div>
+  <p style="font-size:13px;margin:0">Drop PDF here or click to browse</p>
+</div>
+<div id="{{ id }}-selected" style="display:none;margin-top:8px" class="badge badge-success"></div>
+{% endmacro %}
+
+{% block content %}
+<div class="page-header">
+  <h1>📄 PDF Tools</h1>
+  <p>Complete PDF toolkit — everything you need in one place.</p>
+</div>
+
+<style>
+/* ── Tool Grid ── */
+.pdf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.pdf-tool-card {
+  background: var(--surface-1);
+  border: 2px solid var(--border-color);
+  border-radius: 14px;
+  padding: 22px 14px 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.pdf-tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--card-color, var(--primary));
+  transform: scaleX(0);
+  transition: transform 0.2s;
+}
+.pdf-tool-card:hover { transform: translateY(-3px); border-color: var(--card-color, var(--primary)); box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+.pdf-tool-card:hover::before { transform: scaleX(1); }
+.pdf-tool-card.active { border-color: var(--card-color, var(--primary)); background: var(--surface-2); }
+.pdf-tool-card.active::before { transform: scaleX(1); }
+.tool-icon { font-size: 32px; margin-bottom: 10px; display: block; }
+.tool-name { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.tool-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+
+/* ── Tool Panel ── */
+.tool-panel { display: none; animation: fadeIn .2s ease; }
+.tool-panel.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px) } to { opacity:1; transform:translateY(0) } }
+
+/* ── Upload zone small ── */
+.upload-zone-sm {
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+  background: var(--surface-2);
+}
+.upload-zone-sm:hover, .upload-zone-sm.drag-over {
+  border-color: var(--primary);
+  background: var(--surface-1);
+}
+
+/* ── Result ── */
+.result-box { margin-top: 16px; display: none; }
+.result-box.show { display: block; }
+
+/* ── Options row ── */
+.opts { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin: 14px 0; }
+.opt-group { display: flex; flex-direction: column; gap: 4px; }
+.opt-group label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+.opt-group select, .opt-group input {
+  padding: 7px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-size: 13px;
+  min-width: 120px;
+}
+/* ── Tabs ── */
+.tabs { display:flex; gap:6px; flex-wrap:wrap; }
+.tab-btn {
+  padding:6px 14px; border:1px solid var(--border-color);
+  border-radius:20px; background:var(--surface-2); color:var(--text-muted);
+  cursor:pointer; font-size:12px; font-weight:600; transition:all .2s;
+}
+.tab-btn:hover { border-color:var(--primary); color:var(--primary); }
+.tab-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+</style>
+
+<!-- ── Tool Cards Grid ──────────────────────────────────────────────── -->
+<div class="pdf-grid">
+  {% set tools = [
+    ('compress',      '🗜️',  'Compress',       'Reduce file size',           '#6c63ff'),
+    ('merge',         '🔗',  'Merge',          'Combine PDFs',                '#22c55e'),
+    ('split',         '✂️',  'Split',          'Divide into parts',           '#f59e0b'),
+    ('rotate',        '🔄',  'Rotate',         'Rotate pages',                '#3b82f6'),
+    ('to-images',     '🖼️',  'PDF → Images',   'Export pages as JPG/PNG',     '#ec4899'),
+    ('img-to-pdf',    '📸',  'Images → PDF',   'JPG/PNG to PDF',              '#8b5cf6'),
+    ('to-word',       '📝',  'PDF → Word',     'Convert to .docx',            '#2563eb'),
+    ('to-excel',      '📊',  'PDF → Excel',    'Extract tables to .xlsx',     '#059669'),
+    ('office-to-pdf', '💼',  'Office → PDF',   'Word/Excel/PPT to PDF',       '#7c3aed'),
+    ('html-to-pdf',   '🌐',  'HTML → PDF',     'Web page to PDF',             '#0891b2'),
+    ('page-nums',     '🔢',  'Page Numbers',   'Add page numbering',          '#14b8a6'),
+    ('watermark',     '💧',  'Watermark',      'Add text watermark',          '#6366f1'),
+    ('extract-text',  '📃',  'Extract Text',   'Get text from PDF',           '#f97316'),
+    ('repair',        '🔧',  'Repair PDF',     'Fix corrupted PDFs',          '#dc2626'),
+    ('flatten',       '📋',  'Flatten PDF',    'Remove forms/annotations',    '#78716c'),
+    ('protect',       '🔐',  'Protect',        'Add password',                '#ef4444'),
+    ('unlock',        '🔓',  'Unlock',         'Remove password',             '#22c55e'),
+    ('extract',       '📑',  'Extract Pages',  'Pick specific pages',         '#f97316'),
+    ('organize',      '🗂️',  'Organize',       'Reorder / delete pages',      '#6366f1'),
+  ] %}
+  {% for id, icon, name, desc, color in tools %}
+  <div class="pdf-tool-card {% if loop.first %}active{% endif %}"
+       style="--card-color:{{ color }}"
+       onclick="showTool('{{ id }}')" id="card-{{ id }}">
+    <span class="tool-icon">{{ icon }}</span>
+    <div class="tool-name">{{ name }}</div>
+    <div class="tool-desc">{{ desc }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ══ TOOL PANELS ═══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-body">
+
+    <!-- ── COMPRESS ── -->
+    <div class="tool-panel active" id="panel-compress">
+      <h3 style="margin:0 0 16px">🗜️ Compress PDF</h3>
+      {{ tool_upload('compress', 'pdf', False) }}
+      <div class="opts">
+        <div class="opt-group">
+          <label>Quality Level</label>
+          <select id="compress-quality">
+            <option value="high">High Quality (light compression)</option>
+            <option value="medium" selected>Balanced (recommended)</option>
+            <option value="low">Maximum Compression</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="compress-btn" onclick="runTool('compress')" disabled>🗜️ Compress PDF</button>
+      <div class="result-box" id="compress-result"></div>
+    </div>
+
+    <!-- ── MERGE ── -->
+    <div class="tool-panel" id="panel-merge">
+      <h3 style="margin:0 0 16px">🔗 Merge PDFs</h3>
+      <div class="upload-zone-sm" id="merge-zone" onclick="document.getElementById('merge-input').click()">
+        <input type="file" id="merge-input" accept=".pdf" multiple style="display:none">
+        <div style="font-size:28px;margin-bottom:8px">📎</div>
+        <p style="font-size:13px;margin:0">Drop PDFs or click • Select multiple files<br><small style="color:var(--text-muted)">Files will merge in the order selected</small></p>
+      </div>
+      <div id="merge-filelist" style="margin-top:10px;font-size:13px;color:var(--text-muted)"></div>
+      <button class="btn btn-primary" id="merge-btn" onclick="runMerge()" disabled style="margin-top:14px">🔗 Merge PDFs</button>
+      <div class="result-box" id="merge-result"></div>
+    </div>
+
+    <!-- ── SPLIT ── -->
+    <div class="tool-panel" id="panel-split">
+      <h3 style="margin:0 0 16px">✂️ Split PDF</h3>
+      {{ tool_upload('split', 'pdf', False) }}
+      <div class="opts">
+        <div class="opt-group">
+          <label>Split Mode</label>
+          <select id="split-mode" onchange="updateSplitMode()">
+            <option value="single">Every page separately</option>
+            <option value="every" selected>Every N pages</option>
+            <option value="range">Custom ranges</option>
+          </select>
+        </div>
+        <div class="opt-group" id="split-n-group">
+          <label>Pages per part</label>
+          <input type="number" id="split-every" value="1" min="1" max="999" style="width:80px">
+        </div>
+        <div class="opt-group" id="split-range-group" style="display:none">
+          <label>Page Ranges</label>
+          <input type="text" id="split-ranges" placeholder="1-3, 4-7, 8" style="width:200px">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="split-btn" onclick="runTool('split')" disabled>✂️ Split PDF</button>
+      <div class="result-box" id="split-result"></div>
+    </div>
+
+    <!-- ── ROTATE ── -->
+    <div class="tool-panel" id="panel-rotate">
+      <h3 style="margin:0 0 16px">🔄 Rotate Pages</h3>
+      {{ tool_upload('rotate', 'pdf', False) }}
+      <div class="opts">
+        <div class="opt-group">
+          <label>Rotation</label>
+          <select id="rotate-angle">
+            <option value="90">90° Clockwise</option>
+            <option value="270">90° Counter-clockwise</option>
+            <option value="180">180° (Upside down)</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label>Pages</label>
+          <input type="text" id="rotate-pages" value="all" placeholder="all  or  1,3  or  2-5" style="width:160px">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="rotate-btn" onclick="runTool('rotate')" disabled>🔄 Rotate PDF</button>
+      <div class="result-box" id="rotate-result"></div>
+    </div>
+
+    <!-- ── PDF → IMAGES ── -->
+    <div class="tool-panel" id="panel-to-images">
+      <h3 style="margin:0 0 16px">🖼️ PDF → Images</h3>
+      {{ tool_upload('to-images', 'pdf', False) }}
+      <div class="opts">
+        <div class="opt-group">
+          <label>Format</label>
+          <select id="toimg-format">
+            <option value="jpg">JPG (smaller size)</option>
+            <option value="png">PNG (better quality)</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label>Resolution (DPI)</label>
+          <select id="toimg-dpi">
+            <option value="96">96 DPI (screen)</option>
+            <option value="150" selected>150 DPI (standard)</option>
+            <option value="200">200 DPI (good)</option>
+            <option value="300">300 DPI (print quality)</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label>Pages</label>
+          <input type="text" id="toimg-pages" value="all" placeholder="all or 1-5" style="width:120px">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="to-images-btn" onclick="runTool('to-images')" disabled>🖼️ Convert to Images</button>
+      <div class="result-box" id="to-images-result"></div>
+    </div>
+
+    <!-- ── IMAGES → PDF ── -->
+    <div class="tool-panel" id="panel-img-to-pdf">
+      <h3 style="margin:0 0 16px">📸 Images → PDF</h3>
+      <div class="upload-zone-sm" id="imgpdf-zone" onclick="document.getElementById('imgpdf-input').click()">
+        <input type="file" id="imgpdf-input" accept=".jpg,.jpeg,.png,.bmp,.gif,.tiff,.webp" multiple style="display:none">
+        <div style="font-size:28px;margin-bottom:8px">🖼️</div>
+        <p style="font-size:13px;margin:0">Drop images or click<br><small style="color:var(--text-muted)">JPG, PNG, BMP, GIF, TIFF • Multiple files</small></p>
+      </div>
+      <div id="imgpdf-filelist" style="margin-top:10px;font-size:13px;color:var(--text-muted)"></div>
+      <button class="btn btn-primary" id="img-to-pdf-btn" onclick="runImgToPdf()" disabled style="margin-top:14px">📄 Create PDF</button>
+      <div class="result-box" id="img-to-pdf-result"></div>
+    </div>
+
+    <!-- ── PAGE NUMBERS ── -->
+    <div class="tool-panel" id="panel-page-nums">
+      <h3 style="margin:0 0 16px">🔢 Add Page Numbers</h3>
+      {{ tool_upload('page-nums', 'pdf', False) }}
+      <div class="opts">
+        <div class="opt-group">
+          <label>Position</label>
+          <select id="pgnum-position">
+            <option value="bottom-center" selected>Bottom Center</option>
+            <option value="bottom-left">Bottom Left</option>
+            <option value="bottom-right">Bottom Right</option>
+            <option value="top-center">Top Center</option>
+            <option value="top-left">Top Left</option>
+            <option value="top-right">Top Right</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label>Start From</label>
+          <input type="number" id="pgnum-start" value="1" min="0" max="9999" style="width:80px">
+        </div>
+        <div class="opt-group">
+          <label>Font Size</label>
+          <input type="number" id="pgnum-size" value="10" min="6" max="24" style="width:70px">
+        </div>
+        <div class="opt-group">
+          <label>Prefix</label>
+          <input type="text" id="pgnum-prefix" placeholder="Page " style="width:80px">
+        </div>
+        <div class="opt-group">
+          <label>Suffix</label>
+          <input type="text" id="pgnum-suffix" placeholder="" style="width:80px">
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Preview: <strong id="pgnum-preview">1</strong></div>
+      <button class="btn btn-primary" id="page-nums-btn" onclick="runTool('page-nums')" disabled>🔢 Add Page Numbers</button>
+      <div class="result-box" id="page-nums-result"></div>
+    </div>
+
+    <!-- ── PROTECT ── -->
+    <div class="tool-panel" id="panel-protect">
+      <h3 style="margin:0 0 16px">🔐 Protect PDF</h3>
+      {{ tool_upload('protect', 'pdf', False) }}
+      <div class="opts">
+        <div class="opt-group">
+          <label>Password</label>
+          <input type="password" id="protect-pass" placeholder="Enter password" style="width:200px">
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;margin:10px 0 16px;font-size:13px">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="protect-print" checked> Allow printing
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="protect-copy"> Allow copy/paste
+        </label>
+      </div>
+      <button class="btn btn-primary" id="protect-btn" onclick="runTool('protect')" disabled>🔐 Protect PDF</button>
+      <div class="result-box" id="protect-result"></div>
+    </div>
+
+    <!-- ── UNLOCK ── -->
+    <div class="tool-panel" id="panel-unlock">
+      <h3 style="margin:0 0 16px">🔓 Unlock PDF</h3>
+      {{ tool_upload('unlock', 'pdf', False) }}
+      <div class="opts">
+        <div class="opt-group">
+          <label>Password (if any)</label>
+          <input type="password" id="unlock-pass" placeholder="Leave blank if not needed" style="width:240px">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="unlock-btn" onclick="runTool('unlock')" disabled>🔓 Unlock / Remove Password</button>
+      <div class="result-box" id="unlock-result"></div>
+    </div>
+
+    <!-- ── EXTRACT ── -->
+    <div class="tool-panel" id="panel-extract">
+      <h3 style="margin:0 0 16px">📋 Extract Pages</h3>
+      {{ tool_upload('extract', 'pdf', False) }}
+      <div class="opts">
+        <div class="opt-group">
+          <label>Pages to Extract</label>
+          <input type="text" id="extract-pages" placeholder="1, 3, 5-8, 12" style="width:220px">
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">
+        Format: <code>1, 3, 5-8</code> → extracts pages 1, 3, and 5 through 8
+      </div>
+      <button class="btn btn-primary" id="extract-btn" onclick="runTool('extract')" disabled>📋 Extract Pages</button>
+      <div class="result-box" id="extract-result"></div>
+    </div>
+
+    <!-- ── ORGANIZE ── -->
+    <div class="tool-panel" id="panel-organize">
+      <h3 style="margin:0 0 16px">🗂️ Organize Pages</h3>
+      {{ tool_upload('organize', 'pdf', False) }}
+      <div class="opts">
+        <div class="opt-group">
+          <label>New Page Order</label>
+          <input type="text" id="organize-order" placeholder="3, 1, 2, 4" style="width:220px">
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">
+        Enter page numbers in desired order. Pages not mentioned will be <strong>deleted</strong>.<br>
+        Example: <code>3, 1, 2</code> → moves page 3 first, then 1, then 2 (page 4+ removed)
+      </div>
+      <button class="btn btn-primary" id="organize-btn" onclick="runTool('organize')" disabled>🗂️ Reorganize Pages</button>
+      <div class="result-box" id="organize-result"></div>
+    </div>
+
+    <!-- ── PDF → WORD ── -->
+    <div class="tool-panel" id="panel-to-word">
+      <h3 style="margin:0 0 4px">📝 PDF → Word (.docx)</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Converts PDF content to editable Word document. Tables and formatting are preserved where possible.</p>
+      {{ tool_upload('to-word', 'pdf', False) }}
+      <div style="background:#dbeafe;border-left:3px solid #2563eb;padding:10px 14px;border-radius:6px;font-size:12px;margin:14px 0;color:#1e40af">
+        ⏱️ This may take 1-2 minutes for large PDFs. Please be patient.
+      </div>
+      <button class="btn btn-primary" id="to-word-btn" onclick="runTool('to-word')" disabled>📝 Convert to Word</button>
+      <div class="result-box" id="to-word-result"></div>
+    </div>
+
+    <!-- ── PDF → EXCEL ── -->
+    <div class="tool-panel" id="panel-to-excel">
+      <h3 style="margin:0 0 4px">📊 PDF → Excel (.xlsx)</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Detects and extracts tables from PDF → Excel sheets. Each table gets its own sheet.</p>
+      {{ tool_upload('to-excel', 'pdf', False) }}
+      <button class="btn btn-primary" id="to-excel-btn" onclick="runTool('to-excel')" disabled style="margin-top:14px">📊 Extract Tables to Excel</button>
+      <div class="result-box" id="to-excel-result"></div>
+    </div>
+
+    <!-- ── OFFICE → PDF ── -->
+    <div class="tool-panel" id="panel-office-to-pdf">
+      <h3 style="margin:0 0 4px">💼 Word / Excel / PPT → PDF</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Converts Office documents to PDF using MS Office (installed on your PC).</p>
+      <div class="upload-zone-sm" id="office-to-pdf-zone" onclick="document.getElementById('office-to-pdf-input').click()">
+        <input type="file" id="office-to-pdf-input" accept=".doc,.docx,.xls,.xlsx,.ppt,.pptx,.rtf,.odt,.odp,.ods" style="display:none">
+        <div style="font-size:28px;margin-bottom:8px">💼</div>
+        <p style="font-size:13px;margin:0">Drop Office file here or click<br>
+          <small style="color:var(--text-muted)">Word (.doc/.docx) • Excel (.xls/.xlsx) • PowerPoint (.ppt/.pptx)</small>
+        </p>
+      </div>
+      <div id="office-to-pdf-selected" style="display:none;margin-top:8px" class="badge badge-success"></div>
+      <div style="background:#fef3c7;border-left:3px solid #f59e0b;padding:10px 14px;border-radius:6px;font-size:12px;margin:14px 0;color:#92400e">
+        ⚠️ Requires <strong>Microsoft Office</strong> installed on this PC. Works automatically via Office COM automation.
+      </div>
+      <button class="btn btn-primary" id="office-to-pdf-btn" onclick="runOfficeToPdf()" disabled>💼 Convert to PDF</button>
+      <div class="result-box" id="office-to-pdf-result"></div>
+    </div>
+
+    <!-- ── HTML → PDF ── -->
+    <div class="tool-panel" id="panel-html-to-pdf">
+      <h3 style="margin:0 0 4px">🌐 HTML → PDF</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Convert a website URL, HTML file, or HTML code directly to PDF.</p>
+      <div class="tabs" style="margin-bottom:16px">
+        <button class="tab-btn active" data-tab="tab-html-url">🔗 From URL</button>
+        <button class="tab-btn" data-tab="tab-html-file">📄 From File</button>
+        <button class="tab-btn" data-tab="tab-html-code">💻 From Code</button>
+      </div>
+      <div class="tab-content active" id="tab-html-url">
+        <div class="opt-group" style="margin-bottom:14px">
+          <label class="form-label">Website URL</label>
+          <input type="url" id="html-url" placeholder="https://example.com" style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--surface-2);color:var(--text-primary);font-size:14px">
+        </div>
+        <button class="btn btn-primary" onclick="runHtmlToPdf('url')">🌐 Convert URL to PDF</button>
+      </div>
+      <div class="tab-content" id="tab-html-file">
+        <div class="upload-zone-sm" id="html-file-zone" onclick="document.getElementById('html-file-input').click()">
+          <input type="file" id="html-file-input" accept=".html,.htm" style="display:none">
+          <div style="font-size:28px;margin-bottom:8px">📄</div>
+          <p style="font-size:13px;margin:0">Drop .html file here</p>
+        </div>
+        <div id="html-file-selected" style="display:none;margin-top:8px" class="badge badge-success"></div>
+        <button class="btn btn-primary" id="html-file-btn" onclick="runHtmlToPdf('file')" disabled style="margin-top:14px">📄 Convert HTML File</button>
+      </div>
+      <div class="tab-content" id="tab-html-code">
+        <textarea id="html-code" rows="8" placeholder="<html><body><h1>Hello</h1></body></html>"
+          style="width:100%;padding:10px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:var(--surface-2);color:var(--text-primary);font-size:13px;font-family:monospace;resize:vertical"></textarea>
+        <button class="btn btn-primary" onclick="runHtmlToPdf('text')" style="margin-top:10px">💻 Convert Code to PDF</button>
+      </div>
+      <div class="result-box" id="html-to-pdf-result"></div>
+    </div>
+
+    <!-- ── WATERMARK ── -->
+    <div class="tool-panel" id="panel-watermark">
+      <h3 style="margin:0 0 4px">💧 Add Watermark</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Add diagonal text watermark to your PDF pages.</p>
+      {{ tool_upload('watermark', 'pdf', False) }}
+      <div class="opts" style="margin-top:14px">
+        <div class="opt-group">
+          <label>Watermark Text</label>
+          <input type="text" id="wm-text" value="CONFIDENTIAL" style="width:200px">
+        </div>
+        <div class="opt-group">
+          <label>Color</label>
+          <select id="wm-color">
+            <option value="gray">Gray</option>
+            <option value="red">Red</option>
+            <option value="blue">Blue</option>
+            <option value="green">Green</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label>Opacity (0.1–1.0)</label>
+          <input type="number" id="wm-opacity" value="0.3" min="0.1" max="1" step="0.05" style="width:80px">
+        </div>
+        <div class="opt-group">
+          <label>Angle</label>
+          <input type="number" id="wm-angle" value="45" min="-180" max="180" style="width:70px">
+        </div>
+        <div class="opt-group">
+          <label>Font Size</label>
+          <input type="number" id="wm-size" value="48" min="12" max="120" style="width:70px">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="watermark-btn" onclick="runTool('watermark')" disabled>💧 Add Watermark</button>
+      <div class="result-box" id="watermark-result"></div>
+    </div>
+
+    <!-- ── EXTRACT TEXT ── -->
+    <div class="tool-panel" id="panel-extract-text">
+      <h3 style="margin:0 0 4px">📃 Extract Text from PDF</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Extract all readable text from PDF — download as TXT file.</p>
+      {{ tool_upload('extract-text', 'pdf', False) }}
+      <div class="opts" style="margin-top:14px">
+        <div class="opt-group">
+          <label>Output Format</label>
+          <select id="exttext-format">
+            <option value="txt">Plain Text (.txt)</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label>Pages</label>
+          <input type="text" id="exttext-pages" value="all" placeholder="all or 1-5" style="width:120px">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="extract-text-btn" onclick="runTool('extract-text')" disabled>📃 Extract Text</button>
+      <div class="result-box" id="extract-text-result"></div>
+    </div>
+
+    <!-- ── REPAIR ── -->
+    <div class="tool-panel" id="panel-repair">
+      <h3 style="margin:0 0 4px">🔧 Repair PDF</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Tries to fix corrupted, damaged, or malformed PDF files.</p>
+      {{ tool_upload('repair', 'pdf', False) }}
+      <div style="background:#fef3c7;border-left:3px solid #f59e0b;padding:10px 14px;border-radius:6px;font-size:12px;margin:14px 0;color:#92400e">
+        ⚠️ Works best for minor corruption. Severely damaged files may not be recoverable.
+      </div>
+      <button class="btn btn-primary" id="repair-btn" onclick="runTool('repair')" disabled>🔧 Repair PDF</button>
+      <div class="result-box" id="repair-result"></div>
+    </div>
+
+    <!-- ── FLATTEN ── -->
+    <div class="tool-panel" id="panel-flatten">
+      <h3 style="margin:0 0 4px">📋 Flatten PDF</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Removes all form fields, annotations, and interactive elements. Makes PDF static and non-editable.</p>
+      {{ tool_upload('flatten', 'pdf', False) }}
+      <button class="btn btn-primary" id="flatten-btn" onclick="runTool('flatten')" disabled style="margin-top:14px">📋 Flatten PDF</button>
+      <div class="result-box" id="flatten-result"></div>
+    </div>
+
+  </div><!-- card-body -->
+</div><!-- card -->
+
+
+
+<script>
+const activeFiles = {};   // toolId → File or File[]
+let currentTool = 'compress';
+
+// ── Tool switcher ─────────────────────────────────────────────────────────
+function showTool(id) {
+  document.querySelectorAll('.pdf-tool-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('card-' + id).classList.add('active');
+  document.getElementById('panel-' + id).classList.add('active');
+  currentTool = id;
+}
+
+// ── Single-file upload setup ───────────────────────────────────────────────
+['compress','split','rotate','to-images','page-nums','protect','unlock','extract','organize',
+ 'to-word','to-excel','watermark','extract-text','repair','flatten'].forEach(id => {
+  const zone  = document.getElementById(id + '-zone');
+  const input = document.getElementById(id + '-input');
+  const selEl = document.getElementById(id + '-selected');
+  const btn   = document.getElementById(id + '-btn');
+  if (!zone || !input) return;
+
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag-over');
+    setFile(id, e.dataTransfer.files[0]);
+  });
+  input.addEventListener('change', () => setFile(id, input.files[0]));
+});
+
+function setFile(id, file) {
+  if (!file) return;
+  activeFiles[id] = file;
+  const sel = document.getElementById(id + '-selected');
+  const btn = document.getElementById(id + '-btn');
+  if (sel) { sel.style.display = 'inline-block'; sel.textContent = `✅ ${file.name} (${fmtSize(file.size)})`; }
+  if (btn) btn.disabled = false;
+  updatePageNumPreview();
+}
+
+// ── Merge upload setup ────────────────────────────────────────────────────
+let mergeFiles = [];
+const mergeInput = document.getElementById('merge-input');
+const mergeZone  = document.getElementById('merge-zone');
+if (mergeZone) {
+  mergeZone.addEventListener('dragover', e => { e.preventDefault(); mergeZone.classList.add('drag-over'); });
+  mergeZone.addEventListener('dragleave', () => mergeZone.classList.remove('drag-over'));
+  mergeZone.addEventListener('drop', e => { e.preventDefault(); mergeZone.classList.remove('drag-over'); addMergeFiles(e.dataTransfer.files); });
+}
+if (mergeInput) mergeInput.addEventListener('change', () => addMergeFiles(mergeInput.files));
+
+function addMergeFiles(list) {
+  Array.from(list).filter(f => f.name.toLowerCase().endsWith('.pdf')).forEach(f => mergeFiles.push(f));
+  const fl = document.getElementById('merge-filelist');
+  const btn = document.getElementById('merge-btn');
+  if (mergeFiles.length > 0) {
+    fl.innerHTML = mergeFiles.map((f,i) => `<div style="padding:4px 0;border-bottom:1px solid var(--border-color)">
+      <span style="color:var(--text-muted);width:20px;display:inline-block">${i+1}.</span> ${f.name}
+      <span style="color:var(--text-muted);font-size:11px;margin-left:6px">${fmtSize(f.size)}</span>
+    </div>`).join('');
+    btn.disabled = mergeFiles.length < 2;
+    btn.textContent = mergeFiles.length < 2 ? '🔗 Add at least 2 PDFs' : `🔗 Merge ${mergeFiles.length} PDFs`;
+  }
+}
+
+async function runMerge() {
+  if (mergeFiles.length < 2) return;
+  const fd = new FormData();
+  mergeFiles.forEach(f => fd.append('files', f));
+  await submit('merge', fd, document.getElementById('merge-result'), document.getElementById('merge-btn'));
+}
+
+// ── Images → PDF setup ───────────────────────────────────────────────────
+let imgpdfFiles = [];
+const imgpdfInput = document.getElementById('imgpdf-input');
+const imgpdfZone  = document.getElementById('imgpdf-zone');
+if (imgpdfZone) {
+  imgpdfZone.addEventListener('dragover', e => { e.preventDefault(); imgpdfZone.classList.add('drag-over'); });
+  imgpdfZone.addEventListener('dragleave', () => imgpdfZone.classList.remove('drag-over'));
+  imgpdfZone.addEventListener('drop', e => { e.preventDefault(); imgpdfZone.classList.remove('drag-over'); addImgFiles(e.dataTransfer.files); });
+}
+if (imgpdfInput) imgpdfInput.addEventListener('change', () => addImgFiles(imgpdfInput.files));
+
+function addImgFiles(list) {
+  const exts = ['jpg','jpeg','png','bmp','gif','tiff','webp'];
+  Array.from(list).filter(f => exts.some(e => f.name.toLowerCase().endsWith('.' + e))).forEach(f => imgpdfFiles.push(f));
+  const fl = document.getElementById('imgpdf-filelist');
+  const btn = document.getElementById('img-to-pdf-btn');
+  if (imgpdfFiles.length > 0) {
+    fl.innerHTML = `<div style="font-size:13px;color:var(--text-muted)">${imgpdfFiles.length} image(s): ${imgpdfFiles.map(f=>f.name).join(', ')}</div>`;
+    btn.disabled = false;
+    btn.textContent = `📄 Create PDF from ${imgpdfFiles.length} Image(s)`;
+  }
+}
+
+async function runImgToPdf() {
+  if (!imgpdfFiles.length) return;
+  const fd = new FormData();
+  imgpdfFiles.forEach(f => fd.append('files', f));
+  await submit('img-to-pdf', fd, document.getElementById('img-to-pdf-result'), document.getElementById('img-to-pdf-btn'));
+}
+
+// ── Split mode UI ──────────────────────────────────────────────────────────
+function updateSplitMode() {
+  const mode = document.getElementById('split-mode').value;
+  document.getElementById('split-n-group').style.display    = mode === 'every' ? '' : 'none';
+  document.getElementById('split-range-group').style.display = mode === 'range' ? '' : 'none';
+}
+
+// ── Page number preview ────────────────────────────────────────────────────
+function updatePageNumPreview() {
+  const pre = document.getElementById('pgnum-prefix') ? document.getElementById('pgnum-prefix').value : '';
+  const suf = document.getElementById('pgnum-suffix') ? document.getElementById('pgnum-suffix').value : '';
+  const st  = document.getElementById('pgnum-start')  ? document.getElementById('pgnum-start').value  : '1';
+  const el  = document.getElementById('pgnum-preview');
+  if (el) el.textContent = `${pre}${st}${suf}`;
+}
+['pgnum-prefix','pgnum-suffix','pgnum-start'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', updatePageNumPreview);
+});
+
+// ── Generic run ───────────────────────────────────────────────────────────
+async function runTool(id) {
+  const file = activeFiles[id];
+  if (!file) return;
+  const fd = new FormData();
+  fd.append('file', file);
+
+  // Extra params per tool
+  if (id === 'compress')   fd.append('quality',  document.getElementById('compress-quality').value);
+  if (id === 'split') {
+    fd.append('mode',    document.getElementById('split-mode').value);
+    fd.append('every_n', document.getElementById('split-every').value);
+    fd.append('ranges',  document.getElementById('split-ranges').value);
+  }
+  if (id === 'rotate') {
+    fd.append('angle', document.getElementById('rotate-angle').value);
+    fd.append('pages', document.getElementById('rotate-pages').value);
+  }
+  if (id === 'to-images') {
+    fd.append('format', document.getElementById('toimg-format').value);
+    fd.append('dpi',    document.getElementById('toimg-dpi').value);
+    fd.append('pages',  document.getElementById('toimg-pages').value);
+  }
+  if (id === 'page-nums') {
+    fd.append('position',   document.getElementById('pgnum-position').value);
+    fd.append('start_from', document.getElementById('pgnum-start').value);
+    fd.append('font_size',  document.getElementById('pgnum-size').value);
+    fd.append('prefix',     document.getElementById('pgnum-prefix').value);
+    fd.append('suffix',     document.getElementById('pgnum-suffix').value);
+  }
+  if (id === 'protect') {
+    fd.append('password',    document.getElementById('protect-pass').value);
+    fd.append('allow_print', document.getElementById('protect-print').checked);
+    fd.append('allow_copy',  document.getElementById('protect-copy').checked);
+  }
+  if (id === 'unlock') fd.append('password', document.getElementById('unlock-pass').value);
+  if (id === 'extract') fd.append('pages', document.getElementById('extract-pages').value);
+  if (id === 'organize') fd.append('order', document.getElementById('organize-order').value);
+
+  if (id === 'watermark') {
+    fd.append('text',      document.getElementById('wm-text').value || 'CONFIDENTIAL');
+    fd.append('color',     document.getElementById('wm-color').value);
+    fd.append('opacity',   document.getElementById('wm-opacity').value);
+    fd.append('angle',     document.getElementById('wm-angle').value);
+    fd.append('font_size', document.getElementById('wm-size').value);
+  }
+  if (id === 'extract-text') {
+    fd.append('format', document.getElementById('exttext-format').value);
+    fd.append('pages',  document.getElementById('exttext-pages').value);
+  }
+
+  const apiMap = {
+    'compress': '/api/pdf/compress', 'split': '/api/pdf/split',
+    'rotate': '/api/pdf/rotate', 'to-images': '/api/pdf/to-images',
+    'page-nums': '/api/pdf/page-numbers', 'protect': '/api/pdf/protect',
+    'unlock': '/api/pdf/unlock', 'extract': '/api/pdf/extract',
+    'organize': '/api/pdf/organize',
+    'to-word': '/api/pdf/to-word', 'to-excel': '/api/pdf/to-excel',
+    'watermark': '/api/pdf/watermark', 'extract-text': '/api/pdf/extract-text',
+    'repair': '/api/pdf/repair', 'flatten': '/api/pdf/flatten',
+  };
+  const resEl = document.getElementById(id + '-result');
+  const btn   = document.getElementById(id + '-btn');
+  await submit(id, fd, resEl, btn, apiMap[id]);
+}
+
+// ── Submit + display ───────────────────────────────────────────────────────
+async function submit(id, fd, resEl, btn, apiUrl) {
+  apiUrl = apiUrl || `/api/pdf/${id}`;
+  const origLabel = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Processing...'; }
+  resEl.innerHTML = ''; resEl.classList.remove('show');
+
+  try {
+    const r = await fetch(apiUrl, { method: 'POST', body: fd });
+    const data = await r.json();
+    if (btn) { btn.disabled = false; btn.textContent = origLabel; }
+
+    if (data.success) {
+      const dlUrl = data.download_url || `/api/pdf/download/${data.filename}`;
+      let extra = '';
+      if (data.reduction)         extra += `<br>📉 Reduced by <strong>${data.reduction}%</strong>`;
+      if (data.original_size_str) extra += ` &nbsp;(${data.original_size_str} → ${data.compressed_size_str})`;
+      if (data.total_pages)       extra += `<br>📄 Pages: <strong>${data.total_pages}</strong>`;
+      if (data.parts)             extra += `<br>📦 Parts created: <strong>${data.parts}</strong>`;
+      if (data.pages_rotated)     extra += `<br>🔄 Pages rotated: <strong>${data.pages_rotated}</strong>`;
+      if (data.pages_converted)   extra += `<br>🖼️ Images created: <strong>${data.pages_converted}</strong>`;
+      if (data.pages_extracted)   extra += `<br>📋 Pages extracted: <strong>${data.pages_extracted}</strong>`;
+
+      resEl.innerHTML = `<div class="alert alert-success">
+        ✅ <strong>${data.message}</strong>${extra}<br><br>
+        <a href="${dlUrl}" class="btn btn-primary btn-sm">⬇ Download</a>
+      </div>`;
+    } else {
+      resEl.innerHTML = `<div class="alert alert-error">❌ <strong>Error:</strong> ${data.error}</div>`;
+    }
+    resEl.classList.add('show');
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = origLabel; }
+    resEl.innerHTML = `<div class="alert alert-error">❌ Network error: ${e.message}</div>`;
+    resEl.classList.add('show');
+  }
+}
+
+function fmtSize(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+  return (b/1024/1024).toFixed(2) + ' MB';
+}
+
+// ── Office → PDF upload ───────────────────────────────────────────────────
+const officeInput = document.getElementById('office-to-pdf-input');
+if (officeInput) {
+  officeInput.addEventListener('change', () => {
+    const f = officeInput.files[0];
+    if (!f) return;
+    activeFiles['office-to-pdf'] = f;
+    document.getElementById('office-to-pdf-selected').style.display = 'inline-block';
+    document.getElementById('office-to-pdf-selected').textContent = `✅ ${f.name} (${fmtSize(f.size)})`;
+    document.getElementById('office-to-pdf-btn').disabled = false;
+  });
+  const officeZone = document.getElementById('office-to-pdf-zone');
+  officeZone.addEventListener('dragover', e => { e.preventDefault(); officeZone.classList.add('drag-over'); });
+  officeZone.addEventListener('dragleave', () => officeZone.classList.remove('drag-over'));
+  officeZone.addEventListener('drop', e => {
+    e.preventDefault(); officeZone.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (!f) return;
+    activeFiles['office-to-pdf'] = f;
+    document.getElementById('office-to-pdf-selected').style.display = 'inline-block';
+    document.getElementById('office-to-pdf-selected').textContent = `✅ ${f.name}`;
+    document.getElementById('office-to-pdf-btn').disabled = false;
+  });
+}
+
+async function runOfficeToPdf() {
+  const file = activeFiles['office-to-pdf'];
+  if (!file) return;
+  const fd = new FormData();
+  fd.append('file', file);
+  const resEl = document.getElementById('office-to-pdf-result');
+  const btn   = document.getElementById('office-to-pdf-btn');
+  await submit('office-to-pdf', fd, resEl, btn, '/api/pdf/office-to-pdf');
+}
+
+// ── HTML → PDF handlers ───────────────────────────────────────────────────
+const htmlFileInput = document.getElementById('html-file-input');
+if (htmlFileInput) {
+  htmlFileInput.addEventListener('change', () => {
+    const f = htmlFileInput.files[0];
+    if (!f) return;
+    activeFiles['html-file'] = f;
+    document.getElementById('html-file-selected').style.display = 'inline-block';
+    document.getElementById('html-file-selected').textContent = `✅ ${f.name}`;
+    document.getElementById('html-file-btn').disabled = false;
+  });
+}
+
+async function runHtmlToPdf(mode) {
+  const resEl = document.getElementById('html-to-pdf-result');
+  const fd = new FormData();
+  fd.append('mode', mode);
+  if (mode === 'url') {
+    const url = document.getElementById('html-url').value.trim();
+    if (!url) { alert('Enter a URL!'); return; }
+    fd.append('url', url);
+  } else if (mode === 'file') {
+    const file = activeFiles['html-file'];
+    if (!file) { alert('Select an HTML file!'); return; }
+    fd.append('file', file);
+  } else {
+    const html = document.getElementById('html-code').value.trim();
+    if (!html) { alert('Enter HTML code!'); return; }
+    fd.append('html', html);
+  }
+  await submit('html-to-pdf', fd, resEl, null, '/api/pdf/html-to-pdf');
+}
+
+// ── Tabs for HTML→PDF ─────────────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const panel = btn.closest('.tool-panel');
+    panel.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    panel.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+</script>
+{% endblock %}

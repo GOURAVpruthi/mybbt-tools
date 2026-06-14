@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Excel Consolidator — Corporate Tools Suite{% endblock %}
+{% block page_id %}excel-tools{% endblock %}
+{% block topbar_title %}Excel Consolidator{% endblock %}
+{% block topbar_breadcrumb %}<span>Document Tools</span> › Excel File Consolidator{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>📊 Excel Consolidator</h1>
+  <p>Merge multiple Excel (.xlsx, .xls) and CSV files into one consolidated report with formatted headers.</p>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" class="excel-grid">
+  <!-- Upload -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Upload Files</h2>
+      <span class="badge badge-primary">Excel &amp; CSV</span>
+    </div>
+    <div class="card-body">
+      <div class="upload-zone" id="excel-zone">
+        <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" multiple>
+        <div class="upload-zone-icon">📊</div>
+        <h3>Drop Excel / CSV files here</h3>
+        <p>Supports .xlsx, .xls, .csv formats</p>
+      </div>
+      <div class="file-list" id="excel-file-list" style="margin-top:16px;max-height:280px;overflow-y:auto"></div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div class="card">
+    <div class="card-header"><h2>Consolidation Settings</h2></div>
+    <div class="card-body">
+      <div class="form-group">
+        <label class="form-label" for="consolidate-mode">Merge Mode</label>
+        <select class="form-control form-select" id="consolidate-mode">
+          <option value="append">Stack Rows (Append all into one sheet)</option>
+          <option value="separate_sheets">Separate Sheets (each file = one sheet)</option>
+        </select>
+        <div class="form-hint">
+          <strong>Stack Rows:</strong> All data combined into a single sheet.<br>
+          <strong>Separate Sheets:</strong> Each file becomes its own sheet tab.
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:14px;font-size:13px;margin-bottom:16px">
+        <strong>✨ Output features:</strong>
+        <ul style="margin-top:8px;padding-left:16px;list-style:disc;color:var(--text-muted);line-height:1.9">
+          <li>Blue formatted header row</li>
+          <li>Auto-sized columns</li>
+          <li>Source file column added</li>
+          <li>Professional Excel output</li>
+        </ul>
+      </div>
+
+      <div id="excel-progress" style="display:none;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text-muted)">Consolidating...</div>
+        <div class="progress"><div class="progress-bar"></div></div>
+      </div>
+
+      <button class="btn btn-primary btn-lg" id="excel-consolidate-btn" disabled style="width:100%">
+        📊 Consolidate Files
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Result -->
+<div class="result-box" id="excel-result" style="margin-top:20px"></div>
+
+<!-- How it works -->
+<div class="card" style="margin-top:20px">
+  <div class="card-header"><h2>📖 How It Works</h2></div>
+  <div class="card-body">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px">
+      <div style="text-align:center;padding:16px">
+        <div style="font-size:32px;margin-bottom:8px">1️⃣</div>
+        <strong style="font-size:13px">Upload Files</strong>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:4px">Drag & drop your Excel or CSV files</p>
+      </div>
+      <div style="text-align:center;padding:16px">
+        <div style="font-size:32px;margin-bottom:8px">2️⃣</div>
+        <strong style="font-size:13px">Choose Mode</strong>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:4px">Stack rows together or separate sheets</p>
+      </div>
+      <div style="text-align:center;padding:16px">
+        <div style="font-size:32px;margin-bottom:8px">3️⃣</div>
+        <strong style="font-size:13px">Consolidate</strong>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:4px">Click the button to process</p>
+      </div>
+      <div style="text-align:center;padding:16px">
+        <div style="font-size:32px;margin-bottom:8px">4️⃣</div>
+        <strong style="font-size:13px">Download</strong>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:4px">Get your formatted Excel report</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+@media (max-width: 640px) { .excel-grid { grid-template-columns: 1fr !important; } }
+</style>
+{% endblock %}

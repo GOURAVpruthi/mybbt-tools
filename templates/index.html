@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — Corporate Tools Suite{% endblock %}
+{% block page_id %}dashboard{% endblock %}
+{% block topbar_title %}Dashboard{% endblock %}
+{% block topbar_breadcrumb %}Welcome back! All your tools are ready.{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<div class="hero">
+  <div class="hero-content">
+    <h1>⚙️ Corporate Tools Suite</h1>
+    <p>A complete productivity platform for corporate and GST professionals. Process files, reconcile GST returns, compress PDFs, and consolidate Excel sheets — all in one place.</p>
+    <div class="hero-chips">
+      <span class="hero-chip">📁 File Manager</span>
+      <span class="hero-chip">🗜️ PDF Tools</span>
+      <span class="hero-chip">📊 Excel Consolidator</span>
+      <span class="hero-chip">🧾 GSTR-1 / 2B / 3B</span>
+      <span class="hero-chip">📋 GSTR-9 / 9C</span>
+      <span class="hero-chip">🔄 PR vs 2B Reco</span>
+    </div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon blue">📁</div>
+    <div class="stat-info">
+      <div class="stat-value">10+</div>
+      <div class="stat-label">Professional Tools</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">🔒</div>
+    <div class="stat-info">
+      <div class="stat-value">100%</div>
+      <div class="stat-label">Secure & Private</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">⚡</div>
+    <div class="stat-info">
+      <div class="stat-value">Fast</div>
+      <div class="stat-label">Local Processing</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red">🇮🇳</div>
+    <div class="stat-info">
+      <div class="stat-value">GST</div>
+      <div class="stat-label">India Compliant</div>
+    </div>
+  </div>
+</div>
+
+<!-- Section: File & Document Tools -->
+<div class="page-header">
+  <h2 style="font-size:16px;font-weight:700;margin-bottom:4px">📂 File & Document Tools</h2>
+  <p style="font-size:13px;color:var(--text-muted)">Manage, compress, merge and consolidate your files easily</p>
+</div>
+
+<div class="tools-grid">
+  <a href="/file-manager" style="text-decoration:none">
+    <div class="tool-card">
+      <div class="tool-card-icon" style="background:#dbeafe">📁</div>
+      <h3>File Manager</h3>
+      <p>Upload, organize, batch collect and download files. Supports all file types with drag & drop.</p>
+      <div class="tool-card-footer">
+        <span class="tool-tag">File Tool</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="/pdf-tools" style="text-decoration:none">
+    <div class="tool-card">
+      <div class="tool-card-icon" style="background:#fee2e2">🗜️</div>
+      <h3>PDF Compressor</h3>
+      <p>Reduce PDF file sizes without losing quality. Choose from low, medium, or high compression.</p>
+      <div class="tool-card-footer">
+        <span class="tool-tag">PDF Tool</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="/pdf-tools#merge" style="text-decoration:none">
+    <div class="tool-card">
+      <div class="tool-card-icon" style="background:#fee2e2">🔗</div>
+      <h3>PDF Merger</h3>
+      <p>Combine multiple PDF documents into a single file. Preserves all pages and formatting.</p>
+      <div class="tool-card-footer">
+        <span class="tool-tag">PDF Tool</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="/excel-tools" style="text-decoration:none">
+    <div class="tool-card">
+      <div class="tool-card-icon" style="background:#d1fae5">📊</div>
+      <h3>Excel Consolidator</h3>
+      <p>Merge multiple Excel and CSV files into one consolidated report with formatted headers.</p>
+      <div class="tool-card-footer">
+        <span class="tool-tag">Excel Tool</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </div>
+  </a>
+</div>
+
+<!-- Section: GST Tools -->
+<div class="page-header" style="margin-top:8px">
+  <h2 style="font-size:16px;font-weight:700;margin-bottom:4px">🧾 GST Tools</h2>
+  <p style="font-size:13px;color:var(--text-muted)">Complete GST return processing and reconciliation tools for Indian businesses</p>
+</div>
+
+<div class="tools-grid">
+  <a href="/gst-tools?tab=gstr1" style="text-decoration:none">
+    <div class="tool-card">
+      <div class="tool-card-icon" style="background:#e0e7ff">📋</div>
+      <h3>GSTR-1 Processor</h3>
+      <p>Process outward supply data and generate GSTR-1 format reports for filing.</p>
+      <div class="tool-card-footer">
+        <span class="tool-tag">GST Tool</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="/gst-tools?tab=gstr2b" style="text-decoration:none">
+    <div class="tool-card">
+      <div class="tool-card-icon" style="background:#fef3c7">🔄</div>
+      <h3>GSTR-2B Reconciliation</h3>
+      <p>Match your purchase register against GSTR-2B data. Identify matched, unmatched records.</p>
+      <div class="tool-card-footer">
+        <span class="tool-tag">GST Reco</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="/gst-tools?tab=gstr3b" style="text-decoration:none">
+    <div class="tool-card">
+      <div class="tool-card-icon" style="background:#d1fae5">📝</div>
+      <h3>GSTR-3B Processor</h3>
+      <p>Compute GSTR-3B summary values from your data. Generate tax liability report.</p>
+      <div class="tool-card-footer">
+        <span class="tool-tag">GST Tool</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="/gst-tools?tab=gstr9" style="text-decoration:none">
+    <div class="tool-card">
+      <div class="tool-card-icon" style="background:#f5f3ff">📑</div>
+      <h3>GSTR-9 / 9C Annual</h3>
+      <p>Process annual return data for GSTR-9 and reconciliation statement GSTR-9C.</p>
+      <div class="tool-card-footer">
+        <span class="tool-tag">Annual Return</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="/gst-tools?tab=pr2b" style="text-decoration:none">
+    <div class="tool-card">
+      <div class="tool-card-icon" style="background:#fce7f3">📊</div>
+      <h3>PR vs 2B Reconciliation</h3>
+      <p>Detailed Purchase Register vs GSTR-2B comparison with color-coded mismatch report.</p>
+      <div class="tool-card-footer">
+        <span class="tool-tag">Detailed Reco</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </div>
+  </a>
+
+  <a href="/gst-tools?tab=portal" style="text-decoration:none">
+    <div class="tool-card">
+      <div class="tool-card-icon" style="background:#fef3c7">🌐</div>
+      <h3>GST Portal Helper</h3>
+      <p>Quick access links to GST portal modules. Login, download, and filing shortcuts.</p>
+      <div class="tool-card-footer">
+        <span class="tool-tag">Portal</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </div>
+  </a>
+</div>
+
+{% endblock %}
