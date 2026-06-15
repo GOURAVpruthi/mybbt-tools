@@ -328,6 +328,10 @@ select:focus{border-color:var(--red)}
           <div class="tool-icon ic-green">📊</div>
           <div class="tool-info"><div class="tool-name">PDF to Excel</div><div class="tool-desc">PDF → XLSX</div></div>
         </div>
+        <div class="tool-card" onclick="openTool('pdf-to-pptx')">
+          <div class="tool-icon ic-green">🖥️</div>
+          <div class="tool-info"><div class="tool-name">PDF to PowerPoint</div><div class="tool-desc">PDF → PPTX</div></div>
+        </div>
         <div class="tool-card" onclick="openTool('extract-text')">
           <div class="tool-icon ic-green">📃</div>
           <div class="tool-info"><div class="tool-name">Extract Text</div><div class="tool-desc">Get text from PDF</div></div>
@@ -347,6 +351,18 @@ select:focus{border-color:var(--red)}
           <div class="tool-icon ic-purple">💧</div>
           <div class="tool-info"><div class="tool-name">Add Watermark</div><div class="tool-desc">Stamp text on pages</div></div>
         </div>
+        <div class="tool-card" onclick="openTool('sign')">
+          <div class="tool-icon ic-purple">✍️</div>
+          <div class="tool-info"><div class="tool-name">Sign PDF</div><div class="tool-desc">Draw &amp; embed signature</div></div>
+        </div>
+        <div class="tool-card" onclick="openTool('redact')">
+          <div class="tool-icon ic-purple">⬛</div>
+          <div class="tool-info"><div class="tool-name">Redact PDF</div><div class="tool-desc">Black out text</div></div>
+        </div>
+        <div class="tool-card" onclick="openTool('compare')">
+          <div class="tool-icon ic-purple">🔍</div>
+          <div class="tool-info"><div class="tool-name">Compare PDF</div><div class="tool-desc">Side-by-side diff</div></div>
+        </div>
       </div>
     </div>
 
@@ -362,6 +378,24 @@ select:focus{border-color:var(--red)}
           <div class="tool-icon ic-teal">🔐</div>
           <div class="tool-info"><div class="tool-name">Protect PDF</div><div class="tool-desc">Add password</div></div>
         </div>
+      </div>
+    </div>
+
+    <!-- PDF INTELLIGENCE -->
+    <div class="category-section">
+      <div class="category-title">PDF Intelligence</div>
+      <div class="tools-grid">
+        <div class="tool-card" onclick="openTool('ai-summarize')">
+          <div class="tool-icon" style="background:#fdf4ff;color:#9333ea">🤖</div>
+          <div class="tool-info"><div class="tool-name">AI Summarizer</div><div class="tool-desc">Gemini AI summary</div></div>
+        </div>
+        <div class="tool-card" onclick="openTool('translate')">
+          <div class="tool-icon" style="background:#fdf4ff;color:#9333ea">🌐</div>
+          <div class="tool-info"><div class="tool-name">Translate PDF</div><div class="tool-desc">100+ languages</div></div>
+        </div>
+      </div>
+    </div>
+
       </div>
     </div>
 
@@ -872,6 +906,15 @@ select:focus{border-color:var(--red)}
 // ── Tool metadata ─────────────────────────────────────────
 const TOOLS = {
   'scan-to-pdf': {title:'Scan to PDF',   tpl:'tpl-scan-to-pdf'},
+  'ocr':         {title:'OCR PDF',        tpl:'tpl-ocr'},
+  'crop':        {title:'Crop PDF',       tpl:'tpl-crop'},
+  'sign':        {title:'Sign PDF',       tpl:'tpl-sign'},
+  'redact':      {title:'Redact PDF',     tpl:'tpl-redact'},
+  'compare':     {title:'Compare PDF',    tpl:'tpl-compare'},
+  'pdf-to-pptx': {title:'PDF to PowerPoint', tpl:'tpl-pdf-to-pptx'},
+  'to-pdfa':     {title:'PDF to PDF/A',  tpl:'tpl-to-pdfa'},
+  'ai-summarize':{title:'AI Summarizer', tpl:'tpl-ai-summarize'},
+  'translate':   {title:'Translate PDF', tpl:'tpl-translate'},
   'compress':    {title:'Compress PDF',   tpl:'tpl-compress'},
   'merge':       {title:'Merge PDF',      tpl:'tpl-merge'},
   'split':       {title:'Split PDF',      tpl:'tpl-split'},
@@ -1658,6 +1701,344 @@ async function scanGenerate() {
   }
 }
 </script>
+
+
+<!-- ══ OCR PDF ══ -->
+<template id="tpl-ocr">
+  <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:6px">OCR PDF</h2>
+  <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:24px">Extract text from scanned PDFs using Optical Character Recognition.</p>
+  <div class="upload-zone" id="ocr-zone" onclick="document.getElementById('ocr-file').click()">
+    <input type="file" id="ocr-file" accept=".pdf" style="display:none" onchange="handleSingleFile(this,'ocr-zone','ocr-name')"/>
+    <div class="upload-icon">🔍</div>
+    <div class="upload-text">Drop your scanned PDF here</div>
+    <div class="upload-sub">or click to browse</div>
+    <div id="ocr-name" class="upload-filename"></div>
+  </div>
+  <button class="action-btn" onclick="runTool('ocr','/api/pdf/ocr',{},true)">🔍 Extract Text with OCR</button>
+  <div class="result-box" id="result-ocr">
+    <div id="ocr-preview" style="display:none;margin-top:12px;padding:14px;background:var(--gray-50);border-radius:8px;
+      font-family:monospace;font-size:.8rem;white-space:pre-wrap;max-height:200px;overflow-y:auto;border:1px solid var(--gray-200)"></div>
+  </div>
+</template>
+
+<!-- ══ CROP PDF ══ -->
+<template id="tpl-crop">
+  <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:6px">Crop PDF</h2>
+  <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:24px">Remove white margins from all pages. Values in points (72pt = 1 inch).</p>
+  <div class="upload-zone" id="crop-zone" onclick="document.getElementById('crop-file').click()">
+    <input type="file" id="crop-file" accept=".pdf" style="display:none" onchange="handleSingleFile(this,'crop-zone','crop-name')"/>
+    <div class="upload-icon">✂️</div>
+    <div class="upload-text">Drop PDF here</div>
+    <div id="crop-name" class="upload-filename"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0">
+    <div><label style="font-size:.8rem;font-weight:600;color:var(--gray-600)">Top (pt)</label>
+      <input type="number" id="crop-top" value="0" min="0" max="200"
+        style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--gray-300);border-radius:6px;font-size:.9rem"/></div>
+    <div><label style="font-size:.8rem;font-weight:600;color:var(--gray-600)">Bottom (pt)</label>
+      <input type="number" id="crop-bottom" value="0" min="0" max="200"
+        style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--gray-300);border-radius:6px;font-size:.9rem"/></div>
+    <div><label style="font-size:.8rem;font-weight:600;color:var(--gray-600)">Left (pt)</label>
+      <input type="number" id="crop-left" value="0" min="0" max="200"
+        style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--gray-300);border-radius:6px;font-size:.9rem"/></div>
+    <div><label style="font-size:.8rem;font-weight:600;color:var(--gray-600)">Right (pt)</label>
+      <input type="number" id="crop-right" value="0" min="0" max="200"
+        style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--gray-300);border-radius:6px;font-size:.9rem"/></div>
+  </div>
+  <p style="font-size:.78rem;color:var(--gray-400);margin-bottom:12px">💡 Tip: 36pt = 0.5 inch, 72pt = 1 inch</p>
+  <button class="action-btn" onclick="runTool('crop','/api/pdf/crop',{
+    top:document.getElementById('crop-top').value,
+    bottom:document.getElementById('crop-bottom').value,
+    left:document.getElementById('crop-left').value,
+    right:document.getElementById('crop-right').value
+  },true)">✂️ Crop PDF</button>
+  <div class="result-box" id="result-crop"></div>
+</template>
+
+<!-- ══ SIGN PDF ══ -->
+<template id="tpl-sign">
+  <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:6px">Sign PDF</h2>
+  <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:20px">Draw your signature and embed it into your PDF.</p>
+  <div class="upload-zone" id="sign-zone" onclick="document.getElementById('sign-file').click()">
+    <input type="file" id="sign-file" accept=".pdf" style="display:none" onchange="handleSingleFile(this,'sign-zone','sign-name')"/>
+    <div class="upload-icon">📄</div><div class="upload-text">Drop PDF here</div>
+    <div id="sign-name" class="upload-filename"></div>
+  </div>
+  <div style="margin:16px 0">
+    <p style="font-size:.85rem;font-weight:600;color:var(--gray-700);margin-bottom:8px">Draw your signature below:</p>
+    <canvas id="sig-canvas" width="560" height="150"
+      style="border:2px solid var(--gray-300);border-radius:8px;cursor:crosshair;background:#fff;width:100%;touch-action:none"></canvas>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button onclick="clearSig()" style="padding:6px 14px;border:1px solid var(--gray-300);border-radius:6px;
+        background:#fff;cursor:pointer;font-size:.8rem;color:var(--gray-600)">🗑️ Clear</button>
+      <select id="sig-color" style="padding:6px 10px;border:1px solid var(--gray-300);border-radius:6px;font-size:.8rem">
+        <option value="#1a1a2e">Black</option><option value="#1a56db">Blue</option>
+        <option value="#e2192c">Red</option><option value="#16a34a">Green</option>
+      </select>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+    <div><label style="font-size:.8rem;font-weight:600;color:var(--gray-600)">Position</label>
+      <select id="sig-pos" style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--gray-300);border-radius:6px;font-size:.85rem">
+        <option value="bottom-right">Bottom Right</option>
+        <option value="bottom-left">Bottom Left</option>
+        <option value="bottom-center">Bottom Center</option>
+        <option value="top-right">Top Right</option>
+        <option value="top-left">Top Left</option>
+      </select></div>
+    <div><label style="font-size:.8rem;font-weight:600;color:var(--gray-600)">Page Number</label>
+      <input type="number" id="sig-page" placeholder="Last page" min="1"
+        style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--gray-300);border-radius:6px;font-size:.9rem"/></div>
+  </div>
+  <button class="action-btn" onclick="applySig()">✍️ Apply Signature</button>
+  <div class="result-box" id="result-sign"></div>
+  <script>
+  (function(){
+    let drawing=false, ctx, lx=0, ly=0;
+    function initCanvas(){
+      const c=document.getElementById('sig-canvas');
+      if(!c)return;
+      ctx=c.getContext('2d');
+      ctx.lineCap='round'; ctx.lineJoin='round'; ctx.lineWidth=2.5;
+      c.addEventListener('mousedown',e=>{drawing=true;[lx,ly]=getPos(c,e)});
+      c.addEventListener('mousemove',e=>{if(!drawing)return;const[x,y]=getPos(c,e);
+        ctx.strokeStyle=document.getElementById('sig-color').value;
+        ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(x,y);ctx.stroke();[lx,ly]=[x,y]});
+      c.addEventListener('mouseup',()=>drawing=false);
+      c.addEventListener('mouseleave',()=>drawing=false);
+      // Touch
+      c.addEventListener('touchstart',e=>{e.preventDefault();drawing=true;[lx,ly]=getPos(c,e.touches[0])},{passive:false});
+      c.addEventListener('touchmove',e=>{e.preventDefault();if(!drawing)return;const[x,y]=getPos(c,e.touches[0]);
+        ctx.strokeStyle=document.getElementById('sig-color').value;
+        ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(x,y);ctx.stroke();[lx,ly]=[x,y]},{passive:false});
+      c.addEventListener('touchend',()=>drawing=false);
+    }
+    function getPos(c,e){const r=c.getBoundingClientRect();
+      return [(e.clientX-r.left)*(c.width/r.width),(e.clientY-r.top)*(c.height/r.height)];}
+    window.clearSig=()=>{if(ctx){ctx.clearRect(0,0,560,150);}};
+    window.getSigB64=()=>document.getElementById('sig-canvas').toDataURL('image/png');
+    // Init when template loads
+    setTimeout(initCanvas,50);
+  })();
+  async function applySig(){
+    const f=document.getElementById('sign-file').files[0];
+    if(!f){alert('Please upload a PDF first');return;}
+    const sig=window.getSigB64();
+    if(!sig){alert('Please draw your signature');return;}
+    const fd=new FormData();
+    fd.append('file',f);
+    fd.append('signature',sig);
+    fd.append('position',document.getElementById('sig-pos').value);
+    const pg=document.getElementById('sig-page').value;
+    if(pg) fd.append('page_num',pg);
+    showLoading('result-sign',true,'Embedding signature…');
+    try{
+      const res=await fetch('/api/pdf/sign',{method:'POST',body:fd});
+      const data=await res.json();
+      showResult('result-sign',data.success,data.message||data.error,'',data.filename);
+    }catch(e){showResult('result-sign',false,'Network error','');}
+  }
+  </script>
+</template>
+
+<!-- ══ REDACT PDF ══ -->
+<template id="tpl-redact">
+  <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:6px">Redact PDF</h2>
+  <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:24px">Permanently black out sensitive text. Cannot be undone!</p>
+  <div class="upload-zone" id="redact-zone" onclick="document.getElementById('redact-file').click()">
+    <input type="file" id="redact-file" accept=".pdf" style="display:none" onchange="handleSingleFile(this,'redact-zone','redact-name')"/>
+    <div class="upload-icon">⬛</div><div class="upload-text">Drop PDF here</div>
+    <div id="redact-name" class="upload-filename"></div>
+  </div>
+  <div style="margin:16px 0">
+    <label style="font-size:.85rem;font-weight:600;color:var(--gray-700);display:block;margin-bottom:6px">Text to Redact</label>
+    <input type="text" id="redact-text" placeholder="e.g. John Smith, SSN, phone number…"
+      style="width:100%;padding:10px 14px;border:1px solid var(--gray-300);border-radius:8px;font-size:.9rem"/>
+    <p style="font-size:.75rem;color:var(--gray-400);margin-top:6px">⚠️ Case-sensitive. All exact matches will be permanently blacked out.</p>
+  </div>
+  <button class="action-btn" onclick="runTool('redact','/api/pdf/redact',{text:document.getElementById('redact-text').value},true)">
+    ⬛ Redact Text
+  </button>
+  <div class="result-box" id="result-redact"></div>
+</template>
+
+<!-- ══ COMPARE PDF ══ -->
+<template id="tpl-compare">
+  <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:6px">Compare PDF</h2>
+  <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:24px">Upload 2 PDFs and see them side by side to spot differences.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="upload-zone" style="padding:20px" onclick="document.getElementById('cmp-a').click()">
+      <input type="file" id="cmp-a" accept=".pdf" style="display:none"/>
+      <div class="upload-icon" style="font-size:1.8rem">📄</div>
+      <div class="upload-text" style="font-size:.85rem">PDF A (Original)</div>
+      <div id="cmp-a-name" style="font-size:.75rem;color:var(--red);margin-top:4px"></div>
+    </div>
+    <div class="upload-zone" style="padding:20px" onclick="document.getElementById('cmp-b').click()">
+      <input type="file" id="cmp-b" accept=".pdf" style="display:none"/>
+      <div class="upload-icon" style="font-size:1.8rem">📄</div>
+      <div class="upload-text" style="font-size:.85rem">PDF B (Modified)</div>
+      <div id="cmp-b-name" style="font-size:.75rem;color:var(--red);margin-top:4px"></div>
+    </div>
+  </div>
+  <script>
+  document.getElementById('cmp-a').onchange=e=>{const f=e.target.files[0];if(f)document.getElementById('cmp-a-name').textContent=f.name;};
+  document.getElementById('cmp-b').onchange=e=>{const f=e.target.files[0];if(f)document.getElementById('cmp-b-name').textContent=f.name;};
+  async function runCompare(){
+    const fa=document.getElementById('cmp-a').files[0];
+    const fb=document.getElementById('cmp-b').files[0];
+    if(!fa||!fb){alert('Upload both PDFs');return;}
+    const fd=new FormData();fd.append('files[]',fa);fd.append('files[]',fb);
+    showLoading('result-compare',true,'Generating comparison…');
+    try{
+      const res=await fetch('/api/pdf/compare',{method:'POST',body:fd});
+      const data=await res.json();
+      if(data.success){
+        let html=`<div style="color:var(--green);font-weight:600;margin-bottom:12px">✅ ${data.message}</div>`;
+        data.comparisons.forEach(c=>{
+          html+=`<div style="margin-bottom:16px">
+            <div style="font-size:.8rem;font-weight:700;color:var(--gray-500);margin-bottom:6px">Page ${c.page}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div><div style="font-size:.72rem;color:var(--gray-400);margin-bottom:4px">PDF A</div>
+                <img src="${c.img_a}" style="width:100%;border-radius:6px;border:1px solid var(--gray-200)"/></div>
+              <div><div style="font-size:.72rem;color:var(--gray-400);margin-bottom:4px">PDF B</div>
+                <img src="${c.img_b}" style="width:100%;border-radius:6px;border:1px solid var(--gray-200)"/></div>
+            </div></div>`;
+        });
+        document.getElementById('result-compare').innerHTML=html;
+        document.getElementById('result-compare').style.display='block';
+      }else{
+        showResult('result-compare',false,data.error,'');
+      }
+    }catch(e){showResult('result-compare',false,'Network error','');}
+  }
+  </script>
+  <button class="action-btn" onclick="runCompare()">🔍 Compare PDFs</button>
+  <div class="result-box" id="result-compare"></div>
+</template>
+
+<!-- ══ PDF TO PPTX ══ -->
+<template id="tpl-pdf-to-pptx">
+  <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:6px">PDF to PowerPoint</h2>
+  <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:24px">Convert each PDF page into a PowerPoint slide (image-based).</p>
+  <div class="upload-zone" id="pptx-zone" onclick="document.getElementById('pptx-file').click()">
+    <input type="file" id="pptx-file" accept=".pdf" style="display:none" onchange="handleSingleFile(this,'pptx-zone','pptx-name')"/>
+    <div class="upload-icon">🖥️</div><div class="upload-text">Drop PDF here</div>
+    <div id="pptx-name" class="upload-filename"></div>
+  </div>
+  <button class="action-btn" onclick="runTool('pdf-to-pptx','/api/pdf/to-pptx',{},true)">🖥️ Convert to PowerPoint</button>
+  <div class="result-box" id="result-pdf-to-pptx"></div>
+</template>
+
+<!-- ══ PDF TO PDF/A ══ -->
+<template id="tpl-to-pdfa">
+  <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:6px">PDF to PDF/A</h2>
+  <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:24px">Convert to PDF/A-1b archival format for long-term preservation.</p>
+  <div class="upload-zone" id="pdfa-zone" onclick="document.getElementById('pdfa-file').click()">
+    <input type="file" id="pdfa-file" accept=".pdf" style="display:none" onchange="handleSingleFile(this,'pdfa-zone','pdfa-name')"/>
+    <div class="upload-icon">🏷️</div><div class="upload-text">Drop PDF here</div>
+    <div id="pdfa-name" class="upload-filename"></div>
+  </div>
+  <button class="action-btn" onclick="runTool('to-pdfa','/api/pdf/to-pdfa',{},true)">🏷️ Convert to PDF/A</button>
+  <div class="result-box" id="result-to-pdfa"></div>
+</template>
+
+<!-- ══ AI SUMMARIZER ══ -->
+<template id="tpl-ai-summarize">
+  <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:6px">🤖 AI PDF Summarizer</h2>
+  <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:20px">Uses Google Gemini AI to summarize your PDF content.</p>
+  <div class="upload-zone" id="ais-zone" onclick="document.getElementById('ais-file').click()">
+    <input type="file" id="ais-file" accept=".pdf" style="display:none" onchange="handleSingleFile(this,'ais-zone','ais-name')"/>
+    <div class="upload-icon">🤖</div><div class="upload-text">Drop PDF here</div>
+    <div id="ais-name" class="upload-filename"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0">
+    <div><label style="font-size:.8rem;font-weight:600;color:var(--gray-600)">Summary Language</label>
+      <select id="ais-lang" style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--gray-300);border-radius:6px;font-size:.85rem">
+        <option>English</option><option>Hindi</option><option>Hinglish</option>
+        <option>Spanish</option><option>French</option><option>Arabic</option><option>German</option>
+      </select></div>
+    <div><label style="font-size:.8rem;font-weight:600;color:var(--gray-600)">Gemini API Key</label>
+      <input type="password" id="ais-key" placeholder="AIza… (free at aistudio.google.com)"
+        style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--gray-300);border-radius:6px;font-size:.82rem"/></div>
+  </div>
+  <p style="font-size:.75rem;color:var(--gray-400);margin-bottom:12px">
+    🔑 Get free API key at <a href="https://aistudio.google.com" target="_blank" style="color:var(--blue)">aistudio.google.com</a>
+  </p>
+  <button class="action-btn" onclick="runAISummarize()">🤖 Summarize with AI</button>
+  <div class="result-box" id="result-ai-summarize">
+    <div id="ais-preview" style="display:none;margin-top:12px;padding:14px;background:var(--gray-50);border-radius:8px;
+      font-size:.85rem;line-height:1.6;white-space:pre-wrap;border:1px solid var(--gray-200);max-height:300px;overflow-y:auto"></div>
+  </div>
+  <script>
+  async function runAISummarize(){
+    const f=document.getElementById('ais-file').files[0];
+    if(!f){alert('Upload a PDF first');return;}
+    const key=document.getElementById('ais-key').value.trim();
+    const lang=document.getElementById('ais-lang').value;
+    const fd=new FormData();fd.append('file',f);fd.append('language',lang);
+    if(key) fd.append('api_key',key);
+    showLoading('result-ai-summarize',true,'AI is reading your document…');
+    try{
+      const res=await fetch('/api/pdf/ai-summarize',{method:'POST',body:fd});
+      const data=await res.json();
+      if(data.success){
+        showResult('result-ai-summarize',true,data.message,'',data.filename);
+        const prev=document.getElementById('ais-preview');
+        if(prev&&data.summary){prev.textContent=data.summary;prev.style.display='block';}
+      }else{showResult('result-ai-summarize',false,data.error,'');}
+    }catch(e){showResult('result-ai-summarize',false,'Network error','');}
+  }
+  </script>
+</template>
+
+<!-- ══ TRANSLATE PDF ══ -->
+<template id="tpl-translate">
+  <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:6px">🌐 Translate PDF</h2>
+  <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:20px">Translate PDF content to any language using Gemini AI.</p>
+  <div class="upload-zone" id="tr-zone" onclick="document.getElementById('tr-file').click()">
+    <input type="file" id="tr-file" accept=".pdf" style="display:none" onchange="handleSingleFile(this,'tr-zone','tr-name')"/>
+    <div class="upload-icon">🌐</div><div class="upload-text">Drop PDF here</div>
+    <div id="tr-name" class="upload-filename"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0">
+    <div><label style="font-size:.8rem;font-weight:600;color:var(--gray-600)">Translate to</label>
+      <select id="tr-lang" style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--gray-300);border-radius:6px;font-size:.85rem">
+        <option>Hindi</option><option>English</option><option>Hinglish</option>
+        <option>Spanish</option><option>French</option><option>Arabic</option>
+        <option>German</option><option>Chinese</option><option>Japanese</option>
+        <option>Portuguese</option><option>Russian</option><option>Italian</option>
+        <option>Urdu</option><option>Bengali</option><option>Tamil</option><option>Telugu</option>
+      </select></div>
+    <div><label style="font-size:.8rem;font-weight:600;color:var(--gray-600)">Gemini API Key</label>
+      <input type="password" id="tr-key" placeholder="AIza… (free at aistudio.google.com)"
+        style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--gray-300);border-radius:6px;font-size:.82rem"/></div>
+  </div>
+  <button class="action-btn" onclick="runTranslate()">🌐 Translate PDF</button>
+  <div class="result-box" id="result-translate">
+    <div id="tr-preview" style="display:none;margin-top:12px;padding:14px;background:var(--gray-50);border-radius:8px;
+      font-size:.85rem;line-height:1.6;white-space:pre-wrap;border:1px solid var(--gray-200);max-height:300px;overflow-y:auto"></div>
+  </div>
+  <script>
+  async function runTranslate(){
+    const f=document.getElementById('tr-file').files[0];
+    if(!f){alert('Upload a PDF first');return;}
+    const key=document.getElementById('tr-key').value.trim();
+    const lang=document.getElementById('tr-lang').value;
+    const fd=new FormData();fd.append('file',f);fd.append('target_lang',lang);
+    if(key) fd.append('api_key',key);
+    showLoading('result-translate',true,'Translating with AI…');
+    try{
+      const res=await fetch('/api/pdf/translate',{method:'POST',body:fd});
+      const data=await res.json();
+      if(data.success){
+        showResult('result-translate',true,data.message,'',data.filename);
+        const prev=document.getElementById('tr-preview');
+        if(prev&&data.preview){prev.textContent=data.preview+'…';prev.style.display='block';}
+      }else{showResult('result-translate',false,data.error,'');}
+    }catch(e){showResult('result-translate',false,'Network error','');}
+  }
+  </script>
+</template>
 
 
 </body>

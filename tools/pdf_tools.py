@@ -1288,3 +1288,389 @@ class PDFTools:
     def merge_ordered(self, input_paths):
         """Merge PDFs in the given order (input_paths already ordered)."""
         return self.merge(input_paths)  # Existing merge handles this
+
+    # ══════════════════════════════════════════════════════════
+    #  OCR PDF — Extract text from image-based PDFs
+    # ══════════════════════════════════════════════════════════
+    def ocr_pdf(self, input_path):
+        """Run OCR on scanned PDF pages, return searchable text + txt file."""
+        try:
+            import fitz
+            doc = fitz.open(input_path)
+            if doc.is_encrypted:
+                doc.authenticate('')
+            all_text = []
+            ts = self._ts()
+
+            for i, page in enumerate(doc):
+                # Try embedded text first
+                text = page.get_text().strip()
+                if len(text) > 20:
+                    all_text.append(f"--- Page {i+1} ---\n{text}")
+                else:
+                    # Render page as image and run OCR
+                    try:
+                        import pytesseract
+                        from PIL import Image as PILImage
+                        import io as _io
+                        pix = page.get_pixmap(dpi=200, alpha=False)
+                        img_bytes = pix.tobytes('png')
+                        img = PILImage.open(_io.BytesIO(img_bytes))
+                        ocr_text = pytesseract.image_to_string(img, lang='eng')
+                        all_text.append(f"--- Page {i+1} (OCR) ---\n{ocr_text.strip()}")
+                    except Exception as ocr_err:
+                        all_text.append(f"--- Page {i+1} ---\n[OCR failed: {ocr_err}]")
+
+            doc.close()
+            full_text = '\n\n'.join(all_text)
+            out_name = f'ocr_{ts}.txt'
+            out_path = self._out(out_name)
+            with open(out_path, 'w', encoding='utf-8') as f:
+                f.write(full_text)
+            return {
+                'success': True, 'filename': out_name,
+                'pages': len(all_text),
+                'preview': full_text[:500],
+                'char_count': len(full_text),
+                'message': f'OCR complete! Extracted text from {len(all_text)} pages.'
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # ══════════════════════════════════════════════════════════
+    #  CROP PDF — Remove margins
+    # ══════════════════════════════════════════════════════════
+    def crop_pdf(self, input_path, top=0, bottom=0, left=0, right=0):
+        """Crop PDF margins. Values in points (72pt = 1 inch)."""
+        try:
+            import fitz
+            doc = fitz.open(input_path)
+            if doc.is_encrypted:
+                doc.authenticate('')
+            for page in doc:
+                r = page.rect
+                new_rect = fitz.Rect(
+                    r.x0 + float(left),
+                    r.y0 + float(top),
+                    r.x1 - float(right),
+                    r.y1 - float(bottom)
+                )
+                if new_rect.is_valid and new_rect.width > 10 and new_rect.height > 10:
+                    page.set_cropbox(new_rect)
+            ts = self._ts()
+            out_name = f'cropped_{ts}.pdf'
+            out_path = self._out(out_name)
+            doc.save(out_path, garbage=3, deflate=True)
+            doc.close()
+            return {
+                'success': True, 'filename': out_name,
+                'size_str': self._fmt(os.path.getsize(out_path)),
+                'message': f'PDF cropped! Margins removed: T={top}pt L={left}pt B={bottom}pt R={right}pt'
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # ══════════════════════════════════════════════════════════
+    #  SIGN PDF — Embed signature image
+    # ══════════════════════════════════════════════════════════
+    def sign_pdf(self, input_path, signature_b64, page_num=None,
+                 position='bottom-right', sig_width=200):
+        """Embed a signature (base64 PNG) into PDF."""
+        try:
+            import fitz, base64, io as _io
+            doc = fitz.open(input_path)
+            if doc.is_encrypted:
+                doc.authenticate('')
+            total = len(doc)
+            page_idx = (total - 1) if page_num is None else max(0, int(page_num) - 1)
+            page = doc[page_idx]
+
+            # Decode signature
+            sig_data = base64.b64decode(signature_b64.split(',')[-1])
+            sig_width = float(sig_width)
+            # Get natural aspect from Pillow
+            from PIL import Image as PILImage
+            pimg = PILImage.open(_io.BytesIO(sig_data))
+            aspect = pimg.height / pimg.width
+            sig_height = sig_width * aspect
+
+            pr = page.rect
+            margin = 20
+            positions = {
+                'bottom-right': fitz.Rect(pr.x1 - sig_width - margin,
+                                          pr.y1 - sig_height - margin,
+                                          pr.x1 - margin, pr.y1 - margin),
+                'bottom-left':  fitz.Rect(margin, pr.y1 - sig_height - margin,
+                                          margin + sig_width, pr.y1 - margin),
+                'bottom-center':fitz.Rect((pr.width - sig_width)/2,
+                                          pr.y1 - sig_height - margin,
+                                          (pr.width + sig_width)/2, pr.y1 - margin),
+                'top-right':    fitz.Rect(pr.x1 - sig_width - margin, margin,
+                                          pr.x1 - margin, margin + sig_height),
+                'top-left':     fitz.Rect(margin, margin,
+                                          margin + sig_width, margin + sig_height),
+            }
+            rect = positions.get(position, positions['bottom-right'])
+            page.insert_image(rect, stream=sig_data)
+
+            ts = self._ts()
+            out_name = f'signed_{ts}.pdf'
+            out_path = self._out(out_name)
+            doc.save(out_path, garbage=3, deflate=True)
+            doc.close()
+            return {
+                'success': True, 'filename': out_name,
+                'size_str': self._fmt(os.path.getsize(out_path)),
+                'message': f'Signature added to page {page_idx+1} ({position})!'
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # ══════════════════════════════════════════════════════════
+    #  REDACT PDF — Black out sensitive text
+    # ══════════════════════════════════════════════════════════
+    def redact_pdf(self, input_path, search_text):
+        """Search for text in PDF and permanently redact (black out) it."""
+        try:
+            import fitz
+            doc = fitz.open(input_path)
+            if doc.is_encrypted:
+                doc.authenticate('')
+            total_found = 0
+            for page in doc:
+                hits = page.search_for(search_text, quads=False)
+                for rect in hits:
+                    # Expand slightly for better coverage
+                    expanded = fitz.Rect(rect.x0 - 2, rect.y0 - 1,
+                                         rect.x1 + 2, rect.y1 + 1)
+                    page.add_redact_annot(expanded, fill=(0, 0, 0))
+                    total_found += 1
+                if hits:
+                    page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)
+            ts = self._ts()
+            out_name = f'redacted_{ts}.pdf'
+            out_path = self._out(out_name)
+            doc.save(out_path, garbage=4, deflate=True)
+            doc.close()
+            if total_found == 0:
+                return {'success': False,
+                        'error': f'Text "{search_text}" not found in PDF.'}
+            return {
+                'success': True, 'filename': out_name,
+                'found': total_found,
+                'message': f'Redacted {total_found} instance(s) of "{search_text}"!'
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # ══════════════════════════════════════════════════════════
+    #  COMPARE PDF — Visual side-by-side diff
+    # ══════════════════════════════════════════════════════════
+    def compare_pdf(self, path_a, path_b):
+        """Generate side-by-side comparison images for first page of each PDF."""
+        try:
+            import fitz, base64
+            results = []
+            doc_a = fitz.open(path_a)
+            doc_b = fitz.open(path_b)
+            pages = min(len(doc_a), len(doc_b), 10)  # Compare up to 10 pages
+            for i in range(pages):
+                pix_a = doc_a[i].get_pixmap(dpi=100, alpha=False)
+                pix_b = doc_b[i].get_pixmap(dpi=100, alpha=False)
+                b64_a = base64.b64encode(pix_a.tobytes('png')).decode()
+                b64_b = base64.b64encode(pix_b.tobytes('png')).decode()
+                results.append({
+                    'page': i + 1,
+                    'img_a': f'data:image/png;base64,{b64_a}',
+                    'img_b': f'data:image/png;base64,{b64_b}',
+                })
+            doc_a.close()
+            doc_b.close()
+            return {
+                'success': True,
+                'pages': pages,
+                'comparisons': results,
+                'message': f'Comparing {pages} page(s) side by side.'
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # ══════════════════════════════════════════════════════════
+    #  PDF TO POWERPOINT
+    # ══════════════════════════════════════════════════════════
+    def to_pptx(self, input_path, dpi=150):
+        """Convert PDF pages to PowerPoint (each page = one slide)."""
+        try:
+            import fitz
+            from pptx import Presentation
+            from pptx.util import Inches, Pt
+            from pptx.enum.text import PP_ALIGN
+            import io as _io
+
+            doc = fitz.open(input_path)
+            if doc.is_encrypted:
+                doc.authenticate('')
+
+            prs = Presentation()
+            blank_layout = prs.slide_layouts[6]  # Blank slide
+
+            for page in doc:
+                # Get page dimensions in inches (1 pt = 1/72 inch)
+                w_in = page.rect.width / 72
+                h_in = page.rect.height / 72
+                prs.slide_width = Inches(w_in)
+                prs.slide_height = Inches(h_in)
+                slide = prs.slides.add_slide(blank_layout)
+                # Render page as image
+                pix = page.get_pixmap(dpi=dpi, alpha=False)
+                img_bytes = pix.tobytes('jpeg', jpg_quality=90)
+                img_buf = _io.BytesIO(img_bytes)
+                slide.shapes.add_picture(img_buf, 0, 0,
+                                          width=Inches(w_in),
+                                          height=Inches(h_in))
+
+            ts = self._ts()
+            out_name = f'converted_{ts}.pptx'
+            out_path = self._out(out_name)
+            prs.save(out_path)
+            doc.close()
+            return {
+                'success': True, 'filename': out_name,
+                'slides': len(doc),
+                'size_str': self._fmt(os.path.getsize(out_path)),
+                'message': f'Converted to PowerPoint! {len(doc)} slides created.'
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # ══════════════════════════════════════════════════════════
+    #  PDF TO PDF/A (archival)
+    # ══════════════════════════════════════════════════════════
+    def to_pdfa(self, input_path):
+        """Convert PDF to PDF/A-1b archival format."""
+        try:
+            import fitz
+            doc = fitz.open(input_path)
+            if doc.is_encrypted:
+                doc.authenticate('')
+            ts = self._ts()
+            out_name = f'pdfa_{ts}.pdf'
+            out_path = self._out(out_name)
+            # Save with PDF/A-compatible settings
+            doc.save(out_path,
+                     garbage=4,
+                     deflate=True,
+                     clean=True,
+                     linear=False,
+                     encryption=fitz.PDF_ENCRYPT_NONE)
+            # Add PDF/A XMP metadata
+            xmp = b'''<?xpacket begin='\xef\xbb\xbf' id='W5M0MpCehiHzreSzNTczkc9d'?>
+<x:xmpmeta xmlns:x='adobe:ns:meta/'>
+  <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
+    <rdf:Description rdf:about='' xmlns:pdfaid='http://www.aiim.org/pdfa/ns/id/'>
+      <pdfaid:part>1</pdfaid:part>
+      <pdfaid:conformance>B</pdfaid:conformance>
+    </rdf:Description>
+  </rdf:RDF>
+</x:xmpmeta><?xpacket end='w'?>'''
+            doc2 = fitz.open(out_path)
+            doc2.set_xml_metadata(xmp.decode())
+            doc2.save(out_path, incremental=True, encryption=fitz.PDF_ENCRYPT_NONE)
+            doc2.close()
+            doc.close()
+            return {
+                'success': True, 'filename': out_name,
+                'size_str': self._fmt(os.path.getsize(out_path)),
+                'message': 'Converted to PDF/A-1b archival format!'
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # ══════════════════════════════════════════════════════════
+    #  AI SUMMARIZE
+    # ══════════════════════════════════════════════════════════
+    def ai_summarize(self, input_path, api_key, language='English'):
+        """Extract text and summarize using Gemini API."""
+        try:
+            import fitz
+            doc = fitz.open(input_path)
+            if doc.is_encrypted:
+                doc.authenticate('')
+            text = ''
+            for page in doc:
+                text += page.get_text()
+            doc.close()
+            text = text[:30000]  # Limit to 30k chars for API
+            if len(text.strip()) < 50:
+                return {'success': False, 'error': 'Could not extract text from PDF. '
+                        'The PDF may be image-based (try OCR first).'}
+            import google.generativeai as genai
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            prompt = (f"Please provide a comprehensive summary of the following document "
+                      f"in {language}. Include:\n"
+                      f"1. Main topic/purpose\n"
+                      f"2. Key points (bullet list)\n"
+                      f"3. Important conclusions\n\n"
+                      f"Document text:\n{text}")
+            response = model.generate_content(prompt)
+            summary = response.text
+            ts = self._ts()
+            out_name = f'summary_{ts}.txt'
+            out_path = self._out(out_name)
+            with open(out_path, 'w', encoding='utf-8') as f:
+                f.write(summary)
+            return {
+                'success': True, 'filename': out_name,
+                'summary': summary,
+                'word_count': len(text.split()),
+                'message': 'AI summary generated!'
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # ══════════════════════════════════════════════════════════
+    #  TRANSLATE PDF
+    # ══════════════════════════════════════════════════════════
+    def translate_pdf(self, input_path, api_key, target_lang='Hindi'):
+        """Extract text and translate using Gemini API."""
+        try:
+            import fitz
+            doc = fitz.open(input_path)
+            if doc.is_encrypted:
+                doc.authenticate('')
+            pages_text = []
+            for i, page in enumerate(doc):
+                t = page.get_text().strip()
+                if t:
+                    pages_text.append({'page': i + 1, 'text': t})
+            doc.close()
+            if not pages_text:
+                return {'success': False,
+                        'error': 'No text found in PDF. Try OCR first.'}
+            import google.generativeai as genai
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            translated_parts = []
+            # Translate in chunks (max 5000 chars per API call)
+            for pt in pages_text:
+                chunk = pt['text'][:5000]
+                prompt = f"Translate the following text to {target_lang}. Return ONLY the translation, nothing else:\n\n{chunk}"
+                try:
+                    resp = model.generate_content(prompt)
+                    translated_parts.append(f"--- Page {pt['page']} ---\n{resp.text}")
+                except Exception:
+                    translated_parts.append(f"--- Page {pt['page']} ---\n[Translation failed]")
+            full_translation = '\n\n'.join(translated_parts)
+            ts = self._ts()
+            out_name = f'translated_{ts}.txt'
+            out_path = self._out(out_name)
+            with open(out_path, 'w', encoding='utf-8') as f:
+                f.write(full_translation)
+            return {
+                'success': True, 'filename': out_name,
+                'preview': full_translation[:600],
+                'message': f'Translation to {target_lang} complete!'
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}

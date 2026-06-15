@@ -688,6 +688,155 @@ def cleanup_uploads():
 
 
 # ══════════════════════════════════════════════════════════
+#  COMPLETE TOOL ROUTES — OCR, Crop, Sign, Redact, Compare,
+#  PDF→PPTX, PDF→PDF/A, AI Summarize, Translate
+# ══════════════════════════════════════════════════════════
+
+@app.route('/api/pdf/ocr', methods=['POST'])
+def pdf_ocr():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded'})
+    f = request.files['file']
+    if not f or not allowed_file(f.filename, 'pdf'):
+        return jsonify({'success': False, 'error': 'Please upload a PDF file'})
+    filename = secure_filename(f.filename)
+    fpath = os.path.join(UPLOAD_FOLDER, filename)
+    f.save(fpath)
+    return jsonify(pdf_tools.ocr_pdf(fpath))
+
+
+@app.route('/api/pdf/crop', methods=['POST'])
+def pdf_crop():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded'})
+    f = request.files['file']
+    if not f or not allowed_file(f.filename, 'pdf'):
+        return jsonify({'success': False, 'error': 'Please upload a PDF file'})
+    filename = secure_filename(f.filename)
+    fpath = os.path.join(UPLOAD_FOLDER, filename)
+    f.save(fpath)
+    top    = float(request.form.get('top', 0))
+    bottom = float(request.form.get('bottom', 0))
+    left   = float(request.form.get('left', 0))
+    right  = float(request.form.get('right', 0))
+    return jsonify(pdf_tools.crop_pdf(fpath, top, bottom, left, right))
+
+
+@app.route('/api/pdf/sign', methods=['POST'])
+def pdf_sign():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded'})
+    f = request.files['file']
+    sig_b64 = request.form.get('signature', '')
+    if not f or not allowed_file(f.filename, 'pdf'):
+        return jsonify({'success': False, 'error': 'Please upload a PDF file'})
+    if not sig_b64:
+        return jsonify({'success': False, 'error': 'No signature data received'})
+    filename = secure_filename(f.filename)
+    fpath = os.path.join(UPLOAD_FOLDER, filename)
+    f.save(fpath)
+    page_num  = request.form.get('page_num', None)
+    position  = request.form.get('position', 'bottom-right')
+    sig_width = request.form.get('sig_width', 200)
+    return jsonify(pdf_tools.sign_pdf(fpath, sig_b64, page_num, position, sig_width))
+
+
+@app.route('/api/pdf/redact', methods=['POST'])
+def pdf_redact():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded'})
+    f = request.files['file']
+    search_text = request.form.get('text', '').strip()
+    if not f or not allowed_file(f.filename, 'pdf'):
+        return jsonify({'success': False, 'error': 'Please upload a PDF file'})
+    if not search_text:
+        return jsonify({'success': False, 'error': 'Please enter text to redact'})
+    filename = secure_filename(f.filename)
+    fpath = os.path.join(UPLOAD_FOLDER, filename)
+    f.save(fpath)
+    return jsonify(pdf_tools.redact_pdf(fpath, search_text))
+
+
+@app.route('/api/pdf/compare', methods=['POST'])
+def pdf_compare():
+    files = request.files.getlist('files[]')
+    if len(files) < 2:
+        return jsonify({'success': False, 'error': 'Please upload exactly 2 PDF files'})
+    saved = []
+    for f in files[:2]:
+        if f and allowed_file(f.filename, 'pdf'):
+            fn = secure_filename(f.filename)
+            fp = os.path.join(UPLOAD_FOLDER, fn)
+            f.save(fp)
+            saved.append(fp)
+    if len(saved) < 2:
+        return jsonify({'success': False, 'error': 'Need 2 valid PDF files'})
+    return jsonify(pdf_tools.compare_pdf(saved[0], saved[1]))
+
+
+@app.route('/api/pdf/to-pptx', methods=['POST'])
+def pdf_to_pptx():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded'})
+    f = request.files['file']
+    if not f or not allowed_file(f.filename, 'pdf'):
+        return jsonify({'success': False, 'error': 'Please upload a PDF file'})
+    filename = secure_filename(f.filename)
+    fpath = os.path.join(UPLOAD_FOLDER, filename)
+    f.save(fpath)
+    return jsonify(pdf_tools.to_pptx(fpath))
+
+
+@app.route('/api/pdf/to-pdfa', methods=['POST'])
+def pdf_to_pdfa():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded'})
+    f = request.files['file']
+    if not f or not allowed_file(f.filename, 'pdf'):
+        return jsonify({'success': False, 'error': 'Please upload a PDF file'})
+    filename = secure_filename(f.filename)
+    fpath = os.path.join(UPLOAD_FOLDER, filename)
+    f.save(fpath)
+    return jsonify(pdf_tools.to_pdfa(fpath))
+
+
+@app.route('/api/pdf/ai-summarize', methods=['POST'])
+def pdf_ai_summarize():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded'})
+    f = request.files['file']
+    if not f or not allowed_file(f.filename, 'pdf'):
+        return jsonify({'success': False, 'error': 'Please upload a PDF file'})
+    api_key = request.form.get('api_key', '') or os.environ.get('GEMINI_API_KEY', '')
+    if not api_key:
+        return jsonify({'success': False,
+                        'error': 'Gemini API key required. Add it in the field below.'})
+    language = request.form.get('language', 'English')
+    filename = secure_filename(f.filename)
+    fpath = os.path.join(UPLOAD_FOLDER, filename)
+    f.save(fpath)
+    return jsonify(pdf_tools.ai_summarize(fpath, api_key, language))
+
+
+@app.route('/api/pdf/translate', methods=['POST'])
+def pdf_translate():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded'})
+    f = request.files['file']
+    if not f or not allowed_file(f.filename, 'pdf'):
+        return jsonify({'success': False, 'error': 'Please upload a PDF file'})
+    api_key = request.form.get('api_key', '') or os.environ.get('GEMINI_API_KEY', '')
+    if not api_key:
+        return jsonify({'success': False,
+                        'error': 'Gemini API key required. Get it free at aistudio.google.com'})
+    target_lang = request.form.get('target_lang', 'Hindi')
+    filename = secure_filename(f.filename)
+    fpath = os.path.join(UPLOAD_FOLDER, filename)
+    f.save(fpath)
+    return jsonify(pdf_tools.translate_pdf(fpath, api_key, target_lang))
+
+
+# ══════════════════════════════════════════════════════════
 #  NEW ROUTES — Page Organizer, Thumbnails, Remove Pages
 # ══════════════════════════════════════════════════════════
 
