@@ -1,194 +1,417 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="MyBBT — India's free professional toolkit for CA, CS, Lawyers & Corporate Professionals. PDF tools, GST tools, Corporate Laws reference and more."/>
+<title>MyBBT — Professional Tools for Corporate India</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#e2192c;--red2:#c01020;
+  --dark:#0a0f1e;--dark2:#111827;--dark3:#1f2937;
+  --card:#111827;--card2:#1a2435;
+  --text:#f9fafb;--text2:#d1d5db;--text3:#9ca3af;
+  --blue:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#8b5cf6;
+  --border:rgba(255,255,255,.08);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden;line-height:1.5}
 
-{% block title %}Dashboard — Corporate Tools Suite{% endblock %}
-{% block page_id %}dashboard{% endblock %}
-{% block topbar_title %}Dashboard{% endblock %}
-{% block topbar_breadcrumb %}Welcome back! All your tools are ready.{% endblock %}
+/* ── NAV ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(10,15,30,.85);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);padding:0 5vw}
+.nav-inner{max-width:1200px;margin:0 auto;height:60px;display:flex;align-items:center;gap:24px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-mark{width:36px;height:36px;position:relative;flex-shrink:0}
+.logo-text{font-size:1.15rem;font-weight:800;color:#fff;letter-spacing:-.02em}
+.logo-text span{color:var(--red)}
+.nav-links{display:flex;gap:6px;margin-left:auto;align-items:center}
+.nav-link{padding:7px 14px;border-radius:8px;font-size:.85rem;font-weight:500;
+  color:var(--text2);text-decoration:none;transition:all .2s}
+.nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-cta{background:var(--red);color:#fff!important;padding:7px 18px;border-radius:8px}
+.nav-cta:hover{background:var(--red2)!important}
 
-{% block content %}
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:100px 5vw 60px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-gradient{position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 60% 40%, rgba(226,25,44,.12) 0%, transparent 70%),
+             radial-gradient(ellipse 60% 50% at 20% 80%, rgba(59,130,246,.08) 0%, transparent 60%),
+             linear-gradient(180deg, #0a0f1e 0%, #0d1628 100%)}
+.hero-grid{position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                   linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size:60px 60px}
 
-<!-- Hero Section -->
-<div class="hero">
+/* Globe animation */
+.globe-wrap{position:absolute;right:5%;top:50%;transform:translateY(-50%);
+  width:420px;height:420px;opacity:.18;z-index:1;pointer-events:none}
+@keyframes spinGlobe{from{transform:translateY(-50%) rotate(0deg)}to{transform:translateY(-50%) rotate(360deg)}}
+.globe-wrap svg{animation:spinGlobe 40s linear infinite}
+
+.hero-content{position:relative;z-index:2;max-width:640px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;
+  background:rgba(226,25,44,.15);border:1px solid rgba(226,25,44,.3);border-radius:20px;
+  font-size:.78rem;font-weight:600;color:#fca5a5;margin-bottom:24px;letter-spacing:.03em}
+.hero-badge::before{content:'🇮🇳';font-size:.9rem}
+h1.hero-title{font-size:clamp(2rem,5vw,3.5rem);font-weight:900;line-height:1.1;
+  margin-bottom:20px;letter-spacing:-.03em}
+h1.hero-title .highlight{
+  background:linear-gradient(135deg, #e2192c 0%, #f97316 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:1.05rem;color:var(--text2);margin-bottom:36px;line-height:1.7;max-width:520px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;
+  background:var(--red);color:#fff;border-radius:10px;font-weight:700;font-size:.95rem;
+  text-decoration:none;transition:all .2s;box-shadow:0 4px 20px rgba(226,25,44,.3)}
+.btn-primary:hover{background:var(--red2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(226,25,44,.4)}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;
+  background:rgba(255,255,255,.08);border:1px solid var(--border);color:#fff;
+  border-radius:10px;font-weight:600;font-size:.95rem;text-decoration:none;transition:all .2s}
+.btn-secondary:hover{background:rgba(255,255,255,.13);transform:translateY(-2px)}
+.hero-stats{display:flex;gap:32px;flex-wrap:wrap}
+.hstat{text-align:left}
+.hstat-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hstat-num span{color:var(--red)}
+.hstat-lbl{font-size:.75rem;color:var(--text3);margin-top:2px}
+
+/* ── TOOLS SECTION ── */
+.section{padding:80px 5vw;max-width:1200px;margin:0 auto}
+.section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--red);margin-bottom:10px}
+.section-title{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.section-sub{color:var(--text3);font-size:.95rem;margin-bottom:40px;max-width:560px;line-height:1.6}
+.full-width{max-width:100%!important;padding:80px 5vw}
+.full-width .section{max-width:1200px;margin:0 auto;padding:0}
+
+/* Tool cards grid */
+.tools-showcase{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:24px}
+.tool-showcase-card{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:20px;text-decoration:none;color:inherit;transition:all .2s;cursor:pointer;display:block}
+.tool-showcase-card:hover{background:var(--card2);border-color:rgba(226,25,44,.3);
+  transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.tsc-icon{font-size:1.8rem;margin-bottom:12px}
+.tsc-name{font-size:.9rem;font-weight:700;color:#fff;margin-bottom:4px}
+.tsc-desc{font-size:.78rem;color:var(--text3)}
+.tsc-arrow{font-size:.7rem;color:var(--red);margin-top:8px;font-weight:600}
+.see-all{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;
+  background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;
+  color:var(--text2);text-decoration:none;font-size:.85rem;font-weight:500;transition:all .2s}
+.see-all:hover{background:rgba(255,255,255,.1);color:#fff}
+
+/* ── LAWS TEASER ── */
+.laws-section{background:linear-gradient(135deg, #0d1628 0%, #111827 100%);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:80px 5vw}
+.laws-inner{max-width:1200px;margin:0 auto}
+.laws-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:40px}
+.law-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;
+  padding:22px;text-decoration:none;color:inherit;transition:all .2s;display:block}
+.law-card:hover{background:rgba(255,255,255,.07);border-color:rgba(59,130,246,.3);
+  transform:translateY(-2px)}
+.law-card-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-size:1.3rem;margin-bottom:14px}
+.law-card-title{font-size:.95rem;font-weight:700;color:#fff;margin-bottom:6px}
+.law-card-desc{font-size:.78rem;color:var(--text3);line-height:1.5;margin-bottom:12px}
+.law-card-count{font-size:.72rem;font-weight:600;color:var(--blue);background:rgba(59,130,246,.1);
+  padding:3px 10px;border-radius:20px;display:inline-block}
+.laws-cta-row{margin-top:32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+
+/* ── FEATURES ── */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.feature-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:28px}
+.feature-icon{font-size:2rem;margin-bottom:14px}
+.feature-title{font-size:1rem;font-weight:700;margin-bottom:8px}
+.feature-desc{font-size:.85rem;color:var(--text3);line-height:1.6}
+
+/* ── FOOTER ── */
+footer{background:rgba(0,0,0,.4);border-top:1px solid var(--border);padding:40px 5vw}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:gap;gap:20px}
+.footer-logo{font-size:1.1rem;font-weight:800;color:#fff}
+.footer-logo span{color:var(--red)}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{color:var(--text3);text-decoration:none;font-size:.85rem;transition:color .2s}
+.footer-links a:hover{color:#fff}
+.footer-copy{font-size:.78rem;color:var(--text3);width:100%;text-align:center;padding-top:20px;
+  border-top:1px solid var(--border);margin-top:20px}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);max-width:1200px;margin:0 auto}
+
+/* Mobile */
+@media(max-width:768px){
+  .globe-wrap{display:none}
+  .nav-links .nav-link:not(.nav-cta){display:none}
+  .hero-stats{gap:20px}
+  .footer-inner{flex-direction:column;text-align:center}
+  .footer-links{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="logo">
+      <!-- SVG Globe Logo -->
+      <svg class="logo-mark" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="17" stroke="#e2192c" stroke-width="1.5" fill="none"/>
+        <ellipse cx="18" cy="18" rx="8" ry="17" stroke="#e2192c" stroke-width="1" fill="none" opacity=".5"/>
+        <line x1="1" y1="18" x2="35" y2="18" stroke="#e2192c" stroke-width="1" opacity=".5"/>
+        <line x1="1" y1="12" x2="35" y2="12" stroke="#e2192c" stroke-width=".8" opacity=".35"/>
+        <line x1="1" y1="24" x2="35" y2="24" stroke="#e2192c" stroke-width=".8" opacity=".35"/>
+        <circle cx="18" cy="18" r="3" fill="#e2192c"/>
+        <!-- Server lines -->
+        <line x1="18" y1="18" x2="28" y2="8" stroke="#e2192c" stroke-width=".8" opacity=".6" stroke-dasharray="2,2"/>
+        <line x1="18" y1="18" x2="8" y2="26" stroke="#e2192c" stroke-width=".8" opacity=".6" stroke-dasharray="2,2"/>
+        <circle cx="28" cy="8" r="2" fill="#f97316"/>
+        <circle cx="8" cy="26" r="2" fill="#3b82f6"/>
+      </svg>
+      <span class="logo-text">My<span>BBT</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="/pdf-tools" class="nav-link">📄 PDF Tools</a>
+      <a href="/gst-tools" class="nav-link">🧾 GST Tools</a>
+      <a href="/laws" class="nav-link">⚖️ Laws</a>
+      <a href="/file-manager" class="nav-link">📁 Files</a>
+      <a href="/pdf-tools" class="nav-link nav-cta">Get Started →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-gradient"></div>
+    <div class="hero-grid"></div>
+  </div>
+
+  <!-- Animated Globe -->
+  <div class="globe-wrap">
+    <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="200" cy="200" r="190" stroke="rgba(226,25,44,.4)" stroke-width="1.5"/>
+      <ellipse cx="200" cy="200" rx="80" ry="190" stroke="rgba(226,25,44,.25)" stroke-width="1"/>
+      <ellipse cx="200" cy="200" rx="150" ry="190" stroke="rgba(226,25,44,.15)" stroke-width="1"/>
+      <line x1="10" y1="200" x2="390" y2="200" stroke="rgba(226,25,44,.2)" stroke-width="1"/>
+      <line x1="10" y1="130" x2="390" y2="130" stroke="rgba(226,25,44,.12)" stroke-width="1"/>
+      <line x1="10" y1="270" x2="390" y2="270" stroke="rgba(226,25,44,.12)" stroke-width="1"/>
+      <line x1="10" y1="80" x2="390" y2="80" stroke="rgba(226,25,44,.07)" stroke-width="1"/>
+      <line x1="10" y1="320" x2="390" y2="320" stroke="rgba(226,25,44,.07)" stroke-width="1"/>
+      <!-- Server nodes -->
+      <circle cx="200" cy="200" r="8" fill="#e2192c" opacity=".8"/>
+      <circle cx="120" cy="100" r="5" fill="#3b82f6" opacity=".7"/>
+      <circle cx="300" cy="140" r="5" fill="#22c55e" opacity=".7"/>
+      <circle cx="80" cy="260" r="5" fill="#f59e0b" opacity=".7"/>
+      <circle cx="330" cy="280" r="5" fill="#8b5cf6" opacity=".7"/>
+      <circle cx="240" cy="320" r="4" fill="#e2192c" opacity=".5"/>
+      <!-- Connection lines -->
+      <line x1="200" y1="200" x2="120" y2="100" stroke="rgba(59,130,246,.3)" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="200" y1="200" x2="300" y2="140" stroke="rgba(34,197,94,.3)" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="200" y1="200" x2="80" y2="260" stroke="rgba(245,158,11,.3)" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="200" y1="200" x2="330" y2="280" stroke="rgba(139,92,246,.3)" stroke-width="1" stroke-dasharray="4,4"/>
+      <line x1="200" y1="200" x2="240" y2="320" stroke="rgba(226,25,44,.3)" stroke-width="1" stroke-dasharray="4,4"/>
+    </svg>
+  </div>
+
   <div class="hero-content">
-    <h1>⚙️ Corporate Tools Suite</h1>
-    <p>A complete productivity platform for corporate and GST professionals. Process files, reconcile GST returns, compress PDFs, and consolidate Excel sheets — all in one place.</p>
-    <div class="hero-chips">
-      <span class="hero-chip">📁 File Manager</span>
-      <span class="hero-chip">🗜️ PDF Tools</span>
-      <span class="hero-chip">📊 Excel Consolidator</span>
-      <span class="hero-chip">🧾 GSTR-1 / 2B / 3B</span>
-      <span class="hero-chip">📋 GSTR-9 / 9C</span>
-      <span class="hero-chip">🔄 PR vs 2B Reco</span>
+    <div class="hero-badge">Made for Corporate Professionals · India</div>
+    <h1 class="hero-title">
+      Professional Tools<br/>for <span class="highlight">Corporate India</span>
+    </h1>
+    <p class="hero-sub">
+      Free online toolkit for CAs, CS, Lawyers, and Finance professionals.
+      PDF tools, GST processing, Corporate Law references — all in one place. No signup required.
+    </p>
+    <div class="hero-btns">
+      <a href="/pdf-tools" class="btn-primary">📄 Explore PDF Tools →</a>
+      <a href="/laws" class="btn-secondary">⚖️ Corporate Laws</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-num">30<span>+</span></div><div class="hstat-lbl">PDF Tools</div></div>
+      <div class="hstat"><div class="hstat-num">100<span>%</span></div><div class="hstat-lbl">Free & Secure</div></div>
+      <div class="hstat"><div class="hstat-num">6<span>+</span></div><div class="hstat-lbl">Law Categories</div></div>
+      <div class="hstat"><div class="hstat-num">0</div><div class="hstat-lbl">Signup Needed</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PDF TOOLS -->
+<div style="padding:0 0 80px">
+  <div class="section">
+    <div class="section-label">PDF Tools</div>
+    <div class="section-title">Complete PDF Toolkit</div>
+    <div class="section-sub">30+ tools — merge, compress, convert, sign, redact, OCR, and more. Like ilovepdf but built for India.</div>
+    <div class="tools-showcase">
+      <a href="/pdf-tools#merge" class="tool-showcase-card">
+        <div class="tsc-icon">🔗</div>
+        <div class="tsc-name">Merge PDF</div>
+        <div class="tsc-desc">Combine multiple PDFs in order</div>
+        <div class="tsc-arrow">Use tool →</div>
+      </a>
+      <a href="/pdf-tools#compress" class="tool-showcase-card">
+        <div class="tsc-icon">🗜️</div>
+        <div class="tsc-name">Compress PDF</div>
+        <div class="tsc-desc">Reduce size without quality loss</div>
+        <div class="tsc-arrow">Use tool →</div>
+      </a>
+      <a href="/pdf-tools#unlock" class="tool-showcase-card">
+        <div class="tsc-icon">🔓</div>
+        <div class="tsc-name">Unlock PDF</div>
+        <div class="tsc-desc">Remove all PDF restrictions</div>
+        <div class="tsc-arrow">Use tool →</div>
+      </a>
+      <a href="/pdf-tools#sign" class="tool-showcase-card">
+        <div class="tsc-icon">✍️</div>
+        <div class="tsc-name">Sign PDF</div>
+        <div class="tsc-desc">Draw & embed your signature</div>
+        <div class="tsc-arrow">Use tool →</div>
+      </a>
+      <a href="/pdf-tools#ocr" class="tool-showcase-card">
+        <div class="tsc-icon">🔍</div>
+        <div class="tsc-name">OCR PDF</div>
+        <div class="tsc-desc">Extract text from scanned PDFs</div>
+        <div class="tsc-arrow">Use tool →</div>
+      </a>
+      <a href="/pdf-tools#ai-summarize" class="tool-showcase-card">
+        <div class="tsc-icon">🤖</div>
+        <div class="tsc-name">AI Summarizer</div>
+        <div class="tsc-desc">Gemini AI summary in Hindi/English</div>
+        <div class="tsc-arrow">Use tool →</div>
+      </a>
+      <a href="/pdf-tools#redact" class="tool-showcase-card">
+        <div class="tsc-icon">⬛</div>
+        <div class="tsc-name">Redact PDF</div>
+        <div class="tsc-desc">Permanently black out sensitive text</div>
+        <div class="tsc-arrow">Use tool →</div>
+      </a>
+      <a href="/pdf-tools#scan-to-pdf" class="tool-showcase-card">
+        <div class="tsc-icon">📷</div>
+        <div class="tsc-name">Scan to PDF</div>
+        <div class="tsc-desc">Phone camera → PDF via QR code</div>
+        <div class="tsc-arrow">Use tool →</div>
+      </a>
+    </div>
+    <a href="/pdf-tools" class="see-all">View all 30+ PDF Tools →</a>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- LAWS SECTION -->
+<section class="laws-section">
+  <div class="laws-inner">
+    <div class="section-label">Corporate Laws Hub</div>
+    <div class="section-title">All Corporate Laws. One Place.</div>
+    <div class="section-sub">Direct links to official circulars, notifications, and acts — classified by law category. No searching, just click.</div>
+    <div class="laws-grid">
+      <a href="/laws#gst" class="law-card">
+        <div class="law-card-icon" style="background:rgba(34,197,94,.12)">🧾</div>
+        <div class="law-card-title">GST Laws</div>
+        <div class="law-card-desc">CBIC circulars, notifications, GST Act, rules, rates, and official GST portal links.</div>
+        <div class="law-card-count">CBIC · GST Council</div>
+      </a>
+      <a href="/laws#income-tax" class="law-card">
+        <div class="law-card-icon" style="background:rgba(59,130,246,.12)">💰</div>
+        <div class="law-card-title">Income Tax / Direct Tax</div>
+        <div class="law-card-desc">CBDT circulars, notifications, IT Act 1961, TDS rates, and e-filing portal links.</div>
+        <div class="law-card-count">CBDT · IT Department</div>
+      </a>
+      <a href="/laws#company-law" class="law-card">
+        <div class="law-card-icon" style="background:rgba(139,92,246,.12)">🏢</div>
+        <div class="law-card-title">Company Law (MCA)</div>
+        <div class="law-card-desc">Companies Act 2013, MCA circulars, ROC filing, LLP Act, and Insolvency Code.</div>
+        <div class="law-card-count">MCA · ROC · NCLT</div>
+      </a>
+      <a href="/laws#sebi" class="law-card">
+        <div class="law-card-icon" style="background:rgba(245,158,11,.12)">📈</div>
+        <div class="law-card-title">SEBI Regulations</div>
+        <div class="law-card-desc">SEBI circulars, LODR, ICDR, PIT regulations, and listing obligations.</div>
+        <div class="law-card-count">SEBI · BSE · NSE</div>
+      </a>
+      <a href="/laws#labour" class="law-card">
+        <div class="law-card-icon" style="background:rgba(236,72,153,.12)">👷</div>
+        <div class="law-card-title">Labour Laws</div>
+        <div class="law-card-desc">EPF, ESIC, 4 Labour Codes, Minimum Wages, Shops & Establishment Act.</div>
+        <div class="law-card-count">EPF · ESIC · Labour</div>
+      </a>
+      <a href="/laws#fema-rbi" class="law-card">
+        <div class="law-card-icon" style="background:rgba(6,182,212,.12)">🏦</div>
+        <div class="law-card-title">FEMA / RBI</div>
+        <div class="law-card-desc">FEMA regulations, RBI master circulars, NBFC guidelines, and forex rules.</div>
+        <div class="law-card-count">RBI · FEMA · NBFC</div>
+      </a>
+    </div>
+    <div class="laws-cta-row">
+      <a href="/laws" class="btn-primary" style="font-size:.9rem;padding:12px 24px">⚖️ Browse All Laws →</a>
+      <span style="color:var(--text3);font-size:.85rem">Direct links to official government sources</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<div style="padding:0">
+  <div class="section" style="padding-top:80px;padding-bottom:80px">
+    <div class="section-label">Why MyBBT</div>
+    <div class="section-title">Built for Professionals</div>
+    <div class="section-sub">Designed specifically for Indian CA firms, corporate legal teams, and finance professionals.</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">100% Secure & Private</div>
+        <div class="feature-desc">Files processed on secure server and deleted after processing. No data stored permanently.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">Fast Processing</div>
+        <div class="feature-desc">Advanced PDF engine (PyMuPDF) handles large files quickly. No file size limits for most tools.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🇮🇳</div>
+        <div class="feature-title">India-Specific Tools</div>
+        <div class="feature-desc">GST reconciliation, MCA filing helpers, Indian corporate law links — built for India's compliance needs.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <div class="feature-title">AI-Powered Features</div>
+        <div class="feature-desc">Gemini AI for PDF summarization and translation. Supports Hindi, Hinglish, and 15+ languages.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <div class="feature-title">Works on All Devices</div>
+        <div class="feature-desc">Fully responsive. Scan to PDF using phone camera directly from desktop browser via QR code.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💸</div>
+        <div class="feature-title">Completely Free</div>
+        <div class="feature-desc">All 30+ PDF tools free. No subscription, no signup, no watermarks on output files.</div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Stats -->
-<div class="stats-grid">
-  <div class="stat-card">
-    <div class="stat-icon blue">📁</div>
-    <div class="stat-info">
-      <div class="stat-value">10+</div>
-      <div class="stat-label">Professional Tools</div>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">My<span>BBT</span></div>
+    <div class="footer-links">
+      <a href="/pdf-tools">PDF Tools</a>
+      <a href="/gst-tools">GST Tools</a>
+      <a href="/laws">Corporate Laws</a>
+      <a href="/file-manager">File Manager</a>
+      <a href="/excel-tools">Excel Tools</a>
     </div>
   </div>
-  <div class="stat-card">
-    <div class="stat-icon green">🔒</div>
-    <div class="stat-info">
-      <div class="stat-value">100%</div>
-      <div class="stat-label">Secure & Private</div>
-    </div>
+  <div class="footer-copy">
+    © 2025 MyBBT · Professional Tools for Corporate India · All files processed securely · No signup required
   </div>
-  <div class="stat-card">
-    <div class="stat-icon orange">⚡</div>
-    <div class="stat-info">
-      <div class="stat-value">Fast</div>
-      <div class="stat-label">Local Processing</div>
-    </div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon red">🇮🇳</div>
-    <div class="stat-info">
-      <div class="stat-value">GST</div>
-      <div class="stat-label">India Compliant</div>
-    </div>
-  </div>
-</div>
+</footer>
 
-<!-- Section: File & Document Tools -->
-<div class="page-header">
-  <h2 style="font-size:16px;font-weight:700;margin-bottom:4px">📂 File & Document Tools</h2>
-  <p style="font-size:13px;color:var(--text-muted)">Manage, compress, merge and consolidate your files easily</p>
-</div>
-
-<div class="tools-grid">
-  <a href="/file-manager" style="text-decoration:none">
-    <div class="tool-card">
-      <div class="tool-card-icon" style="background:#dbeafe">📁</div>
-      <h3>File Manager</h3>
-      <p>Upload, organize, batch collect and download files. Supports all file types with drag & drop.</p>
-      <div class="tool-card-footer">
-        <span class="tool-tag">File Tool</span>
-        <span class="tool-arrow">→</span>
-      </div>
-    </div>
-  </a>
-
-  <a href="/pdf-tools" style="text-decoration:none">
-    <div class="tool-card">
-      <div class="tool-card-icon" style="background:#fee2e2">🗜️</div>
-      <h3>PDF Compressor</h3>
-      <p>Reduce PDF file sizes without losing quality. Choose from low, medium, or high compression.</p>
-      <div class="tool-card-footer">
-        <span class="tool-tag">PDF Tool</span>
-        <span class="tool-arrow">→</span>
-      </div>
-    </div>
-  </a>
-
-  <a href="/pdf-tools#merge" style="text-decoration:none">
-    <div class="tool-card">
-      <div class="tool-card-icon" style="background:#fee2e2">🔗</div>
-      <h3>PDF Merger</h3>
-      <p>Combine multiple PDF documents into a single file. Preserves all pages and formatting.</p>
-      <div class="tool-card-footer">
-        <span class="tool-tag">PDF Tool</span>
-        <span class="tool-arrow">→</span>
-      </div>
-    </div>
-  </a>
-
-  <a href="/excel-tools" style="text-decoration:none">
-    <div class="tool-card">
-      <div class="tool-card-icon" style="background:#d1fae5">📊</div>
-      <h3>Excel Consolidator</h3>
-      <p>Merge multiple Excel and CSV files into one consolidated report with formatted headers.</p>
-      <div class="tool-card-footer">
-        <span class="tool-tag">Excel Tool</span>
-        <span class="tool-arrow">→</span>
-      </div>
-    </div>
-  </a>
-</div>
-
-<!-- Section: GST Tools -->
-<div class="page-header" style="margin-top:8px">
-  <h2 style="font-size:16px;font-weight:700;margin-bottom:4px">🧾 GST Tools</h2>
-  <p style="font-size:13px;color:var(--text-muted)">Complete GST return processing and reconciliation tools for Indian businesses</p>
-</div>
-
-<div class="tools-grid">
-  <a href="/gst-tools?tab=gstr1" style="text-decoration:none">
-    <div class="tool-card">
-      <div class="tool-card-icon" style="background:#e0e7ff">📋</div>
-      <h3>GSTR-1 Processor</h3>
-      <p>Process outward supply data and generate GSTR-1 format reports for filing.</p>
-      <div class="tool-card-footer">
-        <span class="tool-tag">GST Tool</span>
-        <span class="tool-arrow">→</span>
-      </div>
-    </div>
-  </a>
-
-  <a href="/gst-tools?tab=gstr2b" style="text-decoration:none">
-    <div class="tool-card">
-      <div class="tool-card-icon" style="background:#fef3c7">🔄</div>
-      <h3>GSTR-2B Reconciliation</h3>
-      <p>Match your purchase register against GSTR-2B data. Identify matched, unmatched records.</p>
-      <div class="tool-card-footer">
-        <span class="tool-tag">GST Reco</span>
-        <span class="tool-arrow">→</span>
-      </div>
-    </div>
-  </a>
-
-  <a href="/gst-tools?tab=gstr3b" style="text-decoration:none">
-    <div class="tool-card">
-      <div class="tool-card-icon" style="background:#d1fae5">📝</div>
-      <h3>GSTR-3B Processor</h3>
-      <p>Compute GSTR-3B summary values from your data. Generate tax liability report.</p>
-      <div class="tool-card-footer">
-        <span class="tool-tag">GST Tool</span>
-        <span class="tool-arrow">→</span>
-      </div>
-    </div>
-  </a>
-
-  <a href="/gst-tools?tab=gstr9" style="text-decoration:none">
-    <div class="tool-card">
-      <div class="tool-card-icon" style="background:#f5f3ff">📑</div>
-      <h3>GSTR-9 / 9C Annual</h3>
-      <p>Process annual return data for GSTR-9 and reconciliation statement GSTR-9C.</p>
-      <div class="tool-card-footer">
-        <span class="tool-tag">Annual Return</span>
-        <span class="tool-arrow">→</span>
-      </div>
-    </div>
-  </a>
-
-  <a href="/gst-tools?tab=pr2b" style="text-decoration:none">
-    <div class="tool-card">
-      <div class="tool-card-icon" style="background:#fce7f3">📊</div>
-      <h3>PR vs 2B Reconciliation</h3>
-      <p>Detailed Purchase Register vs GSTR-2B comparison with color-coded mismatch report.</p>
-      <div class="tool-card-footer">
-        <span class="tool-tag">Detailed Reco</span>
-        <span class="tool-arrow">→</span>
-      </div>
-    </div>
-  </a>
-
-  <a href="/gst-tools?tab=portal" style="text-decoration:none">
-    <div class="tool-card">
-      <div class="tool-card-icon" style="background:#fef3c7">🌐</div>
-      <h3>GST Portal Helper</h3>
-      <p>Quick access links to GST portal modules. Login, download, and filing shortcuts.</p>
-      <div class="tool-card-footer">
-        <span class="tool-tag">Portal</span>
-        <span class="tool-arrow">→</span>
-      </div>
-    </div>
-  </a>
-</div>
-
-{% endblock %}
+</body>
+</html>

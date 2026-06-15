@@ -83,6 +83,12 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/laws')
+def laws_page():
+    return render_template('laws.html')
+
+
+
 # ─────────────────────────────────────────
 # FILE MANAGER
 # ─────────────────────────────────────────
