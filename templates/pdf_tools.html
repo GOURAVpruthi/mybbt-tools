@@ -1039,6 +1039,67 @@ async function callAPI(url, formData, resultEl, loadMsg='Processing…') {
   }
 }
 
+
+// ─── GENERIC SINGLE-FILE TOOL RUNNER ─────────────────────
+// Used by: OCR, Crop, Sign, Redact, PDF/A, PPTX, etc.
+function handleSingleFile(input, zoneId, nameId) {
+  if (!input.files || !input.files[0]) return;
+  const f = input.files[0];
+  const nameEl = document.getElementById(nameId);
+  if (nameEl) nameEl.textContent = '📄 ' + f.name + ' (' + fmtSize(f.size) + ')';
+  const zone = document.getElementById(zoneId);
+  if (zone) {
+    zone.style.borderColor = 'var(--red)';
+    zone.style.background = '#fff8f8';
+  }
+}
+
+function showLoading(resultElId, show, msg) {
+  if (show) showLoader(msg || 'Processing…');
+  const el = document.getElementById(resultElId);
+  if (el) el.style.display = 'none';
+}
+
+// runTool(toolId, apiUrl, extraParams, singleFileMode)
+// Finds file by convention: input id = {toolId}-file
+// Shows result in: result-{toolId}
+async function runTool(toolId, apiUrl, extraParams, singleFile) {
+  const fileInput = document.getElementById(toolId + '-file');
+  if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+    alert('Please upload a PDF file first!');
+    return;
+  }
+  const fd = new FormData();
+  fd.append('file', fileInput.files[0]);
+  // Append extra form params
+  if (extraParams) {
+    Object.entries(extraParams).forEach(([k, v]) => {
+      if (v !== null && v !== undefined && v !== '') fd.append(k, v);
+    });
+  }
+  const resultId = 'result-' + toolId;
+  showLoading(resultId, true, 'Processing…');
+  try {
+    const res = await fetch(apiUrl, { method: 'POST', body: fd });
+    const data = await res.json();
+    hideLoader();
+    if (data.success) {
+      showResult(resultId, true, data.message || 'Done!', data.size_str || '', data.filename);
+      // Show text preview if available
+      const previewEl = document.getElementById(toolId + '-preview');
+      if (previewEl && data.preview) {
+        previewEl.textContent = data.preview;
+        previewEl.style.display = 'block';
+      }
+    } else {
+      showResult(resultId, false, data.error || 'Something went wrong.', '');
+    }
+  } catch (e) {
+    hideLoader();
+    showResult(resultId, false, 'Network error: ' + e.message, '');
+  }
+}
+
 // ═══════════════════════════════════════════════════
 //  TOOL ACTIONS
 // ═══════════════════════════════════════════════════
