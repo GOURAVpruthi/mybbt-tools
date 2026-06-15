@@ -479,6 +479,23 @@ def download_pdf(filename):
     return jsonify({'error': 'File not found'}), 404
 
 
+# ─── Universal download route (used by all tools) ────────
+@app.route('/download/<filename>')
+def download_file(filename):
+    """Universal download — checks outputs folder (and uploads as fallback)."""
+    # Security: no path traversal
+    filename = os.path.basename(filename)
+    # Check output folder first
+    filepath = os.path.join(OUTPUT_FOLDER, filename)
+    if os.path.exists(filepath):
+        return send_file(filepath, as_attachment=True, download_name=filename)
+    # Fallback: uploads folder
+    filepath2 = os.path.join(UPLOAD_FOLDER, filename)
+    if os.path.exists(filepath2):
+        return send_file(filepath2, as_attachment=True, download_name=filename)
+    return jsonify({'error': 'File not found'}), 404
+
+
 
 
 # ─────────────────────────────────────────

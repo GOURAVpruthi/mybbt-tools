@@ -1590,7 +1590,7 @@ class PDFTools:
     #  AI SUMMARIZE
     # ══════════════════════════════════════════════════════════
     def ai_summarize(self, input_path, api_key, language='English'):
-        """Extract text and summarize using Gemini API."""
+        """Extract text and summarize using Gemini API, output as PDF."""
         try:
             import fitz
             doc = fitz.open(input_path)
@@ -1600,7 +1600,7 @@ class PDFTools:
             for page in doc:
                 text += page.get_text()
             doc.close()
-            text = text[:30000]  # Limit to 30k chars for API
+            text = text[:30000]
             if len(text.strip()) < 50:
                 return {'success': False, 'error': 'Could not extract text from PDF. '
                         'The PDF may be image-based (try OCR first).'}
@@ -1616,15 +1616,47 @@ class PDFTools:
             response = model.generate_content(prompt)
             summary = response.text
             ts = self._ts()
-            out_name = f'summary_{ts}.txt'
+            out_name = f'summary_{ts}.pdf'
             out_path = self._out(out_name)
-            with open(out_path, 'w', encoding='utf-8') as f:
-                f.write(summary)
+            # Write summary as a clean PDF
+            out_doc = fitz.open()
+            page = out_doc.new_page(width=595, height=842)  # A4
+            margin = 50
+            page.insert_text(
+                (margin, 80),
+                f'AI Summary ({language})',
+                fontsize=16, fontname='helv', color=(0.13, 0.13, 0.13)
+            )
+            page.draw_line(
+                fitz.Point(margin, 100), fitz.Point(595 - margin, 100),
+                color=(0.88, 0.1, 0.17), width=1.5
+            )
+            # Insert summary text in chunks per line
+            y = 120
+            for line in summary.split('\n'):
+                if y > 800:
+                    page = out_doc.new_page(width=595, height=842)
+                    y = 50
+                # Wrap long lines
+                words = line if len(line) < 90 else line
+                page.insert_text(
+                    (margin, y), line[:110],
+                    fontsize=10, fontname='helv', color=(0.1, 0.1, 0.1)
+                )
+                y += 15
+                if len(line) > 110:
+                    page.insert_text(
+                        (margin, y), line[110:220],
+                        fontsize=10, fontname='helv', color=(0.1, 0.1, 0.1)
+                    )
+                    y += 15
+            out_doc.save(out_path)
+            out_doc.close()
             return {
                 'success': True, 'filename': out_name,
                 'summary': summary,
                 'word_count': len(text.split()),
-                'message': 'AI summary generated!'
+                'message': f'AI summary generated successfully!'
             }
         except Exception as e:
             return {'success': False, 'error': str(e)}
@@ -1633,7 +1665,7 @@ class PDFTools:
     #  TRANSLATE PDF
     # ══════════════════════════════════════════════════════════
     def translate_pdf(self, input_path, api_key, target_lang='Hindi'):
-        """Extract text and translate using Gemini API."""
+        """Extract text and translate using Gemini API, output as PDF."""
         try:
             import fitz
             doc = fitz.open(input_path)
@@ -1652,25 +1684,58 @@ class PDFTools:
             genai.configure(api_key=api_key)
             model = genai.GenerativeModel('gemini-1.5-flash')
             translated_parts = []
-            # Translate in chunks (max 5000 chars per API call)
             for pt in pages_text:
                 chunk = pt['text'][:5000]
                 prompt = f"Translate the following text to {target_lang}. Return ONLY the translation, nothing else:\n\n{chunk}"
                 try:
                     resp = model.generate_content(prompt)
-                    translated_parts.append(f"--- Page {pt['page']} ---\n{resp.text}")
+                    translated_parts.append({'page': pt['page'], 'text': resp.text})
                 except Exception:
-                    translated_parts.append(f"--- Page {pt['page']} ---\n[Translation failed]")
-            full_translation = '\n\n'.join(translated_parts)
+                    translated_parts.append({'page': pt['page'], 'text': '[Translation failed for this page]'})
             ts = self._ts()
-            out_name = f'translated_{ts}.txt'
+            out_name = f'translated_{ts}.pdf'
             out_path = self._out(out_name)
-            with open(out_path, 'w', encoding='utf-8') as f:
-                f.write(full_translation)
+            # Build PDF with translated content
+            out_doc = fitz.open()
+            for part in translated_parts:
+                page = out_doc.new_page(width=595, height=842)
+                # Page header
+                page.insert_text(
+                    (50, 40),
+                    f'Translated to {target_lang}  |  Page {part["page"]}',
+                    fontsize=9, fontname='helv', color=(0.5, 0.5, 0.5)
+                )
+                page.draw_line(
+                    fitz.Point(50, 52), fitz.Point(545, 52),
+                    color=(0.88, 0.1, 0.17), width=0.8
+                )
+                # Insert translated text line by line
+                y = 68
+                for line in part['text'].split('\n'):
+                    # Wrap at 95 chars
+                    while line:
+                        chunk = line[:95]
+                        line = line[95:]
+                        if y > 810:
+                            page = out_doc.new_page(width=595, height=842)
+                            page.insert_text(
+                                (50, 40), f'Translated to {target_lang} (cont.)',
+                                fontsize=9, fontname='helv', color=(0.5, 0.5, 0.5)
+                            )
+                            y = 60
+                        page.insert_text(
+                            (50, y), chunk,
+                            fontsize=10, fontname='helv', color=(0.05, 0.05, 0.05)
+                        )
+                        y += 15
+                    y += 3  # paragraph spacing
+            out_doc.save(out_path)
+            out_doc.close()
+            full_text = '\n\n'.join([p['text'] for p in translated_parts])
             return {
                 'success': True, 'filename': out_name,
-                'preview': full_translation[:600],
-                'message': f'Translation to {target_lang} complete!'
+                'preview': full_text[:600],
+                'message': f'Translation to {target_lang} complete! Downloading as PDF.'
             }
         except Exception as e:
             return {'success': False, 'error': str(e)}
