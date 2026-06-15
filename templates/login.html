@@ -469,8 +469,11 @@ googleProvider.setCustomParameters({ prompt: 'select_account' });
 /* ── Auth state: redirect logged-in users ── */
 auth.onAuthStateChanged(user => {
   if (user) {
+    localStorage.setItem('mybbt_is_logged_in', 'true');
     // Redirect to home if already signed in
     window.location.replace('/');
+  } else {
+    localStorage.removeItem('mybbt_is_logged_in');
   }
 });
 

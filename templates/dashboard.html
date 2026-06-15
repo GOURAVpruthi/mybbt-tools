@@ -417,10 +417,13 @@ auth.onAuthStateChanged(user => {
   const gate = document.getElementById('auth-loading');
 
   if (!user) {
+    localStorage.removeItem('mybbt_is_logged_in');
     // Not logged in — bounce to login
     window.location.replace('/login');
     return;
   }
+  localStorage.setItem('mybbt_is_logged_in', 'true');
+
 
   // Populate UI with user data
   populateDashboard(user);

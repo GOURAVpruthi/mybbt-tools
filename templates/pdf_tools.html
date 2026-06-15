@@ -1019,12 +1019,25 @@ function showResult(elId, success, msg, sub, filename) {
 }
 
 async function callAPI(url, formData, resultEl, loadMsg='Processing…') {
+  // Check login and usage limit (1 free use)
+  const isLoggedIn = localStorage.getItem('mybbt_is_logged_in') === 'true';
+  const usageCount = parseInt(localStorage.getItem('mybbt_usage_count') || '0');
+
+  if (!isLoggedIn && usageCount >= 1) {
+    showResult(resultEl, false, 'Free Limit Reached', 'You have used your 1 free tool execution. Please log in to continue using MyBBT tools.');
+    setTimeout(() => { window.location.href = '/login'; }, 2500);
+    return null;
+  }
+
   showLoader(loadMsg);
   try {
     const res = await fetch(url, {method:'POST', body: formData});
     const data = await res.json();
     hideLoader();
     if (data.success) {
+      if (!isLoggedIn) {
+        localStorage.setItem('mybbt_usage_count', (usageCount + 1).toString());
+      }
       showResult(resultEl, true, data.message || 'Done!',
         data.reduction ? `Size reduced by ${data.reduction}%` :
         data.pages_extracted ? `${data.pages_extracted} pages extracted` : '',
