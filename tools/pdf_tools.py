@@ -424,27 +424,85 @@ class PDFTools:
             return {'success': False, 'error': str(e)}
 
     # ══════════════════════════════════════════════════════════
-    #  9. UNLOCK PDF (Remove Password)
+    #  9. UNLOCK PDF — 4-method approach (ilovepdf level)
     # ══════════════════════════════════════════════════════════
     def unlock(self, input_path, password=''):
-        """Remove password from PDF."""
+        """Remove ALL restrictions from PDF using 4 progressive methods."""
+        ts = self._ts()
+        out_name = f'unlocked_{ts}.pdf'
+        out_path = self._out(out_name)
+
+        # ── Method 1: pikepdf — open with password, save without encryption
         try:
             import pikepdf
-            ts = self._ts()
-            out_name = f'unlocked_{ts}.pdf'
-            out_path = self._out(out_name)
-
-            pdf = pikepdf.Pdf.open(input_path, password=password)
-            pdf.save(out_path)
+            pdf = pikepdf.Pdf.open(input_path, password=password,
+                                   suppress_warnings=True)
+            # Remove ALL encryption + restrictions
+            pdf.save(out_path, encryption=False)
             pdf.close()
-            return {
-                'success': True, 'filename': out_name,
-                'message': 'PDF unlocked successfully! Password removed.'
-            }
-        except pikepdf.PasswordError:
-            return {'success': False, 'error': 'Wrong password! Please check and try again.'}
+            if os.path.exists(out_path) and os.path.getsize(out_path) > 0:
+                return {'success': True, 'filename': out_name,
+                        'method': 'pikepdf', 'message': 'PDF fully unlocked! All restrictions removed.'}
+        except Exception:
+            pass
+
+        # ── Method 2: pikepdf — try without any password (owner-restriction only)
+        if password:
+            try:
+                import pikepdf
+                pdf = pikepdf.Pdf.open(input_path, suppress_warnings=True)
+                pdf.save(out_path, encryption=False)
+                pdf.close()
+                if os.path.exists(out_path) and os.path.getsize(out_path) > 0:
+                    return {'success': True, 'filename': out_name,
+                            'method': 'pikepdf-nopass', 'message': 'PDF unlocked! Owner restrictions removed.'}
+            except Exception:
+                pass
+
+        # ── Method 3: PyMuPDF — authenticate and re-save
+        try:
+            import fitz
+            doc = fitz.open(input_path)
+            if doc.is_encrypted:
+                ok = doc.authenticate(password) if password else doc.authenticate('')
+                if not ok:
+                    doc.authenticate(password)  # try once more
+            new_doc = fitz.open()
+            for page in doc:
+                new_doc.insert_pdf(doc, from_page=page.number, to_page=page.number)
+            new_doc.save(out_path, garbage=4, deflate=True, encryption=fitz.PDF_ENCRYPT_NONE)
+            new_doc.close(); doc.close()
+            if os.path.exists(out_path) and os.path.getsize(out_path) > 0:
+                return {'success': True, 'filename': out_name,
+                        'method': 'fitz', 'message': 'PDF unlocked via PyMuPDF!'}
+        except Exception:
+            pass
+
+        # ── Method 4: Re-render (nuclear option — works on ANY PDF)
+        # Renders each page as high-quality image → new PDF
+        # Loses text selectability but removes ALL restrictions
+        try:
+            import fitz
+            doc = fitz.open(input_path)
+            if doc.is_encrypted:
+                doc.authenticate(password or '')
+            new_doc = fitz.open()
+            for page in doc:
+                # Render at 150 DPI — good quality, reasonable size
+                pix = page.get_pixmap(dpi=150, alpha=False)
+                img_bytes = pix.tobytes('jpeg', jpg_quality=92)
+                new_page = new_doc.new_page(width=page.rect.width, height=page.rect.height)
+                new_page.insert_image(new_page.rect, stream=img_bytes)
+            new_doc.save(out_path, garbage=4, deflate=True)
+            new_doc.close(); doc.close()
+            if os.path.exists(out_path) and os.path.getsize(out_path) > 0:
+                return {'success': True, 'filename': out_name,
+                        'method': 're-render',
+                        'message': 'PDF unlocked via re-render. All restrictions removed. '
+                                   '(Note: text may not be selectable in re-rendered output)'}
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': f'Could not unlock PDF: {str(e)}. '
+                                               f'If password-protected, provide the correct password.'}
 
     # ══════════════════════════════════════════════════════════
     #  10. EXTRACT PAGES
@@ -1118,3 +1176,115 @@ class PDFTools:
             new_doc.save(out_path, garbage=4, deflate=True)
         finally:
             new_doc.close(); doc.close()
+
+    # ══════════════════════════════════════════════════════════
+    #  NEW — GET PAGE THUMBNAILS
+    # ══════════════════════════════════════════════════════════
+    def get_thumbnails(self, input_path, dpi=72):
+        """Return base64 PNG thumbnails for every page."""
+        try:
+            import fitz, base64
+            doc = fitz.open(input_path)
+            if doc.is_encrypted:
+                doc.authenticate('')
+            thumbnails = []
+            mat = fitz.Matrix(dpi / 72, dpi / 72)
+            for i, page in enumerate(doc):
+                pix = page.get_pixmap(matrix=mat, alpha=False)
+                b64 = base64.b64encode(pix.tobytes('png')).decode()
+                thumbnails.append({
+                    'page': i + 1,
+                    'data': f'data:image/png;base64,{b64}',
+                    'width': pix.width,
+                    'height': pix.height,
+                    'rotation': page.rotation,
+                })
+            doc.close()
+            return {'success': True, 'thumbnails': thumbnails, 'total': len(thumbnails)}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # ══════════════════════════════════════════════════════════
+    #  NEW — REMOVE PAGES
+    # ══════════════════════════════════════════════════════════
+    def remove_pages(self, input_path, pages_str):
+        """Remove specific pages. pages_str: '1,3,5-8'"""
+        try:
+            import fitz
+            doc = fitz.open(input_path)
+            total = len(doc)
+            ranges = self._parse_ranges(pages_str, total)
+            if not ranges:
+                doc.close()
+                return {'success': False, 'error': 'Invalid page spec. Use: 1,3,5-8'}
+            # Collect all page indices to remove (0-based), deduplicated
+            to_remove = set()
+            for s, e in ranges:
+                to_remove.update(range(s, e + 1))
+            if len(to_remove) >= total:
+                doc.close()
+                return {'success': False, 'error': 'Cannot remove all pages!'}
+            # Delete in reverse order to preserve indices
+            for idx in sorted(to_remove, reverse=True):
+                doc.delete_page(idx)
+            ts = self._ts()
+            out_name = f'removed_{ts}.pdf'
+            out_path = self._out(out_name)
+            doc.save(out_path, garbage=3, deflate=True)
+            remaining = len(doc)
+            doc.close()
+            return {
+                'success': True, 'filename': out_name,
+                'removed': len(to_remove), 'remaining': remaining,
+                'size_str': self._fmt(os.path.getsize(out_path)),
+                'message': f'Removed {len(to_remove)} page(s). {remaining} pages remaining.'
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # ══════════════════════════════════════════════════════════
+    #  NEW — ORGANIZE PAGES (reorder + rotate)
+    # ══════════════════════════════════════════════════════════
+    def organize_pages(self, input_path, new_order, rotations=None):
+        """Reorder pages and apply per-page rotations.
+        new_order: list of 1-based page numbers in desired order.
+        rotations: dict {"1": 90, "3": 180, ...} page_num -> degrees.
+        """
+        try:
+            import fitz
+            doc = fitz.open(input_path)
+            if doc.is_encrypted:
+                doc.authenticate('')
+            total = len(doc)
+            # Validate order
+            new_order = [int(p) for p in new_order if 1 <= int(p) <= total]
+            if not new_order:
+                doc.close()
+                return {'success': False, 'error': 'Invalid page order'}
+            new_doc = fitz.open()
+            for page_num in new_order:
+                new_doc.insert_pdf(doc, from_page=page_num - 1, to_page=page_num - 1)
+                if rotations and str(page_num) in rotations:
+                    rot = int(rotations[str(page_num)]) % 360
+                    if rot:
+                        new_doc[-1].set_rotation(rot)
+            ts = self._ts()
+            out_name = f'organized_{ts}.pdf'
+            out_path = self._out(out_name)
+            new_doc.save(out_path, garbage=3, deflate=True)
+            new_doc.close(); doc.close()
+            return {
+                'success': True, 'filename': out_name,
+                'pages': len(new_order),
+                'size_str': self._fmt(os.path.getsize(out_path)),
+                'message': f'PDF organized! {len(new_order)} pages saved.'
+            }
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    # ══════════════════════════════════════════════════════════
+    #  NEW — MERGE WITH CUSTOM ORDER
+    # ══════════════════════════════════════════════════════════
+    def merge_ordered(self, input_paths):
+        """Merge PDFs in the given order (input_paths already ordered)."""
+        return self.merge(input_paths)  # Existing merge handles this

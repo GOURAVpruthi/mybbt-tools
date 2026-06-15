@@ -680,6 +680,102 @@ def cleanup_uploads():
         return jsonify({'success': False, 'error': str(e)})
 
 
+# ══════════════════════════════════════════════════════════
+#  NEW ROUTES — Page Organizer, Thumbnails, Remove Pages
+# ══════════════════════════════════════════════════════════
+
+@app.route('/api/pdf/thumbnails', methods=['POST'])
+def pdf_thumbnails():
+    """Generate page thumbnails for uploaded PDF."""
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded'})
+    f = request.files['file']
+    if not f or not allowed_file(f.filename, 'pdf'):
+        return jsonify({'success': False, 'error': 'Please upload a PDF file'})
+    filename = secure_filename(f.filename)
+    fpath = os.path.join(UPLOAD_FOLDER, filename)
+    f.save(fpath)
+    result = pdf_tools.get_thumbnails(fpath, dpi=72)
+    result['filepath'] = filename  # send back so organizer can reference it
+    return jsonify(result)
+
+
+@app.route('/api/pdf/remove-pages', methods=['POST'])
+def pdf_remove_pages():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded'})
+    f = request.files['file']
+    pages_str = request.form.get('pages', '')
+    if not f or not allowed_file(f.filename, 'pdf'):
+        return jsonify({'success': False, 'error': 'Please upload a PDF file'})
+    if not pages_str:
+        return jsonify({'success': False, 'error': 'Please specify pages to remove (e.g. 1,3,5-8)'})
+    filename = secure_filename(f.filename)
+    fpath = os.path.join(UPLOAD_FOLDER, filename)
+    f.save(fpath)
+    result = pdf_tools.remove_pages(fpath, pages_str)
+    return jsonify(result)
+
+
+@app.route('/api/pdf/organize-apply', methods=['POST'])
+def pdf_organize_apply():
+    """Apply page reorder + rotations from the organizer UI."""
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file uploaded'})
+    f = request.files['file']
+    if not f or not allowed_file(f.filename, 'pdf'):
+        return jsonify({'success': False, 'error': 'Please upload a PDF file'})
+    try:
+        new_order = json.loads(request.form.get('order', '[]'))
+        rotations = json.loads(request.form.get('rotations', '{}'))
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid order/rotation data'})
+    filename = secure_filename(f.filename)
+    fpath = os.path.join(UPLOAD_FOLDER, filename)
+    f.save(fpath)
+    result = pdf_tools.organize_pages(fpath, new_order, rotations)
+    return jsonify(result)
+
+
+@app.route('/api/pdf/merge-ordered', methods=['POST'])
+def pdf_merge_ordered():
+    """Merge multiple PDFs in custom order sent from frontend."""
+    files = request.files.getlist('files[]')
+    order_str = request.form.get('order', '')
+    if len(files) < 2:
+        return jsonify({'success': False, 'error': 'Please upload at least 2 PDF files'})
+    saved = []
+    for f in files:
+        if f and allowed_file(f.filename, 'pdf'):
+            fn = secure_filename(f.filename)
+            fp = os.path.join(UPLOAD_FOLDER, fn)
+            f.save(fp)
+            saved.append((fn, fp))
+    if len(saved) < 2:
+        return jsonify({'success': False, 'error': 'Need at least 2 valid PDFs'})
+    # Apply custom order if provided
+    if order_str:
+        try:
+            order = json.loads(order_str)  # list of filenames in desired order
+            ordered_paths = []
+            name_map = {fn: fp for fn, fp in saved}
+            for name in order:
+                if name in name_map:
+                    ordered_paths.append(name_map[name])
+            if len(ordered_paths) == len(saved):
+                saved = [(os.path.basename(p), p) for p in ordered_paths]
+        except Exception:
+            pass
+    result = pdf_tools.merge([fp for _, fp in saved])
+    return jsonify(result)
+
+
+# ── Keep-alive ping endpoint ──────────────────────────────
+@app.route('/ping')
+def ping():
+    return 'pong', 200
+
+
 @app.errorhandler(404)
 def not_found(e):
     return render_template('index.html'), 404
@@ -694,3 +790,4 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_ENV', 'development') == 'development'
     app.run(debug=debug, host='0.0.0.0', port=port)
+
