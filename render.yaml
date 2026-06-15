@@ -3,7 +3,7 @@ services:
     name: corporate-tools-suite
     env: python
     plan: free
-    buildCommand: apt-get update -y && apt-get install -y tesseract-ocr libreoffice --no-install-recommends && pip install -r requirements.txt
+    buildCommand: apt-get update -y && apt-get install -y tesseract-ocr && pip install -r requirements.txt
     startCommand: gunicorn app:app --workers 2 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION
