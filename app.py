@@ -4,7 +4,11 @@ Main application entry point with all routes.
 """
 
 import os
+import io
 import json
+import uuid
+import time
+import base64
 import zipfile
 import shutil
 from datetime import datetime
@@ -47,6 +51,9 @@ file_mgr = FileManager(UPLOAD_FOLDER, OUTPUT_FOLDER)
 pdf_tools = PDFTools(UPLOAD_FOLDER, OUTPUT_FOLDER)
 excel_tools = ExcelTools(UPLOAD_FOLDER, OUTPUT_FOLDER)
 gst_tools = GSTTools(UPLOAD_FOLDER, OUTPUT_FOLDER)
+
+# ── Scan-to-PDF session store (in-memory) ────────────────
+scan_sessions = {}  # {session_id: {images:[], created:float, pdf:None}}
 
 
 def allowed_file(filename, file_type='any'):
@@ -768,6 +775,138 @@ def pdf_merge_ordered():
             pass
     result = pdf_tools.merge([fp for _, fp in saved])
     return jsonify(result)
+
+
+# ══════════════════════════════════════════════════════════
+#  SCAN TO PDF ROUTES
+# ══════════════════════════════════════════════════════════
+
+@app.route('/scan/<session_id>')
+def scan_mobile_page(session_id):
+    """Mobile camera page — opened via QR code."""
+    if session_id not in scan_sessions:
+        return '<h2 style="font-family:sans-serif;padding:40px;color:#e2192c">⚠️ Session expired or invalid.<br>Please generate a new QR code.</h2>', 404
+    return render_template('scan_mobile.html', session_id=session_id)
+
+
+@app.route('/api/scan/create', methods=['POST'])
+def scan_create():
+    """Create a new scan session and return QR code."""
+    # Clean old sessions (older than 1 hour)
+    now = time.time()
+    for sid in list(scan_sessions.keys()):
+        if now - scan_sessions[sid]['created'] > 3600:
+            folder = os.path.join(UPLOAD_FOLDER, f'scan_{sid}')
+            if os.path.exists(folder):
+                shutil.rmtree(folder, ignore_errors=True)
+            del scan_sessions[sid]
+
+    session_id = str(uuid.uuid4())[:10]
+    scan_sessions[session_id] = {'images': [], 'created': now, 'pdf': None}
+    os.makedirs(os.path.join(UPLOAD_FOLDER, f'scan_{session_id}'), exist_ok=True)
+
+    # Build mobile URL (use request host)
+    proto = 'https' if request.is_secure or 'onrender.com' in request.host else 'http'
+    base_url = f"{proto}://{request.host}"
+    mobile_url = f"{base_url}/scan/{session_id}"
+
+    # Generate QR code
+    try:
+        import qrcode
+        qr = qrcode.QRCode(version=1, box_size=8, border=2,
+                           error_correction=qrcode.constants.ERROR_CORRECT_L)
+        qr.add_data(mobile_url)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color='#1f2937', back_color='white')
+        buf = io.BytesIO()
+        img.save(buf, format='PNG')
+        qr_b64 = base64.b64encode(buf.getvalue()).decode()
+        return jsonify({
+            'success': True,
+            'session_id': session_id,
+            'mobile_url': mobile_url,
+            'qr_code': f'data:image/png;base64,{qr_b64}'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': f'QR generation failed: {str(e)}'})
+
+
+@app.route('/api/scan/upload/<session_id>', methods=['POST'])
+def scan_upload(session_id):
+    """Mobile uploads scanned images here."""
+    if session_id not in scan_sessions:
+        return jsonify({'success': False, 'error': 'Session expired'})
+    folder = os.path.join(UPLOAD_FOLDER, f'scan_{session_id}')
+    os.makedirs(folder, exist_ok=True)
+    files = request.files.getlist('images[]')
+    if not files:
+        single = request.files.get('image')
+        if single:
+            files = [single]
+    saved = 0
+    for f in files:
+        if f and f.filename:
+            idx = len(scan_sessions[session_id]['images']) + saved + 1
+            ext = f.filename.rsplit('.', 1)[-1].lower() if '.' in f.filename else 'jpg'
+            fn = f'scan_{idx:03d}.{ext}'
+            fp = os.path.join(folder, fn)
+            f.save(fp)
+            scan_sessions[session_id]['images'].append(fp)
+            saved += 1
+    total = len(scan_sessions[session_id]['images'])
+    return jsonify({'success': True, 'saved': saved, 'total': total})
+
+
+@app.route('/api/scan/status/<session_id>')
+def scan_status(session_id):
+    """Desktop polls this to check how many images arrived."""
+    if session_id not in scan_sessions:
+        return jsonify({'success': False, 'error': 'Session expired'})
+    s = scan_sessions[session_id]
+    return jsonify({
+        'success': True,
+        'image_count': len(s['images']),
+        'pdf': s.get('pdf')
+    })
+
+
+@app.route('/api/scan/generate/<session_id>', methods=['POST'])
+def scan_generate(session_id):
+    """Convert all scanned images to a single PDF."""
+    if session_id not in scan_sessions:
+        return jsonify({'success': False, 'error': 'Session expired'})
+    s = scan_sessions[session_id]
+    if not s['images']:
+        return jsonify({'success': False, 'error': 'No images scanned yet! Scan at least one page.'})
+    try:
+        import fitz
+        ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+        out_name = f'scanned_{ts}.pdf'
+        out_path = os.path.join(OUTPUT_FOLDER, out_name)
+        doc = fitz.open()
+        for img_path in sorted(s['images']):
+            if not os.path.exists(img_path):
+                continue
+            try:
+                img_doc = fitz.open(img_path)
+                rect = img_doc[0].rect
+                img_doc.close()
+            except Exception:
+                rect = fitz.Rect(0, 0, 595, 842)  # A4
+            page = doc.new_page(width=rect.width, height=rect.height)
+            page.insert_image(page.rect, filename=img_path)
+        doc.save(out_path, garbage=4, deflate=True)
+        doc.close()
+        s['pdf'] = out_name
+        size = os.path.getsize(out_path)
+        size_str = f'{size/1024:.1f} KB' if size < 1024*1024 else f'{size/1024/1024:.2f} MB'
+        return jsonify({
+            'success': True, 'filename': out_name,
+            'pages': len(s['images']), 'size_str': size_str,
+            'message': f'Scanned PDF created! {len(s["images"])} page(s), {size_str}'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 
 # ── Keep-alive ping endpoint ──────────────────────────────

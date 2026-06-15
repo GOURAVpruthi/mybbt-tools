@@ -259,6 +259,10 @@ select:focus{border-color:var(--red)}
           <div class="tool-icon ic-red">🔢</div>
           <div class="tool-info"><div class="tool-name">Page Numbers</div><div class="tool-desc">Add page numbering</div></div>
         </div>
+        <div class="tool-card" onclick="openTool('scan-to-pdf')">
+          <div class="tool-icon ic-red">📷</div>
+          <div class="tool-info"><div class="tool-name">Scan to PDF</div><div class="tool-desc">Phone camera → PDF</div></div>
+        </div>
       </div>
     </div>
 
@@ -867,6 +871,7 @@ select:focus{border-color:var(--red)}
 <script>
 // ── Tool metadata ─────────────────────────────────────────
 const TOOLS = {
+  'scan-to-pdf': {title:'Scan to PDF',   tpl:'tpl-scan-to-pdf'},
   'compress':    {title:'Compress PDF',   tpl:'tpl-compress'},
   'merge':       {title:'Merge PDF',      tpl:'tpl-merge'},
   'split':       {title:'Split PDF',      tpl:'tpl-split'},
@@ -1496,5 +1501,164 @@ function handleHash() {
 window.addEventListener('hashchange', handleHash);
 handleHash();
 </script>
+<template id="tpl-scan-to-pdf">
+  <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:6px">Scan to PDF</h2>
+  <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:24px">
+    Scan physical documents using your smartphone camera and convert to PDF instantly.
+  </p>
+
+  <!-- Step 1 — Generate QR -->
+  <div id="scan-step1" style="text-align:center">
+    <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:40px 24px;margin-bottom:20px">
+      <div style="font-size:3rem;margin-bottom:16px">📱</div>
+      <p style="font-weight:600;color:var(--gray-700);margin-bottom:8px">Use your smartphone to scan documents</p>
+      <p style="font-size:.85rem;color:var(--gray-400);margin-bottom:24px">
+        Click the button below to generate a QR code.<br>
+        Scan it with your phone — your camera will open.
+      </p>
+      <button class="action-btn" style="margin:0" onclick="scanInit()">📷 Generate QR Code</button>
+    </div>
+  </div>
+
+  <!-- Step 2 — QR + Live Status -->
+  <div id="scan-step2" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+
+      <!-- QR Code box -->
+      <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:24px;text-align:center">
+        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:12px">
+          Step 1 — Scan this QR code
+        </div>
+        <img id="scan-qr-img" src="" alt="QR Code"
+          style="width:180px;height:180px;border-radius:8px;border:1px solid var(--gray-200)"/>
+        <p style="font-size:.75rem;color:var(--gray-400);margin-top:10px">
+          Opens camera on your phone
+        </p>
+        <button onclick="scanInit()" style="margin-top:10px;background:none;border:1px solid var(--gray-300);
+          border-radius:6px;padding:5px 12px;font-size:.78rem;cursor:pointer;color:var(--gray-600)">
+          🔄 New QR
+        </button>
+      </div>
+
+      <!-- Live status box -->
+      <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:24px">
+        <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);margin-bottom:16px">
+          Step 2 — Scan pages on phone
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div id="scan-dot" style="width:10px;height:10px;border-radius:50%;background:var(--gray-300);flex-shrink:0"></div>
+          <span id="scan-status-text" style="font-size:.85rem;color:var(--gray-600)">Waiting for phone…</span>
+        </div>
+        <div style="background:var(--gray-50);border-radius:8px;padding:14px;text-align:center;margin-bottom:16px">
+          <div id="scan-page-count" style="font-size:2rem;font-weight:700;color:var(--gray-800)">0</div>
+          <div style="font-size:.8rem;color:var(--gray-400)">pages scanned</div>
+        </div>
+        <button class="action-btn" id="scan-gen-btn" style="margin:0;width:100%;justify-content:center"
+          onclick="scanGenerate()" disabled>
+          📄 Generate PDF
+        </button>
+        <p style="font-size:.75rem;color:var(--gray-400);margin-top:8px;text-align:center">
+          Click after scanning all pages
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Direct link fallback -->
+    <div style="margin-top:12px;padding:12px 16px;background:var(--gray-50);border-radius:8px;
+      display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--gray-500)">
+      <span>📋 Or open directly on phone:</span>
+      <a id="scan-mobile-link" href="#" target="_blank"
+        style="color:var(--blue);font-weight:500;word-break:break-all"></a>
+    </div>
+  </div>
+
+  <div class="result-box" id="scan-result"></div>
+</template>
+
+
+<script>
+// ─── SCAN TO PDF logic ────────────────────────────
+let scanSessionId = null;
+let scanPollTimer = null;
+let lastScanCount = 0;
+
+async function scanInit() {
+  const step1 = document.getElementById('scan-step1');
+  const step2 = document.getElementById('scan-step2');
+  if (step1) step1.innerHTML = '<div style="text-align:center;padding:24px;color:var(--gray-400)"><div class="loader-ring" style="margin:0 auto 10px"></div>Generating QR code…</div>';
+
+  const res = await fetch('/api/scan/create', {method:'POST'});
+  const data = await res.json();
+  if (!data.success) { alert('Error: ' + data.error); return; }
+
+  scanSessionId = data.session_id;
+  lastScanCount = 0;
+
+  // Show QR
+  const qrImg = document.getElementById('scan-qr-img');
+  if (qrImg) qrImg.src = data.qr_code;
+  const link = document.getElementById('scan-mobile-link');
+  if (link) { link.href = data.mobile_url; link.textContent = data.mobile_url; }
+
+  if (step1) step1.style.display = 'none';
+  if (step2) step2.style.display = 'block';
+
+  // Start polling
+  clearInterval(scanPollTimer);
+  scanPollTimer = setInterval(scanPoll, 2000);
+  scanPoll();
+}
+
+async function scanPoll() {
+  if (!scanSessionId) return;
+  try {
+    const res = await fetch(`/api/scan/status/${scanSessionId}`);
+    const data = await res.json();
+    if (!data.success) return;
+    const count = data.image_count;
+    document.getElementById('scan-page-count').textContent = count;
+    const dot = document.getElementById('scan-dot');
+    const txt = document.getElementById('scan-status-text');
+    const btn = document.getElementById('scan-gen-btn');
+    if (count > 0) {
+      if (dot) { dot.style.background = '#16a34a'; dot.style.animation = 'pulse 1.5s infinite'; }
+      if (txt) txt.textContent = count + (count===1?' page':' pages') + ' scanned';
+      if (btn) btn.disabled = false;
+    } else {
+      if (dot) dot.style.background = '#f59e0b';
+      if (txt) txt.textContent = 'Waiting for scans…';
+    }
+    if (count !== lastScanCount && count > lastScanCount) {
+      lastScanCount = count;
+    }
+  } catch(e) {}
+}
+
+async function scanGenerate() {
+  if (!scanSessionId) return;
+  clearInterval(scanPollTimer);
+  const btn = document.getElementById('scan-gen-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Creating PDF…'; }
+  const res = await fetch(`/api/scan/generate/${scanSessionId}`, {method:'POST'});
+  const data = await res.json();
+  if (data.success) {
+    showResult('scan-result', true, data.message,
+      `${data.pages} pages · ${data.size_str}`, data.filename);
+    const step2 = document.getElementById('scan-step2');
+    if (step2) step2.style.display = 'none';
+    const step1 = document.getElementById('scan-step1');
+    if (step1) { step1.style.display = 'block'; step1.innerHTML =
+      '<div style="text-align:center;padding:24px"><button class="action-btn" style="margin:0" onclick="scanInit()">📷 Scan More Documents</button></div>'; }
+  } else {
+    showResult('scan-result', false, data.error, '');
+    if (btn) { btn.disabled = false; btn.textContent = '📄 Generate PDF'; }
+    clearInterval(scanPollTimer);
+    scanPollTimer = setInterval(scanPoll, 2000);
+  }
+}
+</script>
+
+
 </body>
 </html>
