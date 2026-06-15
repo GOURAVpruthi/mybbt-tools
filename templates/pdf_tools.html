@@ -1004,6 +1004,7 @@ function hideLoader() { document.getElementById('loader').classList.remove('acti
 
 // ── Result helpers ────────────────────────────────────────
 function showResult(elId, success, msg, sub, filename) {
+  hideLoader(); // ← always stop spinner when showing any result
   const el = document.getElementById(elId);
   if (!el) return;
   el.style.display = 'block';
