@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="description" content="MyBBT Corporate Laws Hub — Direct links to GST, Income Tax, Company Law, SEBI, Labour Law, FEMA circulars and notifications for Indian professionals."/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="MyBBT Corporate Laws Hub — Section-wise access to GST, Income Tax, Companies Act, IND AS, SA and all Indian corporate laws."/>
 <title>Corporate Laws Hub — MyBBT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -20,93 +20,129 @@ html{scroll-behavior:smooth}
 body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);line-height:1.5;overflow-x:hidden}
 
 /* NAV */
-.nav{position:sticky;top:0;z-index:100;background:rgba(10,15,30,.9);backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--border);padding:0 5vw}
-.nav-inner{max-width:1200px;margin:0 auto;height:56px;display:flex;align-items:center;gap:16px}
-.nav-logo{font-size:1.1rem;font-weight:800;color:#fff;text-decoration:none}
+.nav{position:sticky;top:0;z-index:200;background:rgba(10,15,30,.95);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1300px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;gap:12px}
+.nav-logo{font-size:1.1rem;font-weight:800;color:#fff;text-decoration:none;margin-right:8px}
 .nav-logo span{color:var(--red)}
-.nav-back{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;
+.nav-back{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:6px;
   background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);
-  text-decoration:none;font-size:.82rem;transition:all .2s}
+  text-decoration:none;font-size:.8rem;transition:all .2s}
 .nav-back:hover{background:rgba(255,255,255,.1);color:#fff}
-.nav-right{margin-left:auto;display:flex;gap:8px}
-.nav-tool-btn{padding:6px 14px;border-radius:6px;background:var(--red);color:#fff;
-  text-decoration:none;font-size:.82rem;font-weight:600}
+.nav-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.nav-btn{padding:6px 14px;border-radius:6px;background:var(--red);color:#fff;
+  text-decoration:none;font-size:.8rem;font-weight:600;transition:all .2s}
+.nav-btn:hover{background:#c01020}
 
 /* HERO */
-.laws-hero{background:linear-gradient(135deg, rgba(226,25,44,.08) 0%, transparent 60%),
-  linear-gradient(180deg, var(--dark) 0%, var(--dark2) 100%);
-  padding:60px 5vw 40px;border-bottom:1px solid var(--border)}
-.laws-hero-inner{max-width:1200px;margin:0 auto}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;
+.hero{background:linear-gradient(135deg,rgba(226,25,44,.07) 0%,transparent 60%);
+  padding:48px 24px 36px;border-bottom:1px solid var(--border)}
+.hero-inner{max-width:1300px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:4px 12px;
   background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:20px;
-  font-size:.75rem;font-weight:600;color:#93c5fd;margin-bottom:16px}
-h1{font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:800;margin-bottom:12px;letter-spacing:-.02em}
-.hero-sub{color:var(--text3);font-size:.95rem;margin-bottom:24px;max-width:600px;line-height:1.6}
-
-/* SEARCH */
-.search-wrap{max-width:480px;position:relative;margin-bottom:32px}
-.search-input{width:100%;padding:12px 16px 12px 42px;background:rgba(255,255,255,.06);
-  border:1px solid var(--border);border-radius:10px;color:#fff;font-size:.9rem;font-family:inherit;outline:none}
+  font-size:.72rem;font-weight:600;color:#93c5fd;margin-bottom:14px}
+h1{font-size:clamp(1.5rem,3vw,2.5rem);font-weight:800;margin-bottom:10px;letter-spacing:-.02em}
+.hero-sub{color:var(--text3);font-size:.92rem;margin-bottom:20px;max-width:640px;line-height:1.6}
+.search-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;max-width:460px}
+.search-input{width:100%;padding:11px 16px 11px 40px;background:rgba(255,255,255,.06);
+  border:1px solid var(--border);border-radius:10px;color:#fff;font-size:.88rem;
+  font-family:inherit;outline:none;transition:border-color .2s}
+.search-input:focus{border-color:rgba(59,130,246,.5)}
 .search-input::placeholder{color:var(--text3)}
-.search-input:focus{border-color:rgba(59,130,246,.4);background:rgba(255,255,255,.08)}
-.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1rem;opacity:.5}
+.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);opacity:.4;font-size:.95rem}
 
-/* TAB NAV */
-.tab-nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px;padding:0 5vw}
-.tab-nav-inner{max-width:1200px;margin:0 auto;display:flex;gap:8px;flex-wrap:wrap}
-.tab-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);
-  background:rgba(255,255,255,.04);color:var(--text3);font-size:.82rem;font-weight:500;
-  cursor:pointer;transition:all .2s;font-family:inherit;text-decoration:none}
-.tab-btn:hover,.tab-btn.active{background:var(--red);border-color:var(--red);color:#fff}
+/* LAYOUT */
+.layout{display:flex;max-width:1300px;margin:0 auto;min-height:calc(100vh - 180px)}
+.sidebar{width:260px;flex-shrink:0;border-right:1px solid var(--border);
+  padding:20px 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+.sb-section{margin-bottom:6px}
+.sb-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--text3);padding:10px 20px 6px;display:flex;align-items:center;gap:8px}
+.sb-link{display:block;padding:7px 20px;font-size:.82rem;color:var(--text3);
+  text-decoration:none;transition:all .15s;cursor:pointer;border-left:2px solid transparent}
+.sb-link:hover{color:var(--text2);background:rgba(255,255,255,.04)}
+.sb-link.active{color:#fff;background:rgba(226,25,44,.1);border-left-color:var(--red)}
+.sb-sub{padding:5px 20px 5px 32px;font-size:.78rem;color:var(--text3);
+  text-decoration:none;display:block;transition:all .15s}
+.sb-sub:hover{color:var(--text2)}
 
-/* MAIN LAYOUT */
-.main{max-width:1200px;margin:0 auto;padding:40px 5vw 80px}
+/* MAIN */
+.main{flex:1;padding:32px 28px 80px;min-width:0}
 
-/* SECTION */
-.law-section{margin-bottom:60px;scroll-margin-top:80px}
-.ls-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;
-  padding-bottom:16px;border-bottom:1px solid var(--border)}
-.ls-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;
+/* LAW BLOCK */
+.law-block{margin-bottom:52px;scroll-margin-top:72px}
+.lb-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;
+  padding-bottom:14px;border-bottom:2px solid var(--border)}
+.lb-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;
   justify-content:center;font-size:1.4rem;flex-shrink:0}
-.ls-title{font-size:1.15rem;font-weight:700}
-.ls-subtitle{font-size:.8rem;color:var(--text3);margin-top:2px}
+.lb-title{font-size:1.1rem;font-weight:800;margin-bottom:2px}
+.lb-sub{font-size:.75rem;color:var(--text3)}
 
-/* LINK CARDS */
-.links-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
-.link-card{background:var(--card);border:1px solid var(--border);border-radius:10px;
-  padding:16px 18px;text-decoration:none;color:inherit;transition:all .2s;
-  display:flex;align-items:flex-start;gap:12px}
-.link-card:hover{background:#1a2435;border-color:rgba(255,255,255,.15);
-  transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
-.lc-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px}
-.lc-body{flex:1;min-width:0}
-.lc-title{font-size:.88rem;font-weight:600;color:#fff;margin-bottom:3px;
-  display:flex;align-items:center;gap:6px}
-.lc-ext{font-size:.65rem;color:var(--text3);background:rgba(255,255,255,.08);
-  padding:1px 6px;border-radius:4px;font-weight:500}
-.lc-desc{font-size:.76rem;color:var(--text3);line-height:1.4}
-.lc-arrow{font-size:.75rem;color:var(--blue);margin-top:6px;font-weight:600}
+/* TABS */
+.law-tabs{display:flex;gap:4px;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:0}
+.lt{padding:7px 14px;font-size:.78rem;font-weight:500;border:none;background:none;
+  color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;
+  margin-bottom:-1px;transition:all .2s;font-family:inherit}
+.lt:hover{color:var(--text2)}
+.lt.active{color:var(--red);border-bottom-color:var(--red)}
 
-/* IMPORTANT BADGE */
-.imp-badge{font-size:.65rem;background:rgba(245,158,11,.15);color:#fbbf24;
-  border:1px solid rgba(245,158,11,.25);padding:1px 7px;border-radius:10px;font-weight:600}
-.new-badge{font-size:.65rem;background:rgba(34,197,94,.15);color:#4ade80;
-  border:1px solid rgba(34,197,94,.25);padding:1px 7px;border-radius:10px;font-weight:600}
+/* TAB CONTENT */
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* SECTION ACCORDION */
+.acc-group{margin-bottom:8px}
+.acc-chapter{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--text3);padding:10px 0 6px;display:flex;align-items:center;gap:8px}
+.acc-chapter::after{content:'';flex:1;height:1px;background:var(--border)}
+.sections-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px}
+.sec-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;
+  padding:12px 14px;text-decoration:none;color:inherit;transition:all .18s;display:flex;
+  align-items:flex-start;gap:10px}
+.sec-card:hover{background:rgba(255,255,255,.07);border-color:rgba(226,25,44,.3);
+  transform:translateY(-1px)}
+.sec-num{font-size:.75rem;font-weight:700;color:var(--red);background:rgba(226,25,44,.1);
+  padding:2px 7px;border-radius:5px;flex-shrink:0;margin-top:1px;white-space:nowrap}
+.sec-body{flex:1;min-width:0}
+.sec-title{font-size:.83rem;font-weight:600;color:var(--text2);margin-bottom:2px;line-height:1.3}
+.sec-desc{font-size:.73rem;color:var(--text3);line-height:1.4}
+.sec-src{font-size:.68rem;color:var(--blue);margin-top:4px;font-weight:500}
+
+/* LINKS TABLE */
+.links-table{width:100%;border-collapse:collapse}
+.links-table th{font-size:.72rem;font-weight:700;color:var(--text3);text-align:left;
+  padding:8px 12px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.06em}
+.links-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);
+  font-size:.82rem;vertical-align:top}
+.links-table tr:hover td{background:rgba(255,255,255,.03)}
+.link-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text2);
+  text-decoration:none;font-size:.75rem;transition:all .18s;margin:2px}
+.link-chip:hover{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.3);color:#93c5fd}
+.badge-imp{font-size:.64rem;background:rgba(245,158,11,.15);color:#fbbf24;
+  border:1px solid rgba(245,158,11,.25);padding:1px 6px;border-radius:8px;font-weight:600}
+.badge-new{font-size:.64rem;background:rgba(34,197,94,.15);color:#4ade80;
+  border:1px solid rgba(34,197,94,.25);padding:1px 6px;border-radius:8px;font-weight:600}
 
 /* NOTICE */
-.notice{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:10px;
-  padding:14px 18px;font-size:.82rem;color:#93c5fd;margin-bottom:32px;display:flex;gap:10px}
+.notice{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);border-radius:8px;
+  padding:12px 16px;font-size:.8rem;color:#93c5fd;margin-bottom:24px}
 
 /* Back to top */
-.back-top{position:fixed;bottom:24px;right:24px;width:42px;height:42px;border-radius:50%;
-  background:var(--red);color:#fff;border:none;cursor:pointer;font-size:1.1rem;
-  display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(226,25,44,.4);
-  transition:all .2s;z-index:50}
-.back-top:hover{transform:scale(1.1)}
+.btt{position:fixed;bottom:22px;right:22px;width:40px;height:40px;border-radius:50%;
+  background:var(--red);color:#fff;border:none;cursor:pointer;font-size:1rem;
+  display:none;align-items:center;justify-content:center;z-index:99;transition:all .2s;
+  box-shadow:0 4px 14px rgba(226,25,44,.35)}
+.btt:hover{transform:scale(1.08)}
 
 /* Mobile */
-@media(max-width:640px){.links-grid{grid-template-columns:1fr}}
+@media(max-width:768px){
+  .sidebar{display:none}
+  .layout{display:block}
+  .main{padding:20px 16px 60px}
+  .sections-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -117,624 +153,638 @@ h1{font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:800;margin-bottom:12px;lette
     <a href="/" class="nav-logo">My<span>BBT</span></a>
     <a href="/" class="nav-back">← Home</a>
     <div class="nav-right">
-      <a href="/pdf-tools" class="nav-tool-btn">📄 PDF Tools</a>
+      <a href="/pdf-tools" class="nav-btn">📄 PDF Tools</a>
     </div>
   </div>
 </nav>
 
 <!-- HERO -->
-<div class="laws-hero">
-  <div class="laws-hero-inner">
-    <div class="hero-badge">⚖️ Corporate Laws Reference Hub</div>
-    <h1>All Corporate Laws. One Place.</h1>
-    <p class="hero-sub">
-      Direct links to official circulars, notifications, acts and portals — classified by law category.
-      No Google searching. Just click and read from the official source.
-    </p>
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input class="search-input" type="text" id="law-search" placeholder="Search GST, Income Tax, Companies Act…" oninput="filterLaws(this.value)"/>
-    </div>
-  </div>
-</div>
-
-<!-- TAB NAV -->
-<div class="tab-nav" style="padding-top:24px;background:var(--dark2);border-bottom:1px solid var(--border)">
-  <div class="tab-nav-inner">
-    <a href="#gst" class="tab-btn active" onclick="setActive(this)">🧾 GST</a>
-    <a href="#income-tax" class="tab-btn" onclick="setActive(this)">💰 Income Tax</a>
-    <a href="#company-law" class="tab-btn" onclick="setActive(this)">🏢 Company Law</a>
-    <a href="#sebi" class="tab-btn" onclick="setActive(this)">📈 SEBI</a>
-    <a href="#labour" class="tab-btn" onclick="setActive(this)">👷 Labour Laws</a>
-    <a href="#fema-rbi" class="tab-btn" onclick="setActive(this)">🏦 FEMA/RBI</a>
-    <a href="#customs" class="tab-btn" onclick="setActive(this)">🚢 Customs</a>
-    <a href="#other" class="tab-btn" onclick="setActive(this)">📋 Other</a>
-  </div>
-</div>
-
-<div class="main">
-  <div class="notice">
-    ℹ️ All links open official government websites. MyBBT does not host any legal content — we only provide organized quick-access links to official sources.
-  </div>
-
-  <!-- ══ GST ══ -->
-  <div class="law-section" id="gst">
-    <div class="ls-header">
-      <div class="ls-icon" style="background:rgba(34,197,94,.12)">🧾</div>
-      <div>
-        <div class="ls-title">GST Laws & Resources</div>
-        <div class="ls-subtitle">CBIC · GST Council · GSTN Portal</div>
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">⚖️ Corporate Laws Library · Section-wise Access</div>
+    <h1>Laws. Circulars. Case Laws. One Place.</h1>
+    <p class="hero-sub">Section-by-section access to every Indian corporate law. Click any section to read directly on the official/best readable source. Covers GST, Income Tax, Companies Act, IND AS, SA, SEBI, Labour, FEMA.</p>
+    <div class="search-row">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" type="text" id="law-search" placeholder="Search section, e.g. 'Section 17(5) blocked credits'…" oninput="filterAll(this.value)"/>
       </div>
     </div>
-    <div class="links-grid">
-      <a href="https://cbic-gst.gov.in/gst-acts.html" target="_blank" class="link-card" data-keywords="gst act cgst sgst igst">
-        <span class="lc-icon">📘</span>
-        <div class="lc-body">
-          <div class="lc-title">GST Acts (CGST, IGST, SGST, UTGST) <span class="lc-ext">Official</span></div>
-          <div class="lc-desc">Complete text of all GST Acts as amended. CBIC official source.</div>
-          <div class="lc-arrow">cbic-gst.gov.in →</div>
+  </div>
+</div>
+
+<div class="layout">
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-section">
+    <div class="sb-title">🧾 GST</div>
+    <a class="sb-link" href="#gst" onclick="setActive(this)">CGST Act 2017</a>
+    <a class="sb-sub" href="#gst-ch1">Chapter I–II · Definitions</a>
+    <a class="sb-sub" href="#gst-ch3">Chapter III · Levy & Supply</a>
+    <a class="sb-sub" href="#gst-ch5">Chapter V · ITC</a>
+    <a class="sb-sub" href="#gst-ch6">Chapter VI · Registration</a>
+    <a class="sb-sub" href="#gst-ch7">Chapter VII · Tax Invoice</a>
+    <a class="sb-sub" href="#gst-ch10">Chapter X · Returns</a>
+    <a class="sb-sub" href="#gst-ch15">Chapter XV · Demands</a>
+    <a class="sb-link" href="#gst-circ" onclick="setActive(this)">Circulars & Notifications</a>
+    <a class="sb-link" href="#gst-case" onclick="setActive(this)">Case Laws</a>
+  </div>
+  <div class="sb-section">
+    <div class="sb-title">💰 Income Tax</div>
+    <a class="sb-link" href="#it" onclick="setActive(this)">IT Act 1961</a>
+    <a class="sb-sub" href="#it-exemptions">Sec 10 · Exemptions</a>
+    <a class="sb-sub" href="#it-deductions">Sec 36–43B · Deductions</a>
+    <a class="sb-sub" href="#it-chapter6a">Chapter VI-A · 80C–80U</a>
+    <a class="sb-sub" href="#it-tds">Sec 192–206 · TDS</a>
+    <a class="sb-sub" href="#it-assessment">Assessment & Penalties</a>
+    <a class="sb-link" href="#it-circ" onclick="setActive(this)">CBDT Circulars</a>
+  </div>
+  <div class="sb-section">
+    <div class="sb-title">🏢 Company Law</div>
+    <a class="sb-link" href="#ca" onclick="setActive(this)">Companies Act 2013</a>
+    <a class="sb-sub" href="#ca-incorp">Ch II · Incorporation</a>
+    <a class="sb-sub" href="#ca-mgmt">Ch XII · Board & Meetings</a>
+    <a class="sb-sub" href="#ca-audit">Ch X · Audit & Auditors</a>
+    <a class="sb-sub" href="#ca-rpt">RPT, Loans & Investments</a>
+    <a class="sb-link" href="#ibc" onclick="setActive(this)">IBC / Insolvency</a>
+  </div>
+  <div class="sb-section">
+    <div class="sb-title">📊 Accounting</div>
+    <a class="sb-link" href="#indas" onclick="setActive(this)">IND AS</a>
+    <a class="sb-link" href="#as" onclick="setActive(this)">Old AS (IGAAP)</a>
+    <a class="sb-link" href="#sa" onclick="setActive(this)">SA · Auditing Standards</a>
+  </div>
+  <div class="sb-section">
+    <div class="sb-title">📈 SEBI / Markets</div>
+    <a class="sb-link" href="#sebi" onclick="setActive(this)">SEBI Regulations</a>
+  </div>
+  <div class="sb-section">
+    <div class="sb-title">👷 Labour / FEMA</div>
+    <a class="sb-link" href="#labour" onclick="setActive(this)">Labour Laws</a>
+    <a class="sb-link" href="#fema" onclick="setActive(this)">FEMA / RBI</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="notice">ℹ️ All links open official government websites or best readable legal sources. MyBBT only provides organized access — no legal content is hosted here.</div>
+
+  <!-- ══ GST ══ -->
+  <div class="law-block" id="gst">
+    <div class="lb-header">
+      <div class="lb-icon" style="background:rgba(34,197,94,.12)">🧾</div>
+      <div>
+        <div class="lb-title">GST — Central Goods & Services Tax Act, 2017</div>
+        <div class="lb-sub">CBIC · GST Council · GSTN</div>
+      </div>
+    </div>
+
+    <!-- Law tabs -->
+    <div class="law-tabs">
+      <button class="lt active" onclick="showTab(this,'gst','sections')">📘 Act (Section-wise)</button>
+      <button class="lt" onclick="showTab(this,'gst','rules')">📋 Rules</button>
+      <button class="lt" onclick="showTab(this,'gst','circulars')">📣 Circulars</button>
+      <button class="lt" onclick="showTab(this,'gst','notifications')">🔔 Notifications</button>
+      <button class="lt" onclick="showTab(this,'gst','caselaws')">⚖️ Case Laws</button>
+      <button class="lt" onclick="showTab(this,'gst','portal')">🌐 Portals</button>
+    </div>
+
+    <div id="gst-sections" class="tab-content active">
+      <div class="acc-group" id="gst-ch1">
+        <div class="acc-chapter">Chapter I & II — Preliminary & Definitions</div>
+        <div class="sections-grid">
+          <a href="https://cbic-gst.gov.in/pdf/cgst-act-28012022.pdf#page=1" target="_blank" class="sec-card" data-kw="cgst act preliminary definitions">
+            <span class="sec-num">Sec 1</span>
+            <div class="sec-body"><div class="sec-title">Short Title & Commencement</div><div class="sec-desc">Applicability and commencement of CGST Act</div><div class="sec-src">CBIC →</div></div>
+          </a>
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-2.html" target="_blank" class="sec-card" data-kw="cgst definitions section 2 aggregate turnover taxable person">
+            <span class="sec-num">Sec 2</span>
+            <div class="sec-body"><div class="sec-title">Definitions</div><div class="sec-desc">Aggregate turnover, business, taxable supply, taxable person, zero-rated supply etc.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://cbic-gst.gov.in/gst-rules.html" target="_blank" class="link-card" data-keywords="gst rules cgst rules">
-        <span class="lc-icon">📋</span>
-        <div class="lc-body">
-          <div class="lc-title">GST Rules (CGST Rules 2017)</div>
-          <div class="lc-desc">All GST rules with amendments. Official CBIC source.</div>
-          <div class="lc-arrow">cbic-gst.gov.in →</div>
+      </div>
+
+      <div class="acc-group" id="gst-ch3">
+        <div class="acc-chapter">Chapter III — Levy & Collection of Tax</div>
+        <div class="sections-grid">
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-9.html" target="_blank" class="sec-card" data-kw="gst levy collection cgst section 9 forward charge">
+            <span class="sec-num">Sec 9</span>
+            <div class="sec-body"><div class="sec-title">Levy & Collection (CGST)</div><div class="sec-desc">Charge of tax on intra-state supply. RCM under 9(3) and 9(4).</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-10.html" target="_blank" class="sec-card" data-kw="gst composition scheme section 10">
+            <span class="sec-num">Sec 10</span>
+            <div class="sec-body"><div class="sec-title">Composition Levy</div><div class="sec-desc">Composition scheme eligibility, rates and conditions.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://cbic-gst.gov.in/circular-cgst-notifications.html" target="_blank" class="link-card" data-keywords="gst circular cgst notification">
-        <span class="lc-icon">📣</span>
-        <div class="lc-body">
-          <div class="lc-title">CGST Circulars <span class="imp-badge">Important</span></div>
-          <div class="lc-desc">All CBIC CGST circulars with subject-wise index.</div>
-          <div class="lc-arrow">cbic-gst.gov.in →</div>
+      </div>
+
+      <div class="acc-group" id="gst-ch5">
+        <div class="acc-chapter">Chapter V — Input Tax Credit (Most Important)</div>
+        <div class="sections-grid">
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-16.html" target="_blank" class="sec-card" data-kw="gst itc input tax credit eligibility conditions section 16">
+            <span class="sec-num">Sec 16</span>
+            <div class="sec-body"><div class="sec-title">Eligibility & Conditions for ITC <span class="badge-imp">Key</span></div><div class="sec-desc">ITC conditions: tax invoice, receipt, tax paid, return filed. 4 conditions mandatory.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-17.html" target="_blank" class="sec-card" data-kw="gst blocked credit section 17(5) apportionment itc">
+            <span class="sec-num">Sec 17(5)</span>
+            <div class="sec-body"><div class="sec-title">Blocked Credits — Section 17(5) <span class="badge-imp">Most Asked</span></div><div class="sec-desc">Motor vehicles, food, club, health services, works contract — ITC not available. All 14 categories.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-17.html" target="_blank" class="sec-card" data-kw="gst itc apportionment section 17 business non business">
+            <span class="sec-num">Sec 17(1-4)</span>
+            <div class="sec-body"><div class="sec-title">Apportionment of ITC</div><div class="sec-desc">Business vs non-business use. Taxable vs exempt supply apportionment rules.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-18.html" target="_blank" class="sec-card" data-kw="gst itc availability registration cancellation transfer section 18">
+            <span class="sec-num">Sec 18</span>
+            <div class="sec-body"><div class="sec-title">Availability of Credit in Special Circumstances</div><div class="sec-desc">ITC on new registration, from exempt to taxable, transfer of business.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-19.html" target="_blank" class="sec-card" data-kw="gst itc principal agent job work section 19 20">
+            <span class="sec-num">Sec 19</span>
+            <div class="sec-body"><div class="sec-title">Taking ITC on Input Sent for Job Work</div><div class="sec-desc">ITC for goods sent to job worker. Time limits for return of goods.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://cbic-gst.gov.in/cgst-act-notifications.html" target="_blank" class="link-card" data-keywords="gst notification cgst">
-        <span class="lc-icon">🔔</span>
-        <div class="lc-body">
-          <div class="lc-title">CGST Notifications</div>
-          <div class="lc-desc">CGST rate & non-rate notifications. All years.</div>
-          <div class="lc-arrow">cbic-gst.gov.in →</div>
+      </div>
+
+      <div class="acc-group" id="gst-ch6">
+        <div class="acc-chapter">Chapter VI — Registration</div>
+        <div class="sections-grid">
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-22.html" target="_blank" class="sec-card" data-kw="gst registration compulsory section 22 threshold">
+            <span class="sec-num">Sec 22</span>
+            <div class="sec-body"><div class="sec-title">Persons Liable for Registration</div><div class="sec-desc">Threshold: ₹20L/₹10L services, ₹40L goods. Aggregate turnover basis.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-24.html" target="_blank" class="sec-card" data-kw="gst compulsory registration section 24 irrespective turnover">
+            <span class="sec-num">Sec 24</span>
+            <div class="sec-body"><div class="sec-title">Compulsory Registration</div><div class="sec-desc">Mandatory registration regardless of turnover — ISD, RCM, e-commerce etc.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-29.html" target="_blank" class="sec-card" data-kw="gst cancellation registration section 29 30">
+            <span class="sec-num">Sec 29</span>
+            <div class="sec-body"><div class="sec-title">Cancellation & Revocation of Registration</div><div class="sec-desc">Who can cancel, procedure, revocation of cancelled registration.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://gstcouncil.gov.in/gst-council-meetings" target="_blank" class="link-card" data-keywords="gst council meeting minutes">
-        <span class="lc-icon">🤝</span>
-        <div class="lc-body">
-          <div class="lc-title">GST Council Meeting Minutes</div>
-          <div class="lc-desc">Press releases & minutes from all GST Council meetings.</div>
-          <div class="lc-arrow">gstcouncil.gov.in →</div>
+      </div>
+
+      <div class="acc-group" id="gst-ch7">
+        <div class="acc-chapter">Chapter VII — Tax Invoice, Credit & Debit Notes</div>
+        <div class="sections-grid">
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-31.html" target="_blank" class="sec-card" data-kw="gst tax invoice section 31 credit note debit note">
+            <span class="sec-num">Sec 31</span>
+            <div class="sec-body"><div class="sec-title">Tax Invoice</div><div class="sec-desc">Invoice issuance time, format, mandatory fields, continuous supply, RCM invoice.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-34.html" target="_blank" class="sec-card" data-kw="gst credit note debit note section 34">
+            <span class="sec-num">Sec 34</span>
+            <div class="sec-body"><div class="sec-title">Credit & Debit Notes</div><div class="sec-desc">Issuance conditions, ITC reversal on credit note, time limit.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://www.gst.gov.in" target="_blank" class="link-card" data-keywords="gst portal login filing returns">
-        <span class="lc-icon">🌐</span>
-        <div class="lc-body">
-          <div class="lc-title">GST Portal <span class="new-badge">Filing</span></div>
-          <div class="lc-desc">Official GSTN portal for login, return filing, registration.</div>
-          <div class="lc-arrow">gst.gov.in →</div>
+      </div>
+
+      <div class="acc-group" id="gst-ch10">
+        <div class="acc-chapter">Chapter X — Returns</div>
+        <div class="sections-grid">
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-39.html" target="_blank" class="sec-card" data-kw="gst gstr3b monthly return section 39">
+            <span class="sec-num">Sec 39</span>
+            <div class="sec-body"><div class="sec-title">Furnishing of Returns (GSTR-3B)</div><div class="sec-desc">Monthly/quarterly return filing. Annual return Sec 44. Nil return.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-50.html" target="_blank" class="sec-card" data-kw="gst interest late payment section 50">
+            <span class="sec-num">Sec 50</span>
+            <div class="sec-body"><div class="sec-title">Interest on Delayed Payment <span class="badge-imp">Key</span></div><div class="sec-desc">18% interest on unpaid tax, 24% on excess ITC claimed. Calculation method.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-47.html" target="_blank" class="sec-card" data-kw="gst late fee section 47 48">
+            <span class="sec-num">Sec 47</span>
+            <div class="sec-body"><div class="sec-title">Levy of Late Fee</div><div class="sec-desc">₹50/day late fee (₹20 for nil returns). Sec 47 & 48.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://cbic-gst.gov.in/gst-goods-services-rates.html" target="_blank" class="link-card" data-keywords="gst rate hsn sac">
-        <span class="lc-icon">📊</span>
-        <div class="lc-body">
-          <div class="lc-title">GST Rates — Goods & Services</div>
-          <div class="lc-desc">HSN-wise GST rates for goods and SAC for services.</div>
-          <div class="lc-arrow">cbic-gst.gov.in →</div>
+      </div>
+
+      <div class="acc-group" id="gst-ch15">
+        <div class="acc-chapter">Chapter XV — Demands & Recovery</div>
+        <div class="sections-grid">
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-73.html" target="_blank" class="sec-card" data-kw="gst demand section 73 no fraud scn show cause">
+            <span class="sec-num">Sec 73</span>
+            <div class="sec-body"><div class="sec-title">Determination of Tax — No Fraud <span class="badge-imp">Key</span></div><div class="sec-desc">SCN for non-fraud cases. 3-year time limit. 10% penalty. Pre-SCN payment benefit.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-74.html" target="_blank" class="sec-card" data-kw="gst demand section 74 fraud willful misstatement suppression">
+            <span class="sec-num">Sec 74</span>
+            <div class="sec-body"><div class="sec-title">Determination of Tax — Fraud Cases <span class="badge-imp">Key</span></div><div class="sec-desc">5-year limitation. 100% penalty. Fraud/wilful misstatement/suppression cases.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-75.html" target="_blank" class="sec-card" data-kw="gst general provisions determination tax section 75">
+            <span class="sec-num">Sec 75</span>
+            <div class="sec-body"><div class="sec-title">General Provisions — Determination of Tax</div><div class="sec-desc">Common provisions for 73 & 74. Pre-deposit, opportunity of hearing.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/goods-and-service-tax/cgst-act-section-107.html" target="_blank" class="sec-card" data-kw="gst appeal section 107 108 appellate authority">
+            <span class="sec-num">Sec 107</span>
+            <div class="sec-body"><div class="sec-title">Appeals to Appellate Authority</div><div class="sec-desc">Filing appeal, pre-deposit 10%, time limit 3 months.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://cbic-gst.gov.in/advance-ruling.html" target="_blank" class="link-card" data-keywords="gst advance ruling aar">
-        <span class="lc-icon">⚖️</span>
-        <div class="lc-body">
-          <div class="lc-title">GST Advance Rulings (AAR/AAAR)</div>
-          <div class="lc-desc">State-wise advance ruling orders under GST.</div>
-          <div class="lc-arrow">cbic-gst.gov.in →</div>
-        </div>
-      </a>
+      </div>
+    </div>
+
+    <div id="gst-rules" class="tab-content">
+      <div class="sections-grid">
+        <a href="https://cbic-gst.gov.in/gst-rules.html" target="_blank" class="sec-card"><span class="sec-num">All</span><div class="sec-body"><div class="sec-title">CGST Rules 2017 (Complete)</div><div class="sec-desc">Official CBIC — all rules with amendments</div><div class="sec-src">cbic-gst.gov.in →</div></div></a>
+        <a href="https://taxguru.in/goods-and-service-tax/cgst-rules-2017.html" target="_blank" class="sec-card"><span class="sec-num">R.36</span><div class="sec-body"><div class="sec-title">Rule 36 — ITC Conditions</div><div class="sec-desc">Documentary requirements for ITC claim</div><div class="sec-src">TaxGuru →</div></div></a>
+        <a href="https://taxguru.in/goods-and-service-tax/cgst-rules-2017.html" target="_blank" class="sec-card"><span class="sec-num">R.42</span><div class="sec-body"><div class="sec-title">Rule 42 — ITC Reversal (Exempt)</div><div class="sec-desc">Calculation of ITC reversal for exempt supplies</div><div class="sec-src">TaxGuru →</div></div></a>
+        <a href="https://taxguru.in/goods-and-service-tax/cgst-rules-2017.html" target="_blank" class="sec-card"><span class="sec-num">R.86B</span><div class="sec-body"><div class="sec-title">Rule 86B — Cash Ledger Restriction</div><div class="sec-desc">1% of output tax liability from cash for large taxpayers</div><div class="sec-src">TaxGuru →</div></div></a>
+      </div>
+    </div>
+
+    <div id="gst-circulars" class="tab-content">
+      <table class="links-table">
+        <tr><th>Circular</th><th>Subject</th><th>Link</th></tr>
+        <tr><td>Cir 211/2024</td><td>ITC on demo vehicles</td><td><a href="https://cbic-gst.gov.in/circular-cgst-notifications.html" target="_blank" class="link-chip">CBIC →</a></td></tr>
+        <tr><td>Cir 210/2024</td><td>Place of supply for services</td><td><a href="https://cbic-gst.gov.in/circular-cgst-notifications.html" target="_blank" class="link-chip">CBIC →</a></td></tr>
+        <tr><td>All Circulars</td><td>Year-wise archive 2017–2025</td><td><a href="https://cbic-gst.gov.in/circular-cgst-notifications.html" target="_blank" class="link-chip">CBIC →</a><a href="https://taxguru.in/category/goods-and-service-tax/gst-circular" target="_blank" class="link-chip">TaxGuru →</a></td></tr>
+      </table>
+    </div>
+
+    <div id="gst-notifications" class="tab-content">
+      <table class="links-table">
+        <tr><th>Type</th><th>Source</th><th>Link</th></tr>
+        <tr><td>CGST Rate Notifications</td><td>CBIC Official</td><td><a href="https://cbic-gst.gov.in/cgst-act-notifications.html" target="_blank" class="link-chip">CBIC →</a></td></tr>
+        <tr><td>CGST Non-Rate Notifications</td><td>CBIC Official</td><td><a href="https://cbic-gst.gov.in/cgst-act-notifications.html" target="_blank" class="link-chip">CBIC →</a></td></tr>
+        <tr><td>GST Council Decisions</td><td>GST Council</td><td><a href="https://gstcouncil.gov.in/gst-council-meetings" target="_blank" class="link-chip">GST Council →</a></td></tr>
+      </table>
+    </div>
+
+    <div id="gst-caselaws" class="tab-content">
+      <table class="links-table">
+        <tr><th>Forum</th><th>What You Get</th><th>Link</th></tr>
+        <tr><td>Indian Kanoon</td><td>GST Tribunal/HC/SC orders (free)</td><td><a href="https://indiankanoon.org/search/?formInput=gst+cgst" target="_blank" class="link-chip">IndianKanoon →</a></td></tr>
+        <tr><td>TaxGuru Case Laws</td><td>GST judgment summaries</td><td><a href="https://taxguru.in/category/goods-and-service-tax/judgments" target="_blank" class="link-chip">TaxGuru →</a></td></tr>
+        <tr><td>GST AAR Orders</td><td>Advance Ruling (CBIC)</td><td><a href="https://cbic-gst.gov.in/advance-ruling.html" target="_blank" class="link-chip">CBIC →</a></td></tr>
+      </table>
+    </div>
+
+    <div id="gst-portal" class="tab-content">
+      <div class="sections-grid">
+        <a href="https://www.gst.gov.in" target="_blank" class="sec-card"><span class="sec-num">🌐</span><div class="sec-body"><div class="sec-title">GST Portal — Login & Filing</div><div class="sec-desc">Official GSTN portal for return filing, registration, payments</div><div class="sec-src">gst.gov.in →</div></div></a>
+        <a href="https://cbic-gst.gov.in" target="_blank" class="sec-card"><span class="sec-num">🏛️</span><div class="sec-body"><div class="sec-title">CBIC — Laws & Circulars</div><div class="sec-desc">Official CBIC portal for GST acts, rules, circulars</div><div class="sec-src">cbic-gst.gov.in →</div></div></a>
+        <a href="https://gstcouncil.gov.in" target="_blank" class="sec-card"><span class="sec-num">🤝</span><div class="sec-body"><div class="sec-title">GST Council</div><div class="sec-desc">Meeting minutes, press releases, rate decisions</div><div class="sec-src">gstcouncil.gov.in →</div></div></a>
+      </div>
     </div>
   </div>
 
   <!-- ══ INCOME TAX ══ -->
-  <div class="law-section" id="income-tax">
-    <div class="ls-header">
-      <div class="ls-icon" style="background:rgba(59,130,246,.12)">💰</div>
+  <div class="law-block" id="it">
+    <div class="lb-header">
+      <div class="lb-icon" style="background:rgba(59,130,246,.12)">💰</div>
       <div>
-        <div class="ls-title">Income Tax / Direct Tax (CBDT)</div>
-        <div class="ls-subtitle">Income Tax Act 1961 · CBDT Circulars · e-Filing Portal</div>
+        <div class="lb-title">Income Tax Act, 1961</div>
+        <div class="lb-sub">CBDT · IT Department · e-Filing Portal</div>
       </div>
     </div>
-    <div class="links-grid">
-      <a href="https://incometaxindia.gov.in/Pages/acts/income-tax-act.aspx" target="_blank" class="link-card" data-keywords="income tax act 1961">
-        <span class="lc-icon">📘</span>
-        <div class="lc-body">
-          <div class="lc-title">Income Tax Act, 1961 <span class="lc-ext">Official</span></div>
-          <div class="lc-desc">Complete text of IT Act 1961 with all amendments. Official Income Tax India source.</div>
-          <div class="lc-arrow">incometaxindia.gov.in →</div>
+    <div class="law-tabs">
+      <button class="lt active" onclick="showTab(this,'it','sections')">📘 Act (Section-wise)</button>
+      <button class="lt" onclick="showTab(this,'it','circulars')">📣 CBDT Circulars</button>
+      <button class="lt" onclick="showTab(this,'it','tds')">📊 TDS Rates</button>
+      <button class="lt" onclick="showTab(this,'it','portal')">🌐 Portals</button>
+    </div>
+    <div id="it-sections" class="tab-content active">
+      <div class="acc-group" id="it-exemptions">
+        <div class="acc-chapter">Exemptions — Section 10</div>
+        <div class="sections-grid">
+          <a href="https://taxguru.in/income-tax/section-10-income-tax-act-exempt-incomes.html" target="_blank" class="sec-card" data-kw="income tax section 10 exemption huf hra ltc gratuity">
+            <span class="sec-num">Sec 10</span>
+            <div class="sec-body"><div class="sec-title">Incomes Not Included in Total Income <span class="badge-imp">Key</span></div><div class="sec-desc">HRA 10(13A), LTC 10(5), Gratuity 10(10), PF 10(11), VRS 10(10C), Agricultural income 10(1)</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://incometaxindia.gov.in/Pages/communications/circulars.aspx" target="_blank" class="link-card" data-keywords="cbdt circular income tax">
-        <span class="lc-icon">📣</span>
-        <div class="lc-body">
-          <div class="lc-title">CBDT Circulars <span class="imp-badge">Important</span></div>
-          <div class="lc-desc">All CBDT circulars year-wise. Interpretations and clarifications.</div>
-          <div class="lc-arrow">incometaxindia.gov.in →</div>
+      </div>
+      <div class="acc-group" id="it-deductions">
+        <div class="acc-chapter">Business Deductions — Sections 28–44</div>
+        <div class="sections-grid">
+          <a href="https://taxguru.in/income-tax/section-36-income-tax-act.html" target="_blank" class="sec-card" data-kw="income tax section 36 deductions business insurance bad debts">
+            <span class="sec-num">Sec 36</span>
+            <div class="sec-body"><div class="sec-title">Other Deductions — Business</div><div class="sec-desc">Insurance premium, bonus, interest on borrowing, bad debts, contribution to PF, etc.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/income-tax/section-40a-income-tax-act.html" target="_blank" class="sec-card" data-kw="income tax section 40a disallowances cash payment 10000">
+            <span class="sec-num">Sec 40A</span>
+            <div class="sec-body"><div class="sec-title">Disallowances <span class="badge-imp">Key</span></div><div class="sec-desc">40A(2) related party, 40A(3) cash payments >₹10,000, 40A(7) gratuity provision</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/income-tax/section-43b-income-tax-act.html" target="_blank" class="sec-card" data-kw="income tax section 43b payment basis deduction pf esi">
+            <span class="sec-num">Sec 43B</span>
+            <div class="sec-body"><div class="sec-title">Deductions Only on Actual Payment <span class="badge-imp">Key</span></div><div class="sec-desc">Tax, duty, PF, ESI, leave encashment, gratuity — deductible only on payment basis.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://incometaxindia.gov.in/Pages/communications/notifications.aspx" target="_blank" class="link-card" data-keywords="cbdt notification income tax">
-        <span class="lc-icon">🔔</span>
-        <div class="lc-body">
-          <div class="lc-title">CBDT Notifications</div>
-          <div class="lc-desc">Income Tax notifications including forms, rules, and exemptions.</div>
-          <div class="lc-arrow">incometaxindia.gov.in →</div>
+      </div>
+      <div class="acc-group" id="it-chapter6a">
+        <div class="acc-chapter">Chapter VI-A — Deductions (80C to 80U)</div>
+        <div class="sections-grid">
+          <a href="https://taxguru.in/income-tax/section-80c-income-tax-act.html" target="_blank" class="sec-card" data-kw="income tax 80c deduction investment ppf elss lic">
+            <span class="sec-num">Sec 80C</span>
+            <div class="sec-body"><div class="sec-title">Deductions — Investments <span class="badge-imp">Most Used</span></div><div class="sec-desc">PPF, ELSS, NSC, LIC, Home loan principal, Tuition fees. Max ₹1.5L.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/income-tax/section-80d-income-tax-act.html" target="_blank" class="sec-card" data-kw="income tax 80d health insurance medical premium deduction">
+            <span class="sec-num">Sec 80D</span>
+            <div class="sec-body"><div class="sec-title">Medical Insurance Premium</div><div class="sec-desc">Health insurance deduction. ₹25K self/family, ₹50K senior citizens.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/income-tax/section-80ggc-income-tax-act.html" target="_blank" class="sec-card" data-kw="income tax 80g donation charitable deduction">
+            <span class="sec-num">Sec 80G</span>
+            <div class="sec-body"><div class="sec-title">Donations to Charitable Institutions</div><div class="sec-desc">50%/100% deduction on donations. Conditions for different institutions.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://www.incometax.gov.in/iec/foportal" target="_blank" class="link-card" data-keywords="income tax efiling portal login">
-        <span class="lc-icon">🌐</span>
-        <div class="lc-body">
-          <div class="lc-title">Income Tax e-Filing Portal <span class="new-badge">Filing</span></div>
-          <div class="lc-desc">Official e-filing portal for ITR filing, TDS, Form 26AS.</div>
-          <div class="lc-arrow">incometax.gov.in →</div>
+      </div>
+      <div class="acc-group" id="it-tds">
+        <div class="acc-chapter">TDS Provisions — Sections 192–206</div>
+        <div class="sections-grid">
+          <a href="https://taxguru.in/income-tax/section-194c-income-tax-act.html" target="_blank" class="sec-card" data-kw="tds 194c contractor payment 1% 2%">
+            <span class="sec-num">194C</span>
+            <div class="sec-body"><div class="sec-title">TDS on Contractor Payments</div><div class="sec-desc">1% individual/HUF, 2% others. Threshold ₹30K per payment, ₹1L aggregate.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/income-tax/section-194j-income-tax-act.html" target="_blank" class="sec-card" data-kw="tds 194j professional fees technical services 10%">
+            <span class="sec-num">194J</span>
+            <div class="sec-body"><div class="sec-title">TDS on Professional/Technical Fees</div><div class="sec-desc">10% TDS. 2% for technical services. Threshold ₹30K.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://incometaxindia.gov.in/Pages/utilities/tds-rate-chart.aspx" target="_blank" class="sec-card" data-kw="tds rate chart all sections 194">
+            <span class="sec-num">All</span>
+            <div class="sec-body"><div class="sec-title">Complete TDS Rate Chart</div><div class="sec-desc">All TDS sections with rates, thresholds, resident/NRI rates</div><div class="sec-src">IT India →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://incometaxindia.gov.in/Pages/utilities/tds-rate-chart.aspx" target="_blank" class="link-card" data-keywords="tds rate chart section 194">
-        <span class="lc-icon">📊</span>
-        <div class="lc-body">
-          <div class="lc-title">TDS Rate Chart</div>
-          <div class="lc-desc">Section-wise TDS rates for all categories of payments.</div>
-          <div class="lc-arrow">incometaxindia.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://www.tdscpc.gov.in" target="_blank" class="link-card" data-keywords="tds cpc traces 26as">
-        <span class="lc-icon">📋</span>
-        <div class="lc-body">
-          <div class="lc-title">TRACES — TDS CPC Portal</div>
-          <div class="lc-desc">Download Form 16, 16A, 26AS, and file TDS returns on TRACES.</div>
-          <div class="lc-arrow">tdscpc.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://incometaxindia.gov.in/Pages/direct-taxes-code.aspx" target="_blank" class="link-card" data-keywords="direct tax code dtc">
-        <span class="lc-icon">📑</span>
-        <div class="lc-body">
-          <div class="lc-title">Direct Tax Code (New Income Tax Bill)</div>
-          <div class="lc-desc">Latest updates on New Income Tax Bill and Direct Tax Code 2025.</div>
-          <div class="lc-arrow">incometaxindia.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://incometaxindia.gov.in/Pages/communications/press-release.aspx" target="_blank" class="link-card" data-keywords="cbdt press release income tax">
-        <span class="lc-icon">📰</span>
-        <div class="lc-body">
-          <div class="lc-title">CBDT Press Releases</div>
-          <div class="lc-desc">Official press releases and taxpayer-friendly clarifications from CBDT.</div>
-          <div class="lc-arrow">incometaxindia.gov.in →</div>
-        </div>
-      </a>
+      </div>
+    </div>
+    <div id="it-circulars" class="tab-content">
+      <table class="links-table">
+        <tr><th>Source</th><th>What</th><th>Link</th></tr>
+        <tr><td>IT India — All Circulars</td><td>Year-wise CBDT circulars</td><td><a href="https://incometaxindia.gov.in/Pages/communications/circulars.aspx" target="_blank" class="link-chip">IT India →</a></td></tr>
+        <tr><td>IT India — All Notifications</td><td>CBDT notifications</td><td><a href="https://incometaxindia.gov.in/Pages/communications/notifications.aspx" target="_blank" class="link-chip">IT India →</a></td></tr>
+        <tr><td>TaxGuru Circulars</td><td>Searchable, subject-wise</td><td><a href="https://taxguru.in/category/income-tax/circular" target="_blank" class="link-chip">TaxGuru →</a></td></tr>
+      </table>
+    </div>
+    <div id="it-tds-tab" class="tab-content">
+      <a href="https://incometaxindia.gov.in/Pages/utilities/tds-rate-chart.aspx" target="_blank" class="sec-card" style="max-width:400px"><span class="sec-num">All</span><div class="sec-body"><div class="sec-title">TDS Rate Chart — All Sections</div><div class="sec-src">incometaxindia.gov.in →</div></div></a>
+    </div>
+    <div id="it-portal" class="tab-content">
+      <div class="sections-grid">
+        <a href="https://www.incometax.gov.in" target="_blank" class="sec-card"><span class="sec-num">🌐</span><div class="sec-body"><div class="sec-title">e-Filing Portal</div><div class="sec-desc">ITR filing, TDS, 26AS, AIS, Form 16 download</div><div class="sec-src">incometax.gov.in →</div></div></a>
+        <a href="https://www.tdscpc.gov.in" target="_blank" class="sec-card"><span class="sec-num">📋</span><div class="sec-body"><div class="sec-title">TRACES — TDS Portal</div><div class="sec-desc">Form 16, 16A, 26AS, correction statements</div><div class="sec-src">tdscpc.gov.in →</div></div></a>
+      </div>
     </div>
   </div>
 
-  <!-- ══ COMPANY LAW ══ -->
-  <div class="law-section" id="company-law">
-    <div class="ls-header">
-      <div class="ls-icon" style="background:rgba(139,92,246,.12)">🏢</div>
+  <!-- ══ COMPANIES ACT ══ -->
+  <div class="law-block" id="ca">
+    <div class="lb-header">
+      <div class="lb-icon" style="background:rgba(139,92,246,.12)">🏢</div>
       <div>
-        <div class="ls-title">Company Law / MCA</div>
-        <div class="ls-subtitle">Companies Act 2013 · MCA Circulars · ROC · NCLT · IBC</div>
+        <div class="lb-title">Companies Act, 2013</div>
+        <div class="lb-sub">MCA · ROC · NCLT</div>
       </div>
     </div>
-    <div class="links-grid">
-      <a href="https://www.mca.gov.in/content/mca/global/en/acts-rules/ebooks/acts.html" target="_blank" class="link-card" data-keywords="companies act 2013 mca">
-        <span class="lc-icon">📘</span>
-        <div class="lc-body">
-          <div class="lc-title">Companies Act, 2013 <span class="lc-ext">Official</span></div>
-          <div class="lc-desc">Full text of Companies Act 2013 with all amendments on MCA portal.</div>
-          <div class="lc-arrow">mca.gov.in →</div>
+    <div class="law-tabs">
+      <button class="lt active" onclick="showTab(this,'ca','sections')">📘 Section-wise</button>
+      <button class="lt" onclick="showTab(this,'ca','circulars')">📣 MCA Circulars</button>
+      <button class="lt" onclick="showTab(this,'ca','portal')">🌐 Filing Portals</button>
+    </div>
+    <div id="ca-sections" class="tab-content active">
+      <div class="acc-group" id="ca-incorp">
+        <div class="acc-chapter">Incorporation & MOA/AOA — Chapter II</div>
+        <div class="sections-grid">
+          <a href="https://taxguru.in/company-law/section-2-companies-act-2013.html" target="_blank" class="sec-card" data-kw="companies act 2013 section 2 definitions holding subsidiary associate">
+            <span class="sec-num">Sec 2</span>
+            <div class="sec-body"><div class="sec-title">Key Definitions <span class="badge-imp">Important</span></div><div class="sec-desc">Holding, subsidiary, associate company, body corporate, financial year, KMP, related party</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/company-law/section-7-companies-act-2013.html" target="_blank" class="sec-card" data-kw="companies act incorporation registration section 7">
+            <span class="sec-num">Sec 7</span>
+            <div class="sec-body"><div class="sec-title">Incorporation of a Company</div><div class="sec-desc">Documents, process, COI, registered office, SPICe form</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://www.mca.gov.in/content/mca/global/en/acts-rules/ebooks/circulars.html" target="_blank" class="link-card" data-keywords="mca circular companies act">
-        <span class="lc-icon">📣</span>
-        <div class="lc-body">
-          <div class="lc-title">MCA Circulars <span class="imp-badge">Important</span></div>
-          <div class="lc-desc">All Ministry of Corporate Affairs circulars with year-wise listing.</div>
-          <div class="lc-arrow">mca.gov.in →</div>
+      </div>
+      <div class="acc-group" id="ca-mgmt">
+        <div class="acc-chapter">Board & Meetings — Chapter XII</div>
+        <div class="sections-grid">
+          <a href="https://taxguru.in/company-law/section-96-companies-act-2013.html" target="_blank" class="sec-card" data-kw="agm annual general meeting section 96 companies act">
+            <span class="sec-num">Sec 96</span>
+            <div class="sec-body"><div class="sec-title">Annual General Meeting</div><div class="sec-desc">AGM within 6 months of year end. First AGM within 9 months. 21 days notice.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/company-law/section-134-companies-act-2013.html" target="_blank" class="sec-card" data-kw="board report section 134 companies act directors">
+            <span class="sec-num">Sec 134</span>
+            <div class="sec-body"><div class="sec-title">Board's Report</div><div class="sec-desc">Contents of Directors' Report. CSR, risk management, internal financial controls.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://www.mca.gov.in/content/mca/global/en/acts-rules/ebooks/notifications.html" target="_blank" class="link-card" data-keywords="mca notification gazette">
-        <span class="lc-icon">🔔</span>
-        <div class="lc-body">
-          <div class="lc-title">MCA Notifications & GSRs</div>
-          <div class="lc-desc">Gazette notifications amending Companies Act rules and schedules.</div>
-          <div class="lc-arrow">mca.gov.in →</div>
+      </div>
+      <div class="acc-group" id="ca-audit">
+        <div class="acc-chapter">Audit & Auditors — Chapter X</div>
+        <div class="sections-grid">
+          <a href="https://taxguru.in/company-law/section-139-companies-act-2013.html" target="_blank" class="sec-card" data-kw="auditor appointment section 139 companies act 5 year rotation">
+            <span class="sec-num">Sec 139</span>
+            <div class="sec-body"><div class="sec-title">Appointment of Auditors <span class="badge-imp">Key</span></div><div class="sec-desc">5-year term, rotation of auditors, AGM appointment, NFRA applicability</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/company-law/section-143-companies-act-2013.html" target="_blank" class="sec-card" data-kw="auditor powers duties section 143 companies act reporting">
+            <span class="sec-num">Sec 143</span>
+            <div class="sec-body"><div class="sec-title">Powers & Duties of Auditors</div><div class="sec-desc">Auditor's right of access, reporting fraud u/s 143(12), CARO applicability</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/company-law/section-177-companies-act-2013.html" target="_blank" class="sec-card" data-kw="audit committee section 177 companies act composition">
+            <span class="sec-num">Sec 177</span>
+            <div class="sec-body"><div class="sec-title">Audit Committee</div><div class="sec-desc">Composition: 2/3 independent directors. Powers and functions. Listed companies mandatory.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://efiling.mca.gov.in" target="_blank" class="link-card" data-keywords="mca efiling roc filing roc">
-        <span class="lc-icon">🌐</span>
-        <div class="lc-body">
-          <div class="lc-title">MCA21 — e-Filing Portal <span class="new-badge">Filing</span></div>
-          <div class="lc-desc">ROC filings, annual returns, DIN, DSC, incorporation forms.</div>
-          <div class="lc-arrow">efiling.mca.gov.in →</div>
+      </div>
+      <div class="acc-group" id="ca-rpt">
+        <div class="acc-chapter">RPT, Loans & Investments</div>
+        <div class="sections-grid">
+          <a href="https://taxguru.in/company-law/section-185-companies-act-2013.html" target="_blank" class="sec-card" data-kw="loans directors companies act section 185 related party">
+            <span class="sec-num">Sec 185</span>
+            <div class="sec-body"><div class="sec-title">Loans to Directors <span class="badge-imp">Key</span></div><div class="sec-desc">Prohibition on loans/guarantees to directors. Exceptions. Penalty for violation.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
+          <a href="https://taxguru.in/company-law/section-188-companies-act-2013.html" target="_blank" class="sec-card" data-kw="related party transactions rpt section 188 companies act approval">
+            <span class="sec-num">Sec 188</span>
+            <div class="sec-body"><div class="sec-title">Related Party Transactions <span class="badge-imp">Key</span></div><div class="sec-desc">Board/shareholder approval requirements. Arm's length test. Disclosure in Board report.</div><div class="sec-src">TaxGuru →</div></div>
+          </a>
         </div>
-      </a>
-      <a href="https://www.mca.gov.in/content/mca/global/en/acts-rules/ebooks/acts.html?act=NTk2MA==" target="_blank" class="link-card" data-keywords="llp act limited liability partnership">
-        <span class="lc-icon">🤝</span>
-        <div class="lc-body">
-          <div class="lc-title">LLP Act, 2008</div>
-          <div class="lc-desc">Limited Liability Partnership Act with amendments. MCA official source.</div>
-          <div class="lc-arrow">mca.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://ibbi.gov.in/acts-and-rules/show?type=act" target="_blank" class="link-card" data-keywords="ibc insolvency bankruptcy code ibbi">
-        <span class="lc-icon">⚖️</span>
-        <div class="lc-body">
-          <div class="lc-title">Insolvency & Bankruptcy Code (IBC)</div>
-          <div class="lc-desc">IBC 2016, IBBI regulations, circulars, and case law resources.</div>
-          <div class="lc-arrow">ibbi.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://nclt.gov.in" target="_blank" class="link-card" data-keywords="nclt national company law tribunal order">
-        <span class="lc-icon">🏛️</span>
-        <div class="lc-body">
-          <div class="lc-title">NCLT — National Company Law Tribunal</div>
-          <div class="lc-desc">NCLT orders, cause list, bench details, and practice directions.</div>
-          <div class="lc-arrow">nclt.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://www.icsi.edu" target="_blank" class="link-card" data-keywords="icsi company secretary cs secretarial standard">
-        <span class="lc-icon">🎓</span>
-        <div class="lc-body">
-          <div class="lc-title">ICSI — Secretarial Standards & Guidance</div>
-          <div class="lc-desc">SS-1, SS-2 secretarial standards. CS guidance notes and technical guides.</div>
-          <div class="lc-arrow">icsi.edu →</div>
-        </div>
-      </a>
+      </div>
+    </div>
+    <div id="ca-circulars" class="tab-content">
+      <table class="links-table">
+        <tr><th>Source</th><th>What</th><th>Link</th></tr>
+        <tr><td>MCA — All Circulars</td><td>Year-wise General Circulars</td><td><a href="https://www.mca.gov.in/content/mca/global/en/acts-rules/ebooks/circulars.html" target="_blank" class="link-chip">MCA →</a></td></tr>
+        <tr><td>MCA — Notifications</td><td>Gazette Notifications & GSRs</td><td><a href="https://www.mca.gov.in/content/mca/global/en/acts-rules/ebooks/notifications.html" target="_blank" class="link-chip">MCA →</a></td></tr>
+      </table>
+    </div>
+    <div id="ca-portal" class="tab-content">
+      <div class="sections-grid">
+        <a href="https://efiling.mca.gov.in" target="_blank" class="sec-card"><span class="sec-num">🌐</span><div class="sec-body"><div class="sec-title">MCA21 — e-Filing Portal</div><div class="sec-desc">ROC filings, annual returns, DIN, DSC, charge registration</div><div class="sec-src">efiling.mca.gov.in →</div></div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ IND AS ══ -->
+  <div class="law-block" id="indas">
+    <div class="lb-header">
+      <div class="lb-icon" style="background:rgba(59,130,246,.12)">📊</div>
+      <div><div class="lb-title">IND AS — Indian Accounting Standards</div><div class="lb-sub">ICAI · MCA · NFRA</div></div>
+    </div>
+    <div class="law-tabs">
+      <button class="lt active" onclick="showTab(this,'indas','list')">📘 Standard-wise</button>
+    </div>
+    <div id="indas-list" class="tab-content active">
+      <div class="sections-grid">
+        <a href="https://resource.cdn.icai.org/68268bos55683-cp1.pdf" target="_blank" class="sec-card" data-kw="ind as 1 presentation financial statements">
+          <span class="sec-num">Ind AS 1</span><div class="sec-body"><div class="sec-title">Presentation of Financial Statements</div><div class="sec-desc">Structure, components, materiality, offsetting</div><div class="sec-src">ICAI →</div></div>
+        </a>
+        <a href="https://www.mca.gov.in/Ministry/pdf/INDAS2.pdf" target="_blank" class="sec-card" data-kw="ind as 2 inventories valuation">
+          <span class="sec-num">Ind AS 2</span><div class="sec-body"><div class="sec-title">Inventories</div><div class="sec-desc">Cost formulas, NRV, write-down of inventories</div><div class="sec-src">MCA →</div></div>
+        </a>
+        <a href="https://www.mca.gov.in/Ministry/pdf/INDAS7.pdf" target="_blank" class="sec-card" data-kw="ind as 7 cash flow statement direct indirect">
+          <span class="sec-num">Ind AS 7</span><div class="sec-body"><div class="sec-title">Statement of Cash Flows</div><div class="sec-desc">Direct & indirect method, operating/investing/financing</div><div class="sec-src">MCA →</div></div>
+        </a>
+        <a href="https://www.mca.gov.in/Ministry/pdf/INDAS8.pdf" target="_blank" class="sec-card" data-kw="ind as 8 accounting policies estimates errors">
+          <span class="sec-num">Ind AS 8</span><div class="sec-body"><div class="sec-title">Accounting Policies, Estimates & Errors</div><div class="sec-desc">Change in policy, prospective/retrospective, prior period errors</div><div class="sec-src">MCA →</div></div>
+        </a>
+        <a href="https://www.mca.gov.in/Ministry/pdf/INDAS16.pdf" target="_blank" class="sec-card" data-kw="ind as 16 property plant equipment depreciation">
+          <span class="sec-num">Ind AS 16</span><div class="sec-body"><div class="sec-title">Property, Plant & Equipment <span class="badge-imp">Key</span></div><div class="sec-desc">Recognition, depreciation methods, revaluation, disposal</div><div class="sec-src">MCA →</div></div>
+        </a>
+        <a href="https://www.mca.gov.in/Ministry/pdf/INDAS36.pdf" target="_blank" class="sec-card" data-kw="ind as 36 impairment assets goodwill">
+          <span class="sec-num">Ind AS 36</span><div class="sec-body"><div class="sec-title">Impairment of Assets</div><div class="sec-desc">CGU, recoverable amount, goodwill impairment testing</div><div class="sec-src">MCA →</div></div>
+        </a>
+        <a href="https://www.mca.gov.in/Ministry/pdf/INDAS115.pdf" target="_blank" class="sec-card" data-kw="ind as 115 revenue recognition 5 step model">
+          <span class="sec-num">Ind AS 115</span><div class="sec-body"><div class="sec-title">Revenue from Contracts with Customers <span class="badge-imp">Key</span></div><div class="sec-desc">5-step model: identify contract → PO → price → allocate → recognize</div><div class="sec-src">MCA →</div></div>
+        </a>
+        <a href="https://www.mca.gov.in/Ministry/pdf/INDAS116.pdf" target="_blank" class="sec-card" data-kw="ind as 116 leases right of use asset">
+          <span class="sec-num">Ind AS 116</span><div class="sec-body"><div class="sec-title">Leases</div><div class="sec-desc">Right-of-use asset, lease liability, short-term & low-value lease exemptions</div><div class="sec-src">MCA →</div></div>
+        </a>
+        <a href="https://www.mca.gov.in/content/mca/global/en/acts-rules/ebooks/ind-as.html" target="_blank" class="sec-card" data-kw="ind as all standards complete list">
+          <span class="sec-num">All</span><div class="sec-body"><div class="sec-title">All IND AS Standards (Complete List)</div><div class="sec-desc">MCA official — all Ind AS from 1 to 116</div><div class="sec-src">MCA →</div></div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SA ══ -->
+  <div class="law-block" id="sa">
+    <div class="lb-header">
+      <div class="lb-icon" style="background:rgba(245,158,11,.12)">📋</div>
+      <div><div class="lb-title">Standards on Auditing (SA) — ICAI</div><div class="lb-sub">SA 200–720 Series</div></div>
+    </div>
+    <div class="law-tabs">
+      <button class="lt active" onclick="showTab(this,'sa','list')">📘 SA Standard-wise</button>
+    </div>
+    <div id="sa-list" class="tab-content active">
+      <div class="sections-grid">
+        <a href="https://www.icai.org/post/standards-on-auditing" target="_blank" class="sec-card" data-kw="sa 200 overall objectives auditor">
+          <span class="sec-num">SA 200</span><div class="sec-body"><div class="sec-title">Overall Objectives of the Auditor</div><div class="sec-desc">Reasonable assurance, audit risk, professional skepticism</div><div class="sec-src">ICAI →</div></div>
+        </a>
+        <a href="https://www.icai.org/post/standards-on-auditing" target="_blank" class="sec-card" data-kw="sa 230 audit documentation working papers">
+          <span class="sec-num">SA 230</span><div class="sec-body"><div class="sec-title">Audit Documentation</div><div class="sec-desc">Working papers, ownership, retention (7 years), confidentiality</div><div class="sec-src">ICAI →</div></div>
+        </a>
+        <a href="https://www.icai.org/post/standards-on-auditing" target="_blank" class="sec-card" data-kw="sa 315 risk assessment internal control">
+          <span class="sec-num">SA 315</span><div class="sec-body"><div class="sec-title">Identifying & Assessing Risks <span class="badge-imp">Key</span></div><div class="sec-desc">ROMM, understanding entity, internal controls, risk assessment procedures</div><div class="sec-src">ICAI →</div></div>
+        </a>
+        <a href="https://www.icai.org/post/standards-on-auditing" target="_blank" class="sec-card" data-kw="sa 320 materiality audit planning performance">
+          <span class="sec-num">SA 320</span><div class="sec-body"><div class="sec-title">Materiality in Planning & Performing</div><div class="sec-desc">Overall materiality, performance materiality, trivial threshold</div><div class="sec-src">ICAI →</div></div>
+        </a>
+        <a href="https://www.icai.org/post/standards-on-auditing" target="_blank" class="sec-card" data-kw="sa 500 audit evidence sufficient appropriate">
+          <span class="sec-num">SA 500</span><div class="sec-body"><div class="sec-title">Audit Evidence</div><div class="sec-desc">Sufficiency, appropriateness, relevance, reliability of evidence</div><div class="sec-src">ICAI →</div></div>
+        </a>
+        <a href="https://www.icai.org/post/standards-on-auditing" target="_blank" class="sec-card" data-kw="sa 550 related parties transactions audit">
+          <span class="sec-num">SA 550</span><div class="sec-body"><div class="sec-title">Related Parties</div><div class="sec-desc">Identification, risk assessment, audit procedures for RPT</div><div class="sec-src">ICAI →</div></div>
+        </a>
+        <a href="https://www.icai.org/post/standards-on-auditing" target="_blank" class="sec-card" data-kw="sa 700 audit report forming opinion">
+          <span class="sec-num">SA 700</span><div class="sec-body"><div class="sec-title">Forming Opinion & Reporting <span class="badge-imp">Key</span></div><div class="sec-desc">Unmodified opinion, structure of audit report, new format</div><div class="sec-src">ICAI →</div></div>
+        </a>
+        <a href="https://www.icai.org/post/standards-on-auditing" target="_blank" class="sec-card" data-kw="sa 705 modified opinion qualified adverse disclaimer">
+          <span class="sec-num">SA 705</span><div class="sec-body"><div class="sec-title">Modifications to Audit Opinion</div><div class="sec-desc">Qualified, Adverse, Disclaimer — conditions and reporting</div><div class="sec-src">ICAI →</div></div>
+        </a>
+        <a href="https://www.icai.org/post/standards-on-auditing" target="_blank" class="sec-card" data-kw="sa all complete list icai">
+          <span class="sec-num">All SA</span><div class="sec-body"><div class="sec-title">Complete SA Standards List (ICAI)</div><div class="sec-desc">All SA from 200–720 with study material</div><div class="sec-src">ICAI →</div></div>
+        </a>
+      </div>
     </div>
   </div>
 
   <!-- ══ SEBI ══ -->
-  <div class="law-section" id="sebi">
-    <div class="ls-header">
-      <div class="ls-icon" style="background:rgba(245,158,11,.12)">📈</div>
-      <div>
-        <div class="ls-title">SEBI Regulations</div>
-        <div class="ls-subtitle">SEBI Circulars · LODR · ICDR · PIT · SAST</div>
-      </div>
+  <div class="law-block" id="sebi">
+    <div class="lb-header">
+      <div class="lb-icon" style="background:rgba(245,158,11,.12)">📈</div>
+      <div><div class="lb-title">SEBI Regulations</div><div class="lb-sub">LODR · ICDR · PIT · SAST · SEBI Circulars</div></div>
     </div>
-    <div class="links-grid">
-      <a href="https://www.sebi.gov.in/legal/circulars.html" target="_blank" class="link-card" data-keywords="sebi circular">
-        <span class="lc-icon">📣</span>
-        <div class="lc-body">
-          <div class="lc-title">SEBI Circulars <span class="imp-badge">Important</span></div>
-          <div class="lc-desc">All SEBI circulars with search by date, department, subject.</div>
-          <div class="lc-arrow">sebi.gov.in →</div>
-        </div>
+    <div class="sections-grid">
+      <a href="https://www.sebi.gov.in/legal/regulations/sep-2015/sebi-listing-obligations-and-disclosure-requirements-regulations-2015_30220.html" target="_blank" class="sec-card" data-kw="sebi lodr listing obligations disclosure requirements">
+        <span class="sec-num">LODR</span><div class="sec-body"><div class="sec-title">SEBI LODR Regulations, 2015 <span class="badge-imp">Listed Cos</span></div><div class="sec-desc">Listing obligations, corporate governance, disclosure requirements for listed entities</div><div class="sec-src">SEBI →</div></div>
       </a>
-      <a href="https://www.sebi.gov.in/legal/regulations.html" target="_blank" class="link-card" data-keywords="sebi regulations lodr icdr pit sast">
-        <span class="lc-icon">📘</span>
-        <div class="lc-body">
-          <div class="lc-title">SEBI Regulations (LODR, ICDR, PIT, SAST)</div>
-          <div class="lc-desc">All SEBI regulations including listing, insider trading, takeover code.</div>
-          <div class="lc-arrow">sebi.gov.in →</div>
-        </div>
+      <a href="https://www.sebi.gov.in/legal/regulations/aug-2018/sebi-prohibition-of-insider-trading-regulations-2015-last-amended-on-december-31-2018-_40222.html" target="_blank" class="sec-card" data-kw="sebi pit insider trading prohibition regulations">
+        <span class="sec-num">PIT</span><div class="sec-body"><div class="sec-title">SEBI PIT Regulations — Insider Trading</div><div class="sec-desc">Prohibition, UPSI, trading plan, code of conduct for listed companies</div><div class="sec-src">SEBI →</div></div>
       </a>
-      <a href="https://www.sebi.gov.in/legal/orders.html" target="_blank" class="link-card" data-keywords="sebi order adjudication">
-        <span class="lc-icon">⚖️</span>
-        <div class="lc-body">
-          <div class="lc-title">SEBI Orders & Adjudication</div>
-          <div class="lc-desc">Orders by SEBI WTM, SAT appellate orders, and enforcement actions.</div>
-          <div class="lc-arrow">sebi.gov.in →</div>
-        </div>
+      <a href="https://www.sebi.gov.in/legal/regulations.html" target="_blank" class="sec-card" data-kw="sebi regulations all complete list icdr sast">
+        <span class="sec-num">All</span><div class="sec-body"><div class="sec-title">All SEBI Regulations</div><div class="sec-desc">Complete list of all SEBI regulations — ICDR, SAST, AIF, PMS, etc.</div><div class="sec-src">SEBI →</div></div>
       </a>
-      <a href="https://scores.sebi.gov.in" target="_blank" class="link-card" data-keywords="sebi scores complaint investor">
-        <span class="lc-icon">📝</span>
-        <div class="lc-body">
-          <div class="lc-title">SCORES — Investor Complaints</div>
-          <div class="lc-desc">SEBI Complaints Redress System for investor grievances.</div>
-          <div class="lc-arrow">scores.sebi.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://www.nseindia.com/regulations/listing-agreements" target="_blank" class="link-card" data-keywords="nse listing compliance">
-        <span class="lc-icon">📊</span>
-        <div class="lc-body">
-          <div class="lc-title">NSE Listing Compliance</div>
-          <div class="lc-desc">NSE listing regulations, compliance calendar, and disclosures.</div>
-          <div class="lc-arrow">nseindia.com →</div>
-        </div>
-      </a>
-      <a href="https://www.bseindia.com/corporates/Comp_Compliance.aspx" target="_blank" class="link-card" data-keywords="bse listing compliance">
-        <span class="lc-icon">📊</span>
-        <div class="lc-body">
-          <div class="lc-title">BSE Listing Compliance</div>
-          <div class="lc-desc">BSE listing regulations, compliance filings, and disclosures.</div>
-          <div class="lc-arrow">bseindia.com →</div>
-        </div>
+      <a href="https://www.sebi.gov.in/legal/circulars.html" target="_blank" class="sec-card" data-kw="sebi circulars all years">
+        <span class="sec-num">📣</span><div class="sec-body"><div class="sec-title">SEBI Circulars <span class="badge-imp">Important</span></div><div class="sec-desc">All SEBI circulars — date-wise, department-wise searchable</div><div class="sec-src">SEBI →</div></div>
       </a>
     </div>
   </div>
 
-  <!-- ══ LABOUR LAWS ══ -->
-  <div class="law-section" id="labour">
-    <div class="ls-header">
-      <div class="ls-icon" style="background:rgba(236,72,153,.12)">👷</div>
-      <div>
-        <div class="ls-title">Labour Laws</div>
-        <div class="ls-subtitle">EPF · ESIC · 4 Labour Codes · Minimum Wages</div>
-      </div>
+  <!-- ══ LABOUR ══ -->
+  <div class="law-block" id="labour">
+    <div class="lb-header">
+      <div class="lb-icon" style="background:rgba(236,72,153,.12)">👷</div>
+      <div><div class="lb-title">Labour Laws</div><div class="lb-sub">4 Labour Codes · EPF · ESIC · Minimum Wages</div></div>
     </div>
-    <div class="links-grid">
-      <a href="https://labour.gov.in/labour-codes" target="_blank" class="link-card" data-keywords="labour codes four code wages industrial">
-        <span class="lc-icon">📘</span>
-        <div class="lc-body">
-          <div class="lc-title">4 Labour Codes <span class="new-badge">New</span></div>
-          <div class="lc-desc">Code on Wages, Industrial Relations, Social Security, and OSH & WC codes.</div>
-          <div class="lc-arrow">labour.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://www.epfindia.gov.in" target="_blank" class="link-card" data-keywords="epf pf provident fund epfo">
-        <span class="lc-icon">💼</span>
-        <div class="lc-body">
-          <div class="lc-title">EPFO — Employees' Provident Fund</div>
-          <div class="lc-desc">PF contribution, ECR filing, UAN, pension scheme, and circulars.</div>
-          <div class="lc-arrow">epfindia.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://www.esic.gov.in" target="_blank" class="link-card" data-keywords="esic esi employees state insurance">
-        <span class="lc-icon">🏥</span>
-        <div class="lc-body">
-          <div class="lc-title">ESIC — Employee State Insurance</div>
-          <div class="lc-desc">ESI contribution rates, employer registration, claim forms, and portal.</div>
-          <div class="lc-arrow">esic.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://labour.gov.in/minimum-wages" target="_blank" class="link-card" data-keywords="minimum wages central state notification">
-        <span class="lc-icon">💰</span>
-        <div class="lc-body">
-          <div class="lc-title">Minimum Wages (Central)</div>
-          <div class="lc-desc">Central government minimum wage notifications by scheduled employment.</div>
-          <div class="lc-arrow">labour.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://shramsuvidha.gov.in" target="_blank" class="link-card" data-keywords="shram suvidha unified portal labour compliance">
-        <span class="lc-icon">🌐</span>
-        <div class="lc-body">
-          <div class="lc-title">Shram Suvidha Portal <span class="new-badge">Filing</span></div>
-          <div class="lc-desc">Unified labour compliance portal — registration, returns, inspections.</div>
-          <div class="lc-arrow">shramsuvidha.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://www.gratuity.gov.in" target="_blank" class="link-card" data-keywords="gratuity payment act">
-        <span class="lc-icon">🎁</span>
-        <div class="lc-body">
-          <div class="lc-title">Payment of Gratuity Act</div>
-          <div class="lc-desc">Gratuity eligibility, calculation, and official government guidance.</div>
-          <div class="lc-arrow">gratuity.gov.in →</div>
-        </div>
-      </a>
+    <div class="sections-grid">
+      <a href="https://labour.gov.in/labour-codes" target="_blank" class="sec-card" data-kw="4 labour codes wages industrial relations social security osh"><span class="sec-num">4 Codes</span><div class="sec-body"><div class="sec-title">4 Labour Codes <span class="badge-new">2024</span></div><div class="sec-desc">Code on Wages, Industrial Relations, Social Security, OSH & Working Conditions</div><div class="sec-src">labour.gov.in →</div></div></a>
+      <a href="https://www.epfindia.gov.in" target="_blank" class="sec-card" data-kw="epf pf provident fund contribution ecr uan"><span class="sec-num">EPF</span><div class="sec-body"><div class="sec-title">EPFO — PF Contribution & Circulars</div><div class="sec-desc">12% employer + 12% employee. ECR filing, UAN, withdrawal rules</div><div class="sec-src">epfindia.gov.in →</div></div></a>
+      <a href="https://www.esic.gov.in" target="_blank" class="sec-card" data-kw="esic esi health insurance contribution employer"><span class="sec-num">ESIC</span><div class="sec-body"><div class="sec-title">ESIC — ESI Contribution</div><div class="sec-desc">3.25% employer + 0.75% employee. Applicability ≥10 employees, wages ≤₹21K</div><div class="sec-src">esic.gov.in →</div></div></a>
     </div>
   </div>
 
-  <!-- ══ FEMA / RBI ══ -->
-  <div class="law-section" id="fema-rbi">
-    <div class="ls-header">
-      <div class="ls-icon" style="background:rgba(6,182,212,.12)">🏦</div>
-      <div>
-        <div class="ls-title">FEMA / RBI / Foreign Exchange</div>
-        <div class="ls-subtitle">RBI Master Circulars · FEMA Regulations · NBFC</div>
-      </div>
+  <!-- ══ FEMA ══ -->
+  <div class="law-block" id="fema">
+    <div class="lb-header">
+      <div class="lb-icon" style="background:rgba(6,182,212,.12)">🏦</div>
+      <div><div class="lb-title">FEMA / RBI</div><div class="lb-sub">FEMA Regulations · RBI Master Circulars · FDI Policy</div></div>
     </div>
-    <div class="links-grid">
-      <a href="https://rbi.org.in/Scripts/FEMANotifications.aspx" target="_blank" class="link-card" data-keywords="fema notification foreign exchange">
-        <span class="lc-icon">📘</span>
-        <div class="lc-body">
-          <div class="lc-title">FEMA Notifications <span class="lc-ext">RBI</span></div>
-          <div class="lc-desc">All FEMA notifications including FDI, ODI, ECB, and NRI investments.</div>
-          <div class="lc-arrow">rbi.org.in →</div>
-        </div>
-      </a>
-      <a href="https://rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx" target="_blank" class="link-card" data-keywords="rbi circular master direction">
-        <span class="lc-icon">📣</span>
-        <div class="lc-body">
-          <div class="lc-title">RBI Master Circulars & Directions <span class="imp-badge">Important</span></div>
-          <div class="lc-desc">RBI master circulars, directions, and guidelines for banks and NBFCs.</div>
-          <div class="lc-arrow">rbi.org.in →</div>
-        </div>
-      </a>
-      <a href="https://rbi.org.in/Scripts/NotificationUser.aspx" target="_blank" class="link-card" data-keywords="rbi notification press release">
-        <span class="lc-icon">🔔</span>
-        <div class="lc-body">
-          <div class="lc-title">RBI Notifications & Press Releases</div>
-          <div class="lc-desc">All RBI notifications including monetary policy, forex, payment systems.</div>
-          <div class="lc-arrow">rbi.org.in →</div>
-        </div>
-      </a>
-      <a href="https://rbi.org.in/Scripts/PublicationReportDetails.aspx?ID=1357" target="_blank" class="link-card" data-keywords="fdi policy foreign direct investment">
-        <span class="lc-icon">💸</span>
-        <div class="lc-body">
-          <div class="lc-title">FDI Policy & Sectoral Caps</div>
-          <div class="lc-desc">DPIIT consolidated FDI policy and RBI guidelines for inbound investments.</div>
-          <div class="lc-arrow">rbi.org.in →</div>
-        </div>
-      </a>
-      <a href="https://www.rbi.org.in/Scripts/NBFC.aspx" target="_blank" class="link-card" data-keywords="nbfc non banking financial company rbi">
-        <span class="lc-icon">🏢</span>
-        <div class="lc-body">
-          <div class="lc-title">NBFC Regulations & Guidelines</div>
-          <div class="lc-desc">RBI master directions for NBFCs — registration, scale-based regulation.</div>
-          <div class="lc-arrow">rbi.org.in →</div>
-        </div>
-      </a>
-      <a href="https://fedai.org.in" target="_blank" class="link-card" data-keywords="fedai forex rate foreign exchange dealer">
-        <span class="lc-icon">💱</span>
-        <div class="lc-body">
-          <div class="lc-title">FEDAI — Forex Rates & Rules</div>
-          <div class="lc-desc">Foreign Exchange Dealers Association rules, forex rates, and circulars.</div>
-          <div class="lc-arrow">fedai.org.in →</div>
-        </div>
-      </a>
-    </div>
-  </div>
-
-  <!-- ══ CUSTOMS ══ -->
-  <div class="law-section" id="customs">
-    <div class="ls-header">
-      <div class="ls-icon" style="background:rgba(245,158,11,.12)">🚢</div>
-      <div>
-        <div class="ls-title">Customs & Import-Export</div>
-        <div class="ls-subtitle">Customs Act · CBIC · DGFT · ITC (HS) Codes</div>
-      </div>
-    </div>
-    <div class="links-grid">
-      <a href="https://cbic.gov.in/htdocs-cbec/customs/cs-circulars-2024" target="_blank" class="link-card" data-keywords="customs circular cbic">
-        <span class="lc-icon">📣</span>
-        <div class="lc-body">
-          <div class="lc-title">CBIC Customs Circulars <span class="imp-badge">Important</span></div>
-          <div class="lc-desc">All customs circulars with year-wise archive from CBIC.</div>
-          <div class="lc-arrow">cbic.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://cbic.gov.in" target="_blank" class="link-card" data-keywords="cbic customs excise">
-        <span class="lc-icon">🌐</span>
-        <div class="lc-body">
-          <div class="lc-title">CBIC — Central Board of Indirect Taxes</div>
-          <div class="lc-desc">Customs duty, anti-dumping, import restrictions, CBIC official portal.</div>
-          <div class="lc-arrow">cbic.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://dgft.gov.in" target="_blank" class="link-card" data-keywords="dgft import export policy itc hs">
-        <span class="lc-icon">🚢</span>
-        <div class="lc-body">
-          <div class="lc-title">DGFT — Foreign Trade Policy</div>
-          <div class="lc-desc">Import-export policy, IEC registration, advance authorization, MEIS/SEIS.</div>
-          <div class="lc-arrow">dgft.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://www.icegate.gov.in" target="_blank" class="link-card" data-keywords="icegate customs filing be shipping bill">
-        <span class="lc-icon">💻</span>
-        <div class="lc-body">
-          <div class="lc-title">ICEGATE — Customs e-Filing</div>
-          <div class="lc-desc">Bill of Entry, Shipping Bill, and all customs e-filing on ICEGATE portal.</div>
-          <div class="lc-arrow">icegate.gov.in →</div>
-        </div>
-      </a>
-    </div>
-  </div>
-
-  <!-- ══ OTHER ══ -->
-  <div class="law-section" id="other">
-    <div class="ls-header">
-      <div class="ls-icon" style="background:rgba(156,163,175,.12)">📋</div>
-      <div>
-        <div class="ls-title">Other Important Resources</div>
-        <div class="ls-subtitle">ICAI · ICSI · MCA Beneficial Ownership · Competition Law · Stamp Duty</div>
-      </div>
-    </div>
-    <div class="links-grid">
-      <a href="https://resource.cdn.icai.org" target="_blank" class="link-card" data-keywords="icai standards audit guidance">
-        <span class="lc-icon">🎓</span>
-        <div class="lc-body">
-          <div class="lc-title">ICAI — Accounting & Auditing Standards</div>
-          <div class="lc-desc">Ind AS, SA standards, technical guides, and ICAI guidance notes.</div>
-          <div class="lc-arrow">icai.org →</div>
-        </div>
-      </a>
-      <a href="https://www.cci.gov.in" target="_blank" class="link-card" data-keywords="cci competition act antitrust">
-        <span class="lc-icon">⚖️</span>
-        <div class="lc-body">
-          <div class="lc-title">CCI — Competition Commission</div>
-          <div class="lc-desc">Competition Act orders, combinations approval, antitrust guidance.</div>
-          <div class="lc-arrow">cci.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://iepfa.gov.in" target="_blank" class="link-card" data-keywords="iepfa investor education unclaimed dividend">
-        <span class="lc-icon">💰</span>
-        <div class="lc-body">
-          <div class="lc-title">IEPFA — Unclaimed Dividends</div>
-          <div class="lc-desc">Investor Education & Protection Fund — claim unclaimed dividends and shares.</div>
-          <div class="lc-arrow">iepfa.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://www.indiacode.nic.in" target="_blank" class="link-card" data-keywords="india code legislation bare act">
-        <span class="lc-icon">📚</span>
-        <div class="lc-body">
-          <div class="lc-title">India Code — All Central Acts</div>
-          <div class="lc-desc">Complete repository of all Central Acts and Subordinate Legislation.</div>
-          <div class="lc-arrow">indiacode.nic.in →</div>
-        </div>
-      </a>
-      <a href="https://egazette.gov.in" target="_blank" class="link-card" data-keywords="gazette notification official gazette">
-        <span class="lc-icon">📰</span>
-        <div class="lc-body">
-          <div class="lc-title">e-Gazette — Official Gazette of India</div>
-          <div class="lc-desc">Search and download all official Gazette notifications of India.</div>
-          <div class="lc-arrow">egazette.gov.in →</div>
-        </div>
-      </a>
-      <a href="https://taxmann.com/research" target="_blank" class="link-card" data-keywords="taxmann case law judgment">
-        <span class="lc-icon">🔎</span>
-        <div class="lc-body">
-          <div class="lc-title">Taxmann Research — Case Laws</div>
-          <div class="lc-desc">Search income tax, GST, company law case laws and tribunal orders.</div>
-          <div class="lc-arrow">taxmann.com →</div>
-        </div>
-      </a>
-      <a href="https://indiankanoon.org" target="_blank" class="link-card" data-keywords="indian kanoon case law court judgment">
-        <span class="lc-icon">⚖️</span>
-        <div class="lc-body">
-          <div class="lc-title">Indian Kanoon — Free Case Law Search</div>
-          <div class="lc-desc">Free search across Supreme Court, High Court, and Tribunal judgments.</div>
-          <div class="lc-arrow">indiankanoon.org →</div>
-        </div>
-      </a>
-      <a href="https://dippam.gov.in" target="_blank" class="link-card" data-keywords="dpiit dippam fdi policy startup">
-        <span class="lc-icon">🚀</span>
-        <div class="lc-body">
-          <div class="lc-title">DPIIT — Start-up India & FDI Policy</div>
-          <div class="lc-desc">FDI Policy, startup registration, and DPIIT notifications and circulars.</div>
-          <div class="lc-arrow">dippam.gov.in →</div>
-        </div>
-      </a>
+    <div class="sections-grid">
+      <a href="https://rbi.org.in/Scripts/FEMANotifications.aspx" target="_blank" class="sec-card" data-kw="fema notification foreign exchange rbi"><span class="sec-num">FEMA</span><div class="sec-body"><div class="sec-title">FEMA Notifications (RBI)</div><div class="sec-desc">All FEMA notifications — FDI, ODI, ECB, NRI, export/import</div><div class="sec-src">rbi.org.in →</div></div></a>
+      <a href="https://rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx" target="_blank" class="sec-card" data-kw="rbi master circular direction guidelines banks nbfc"><span class="sec-num">RBI</span><div class="sec-body"><div class="sec-title">RBI Master Circulars & Directions <span class="badge-imp">Key</span></div><div class="sec-desc">Master directions for banks, NBFCs, payment systems</div><div class="sec-src">rbi.org.in →</div></div></a>
     </div>
   </div>
 
 </div><!-- /main -->
+</div><!-- /layout -->
 
-<!-- Back to top -->
-<button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+<button class="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script>
-function setActive(el){
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+// Tab switching
+function showTab(btn, prefix, tabId) {
+  // Deactivate all tabs in this law block
+  const block = btn.closest('.law-block');
+  block.querySelectorAll('.lt').forEach(b => b.classList.remove('active'));
+  block.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  const el = document.getElementById(prefix + '-' + tabId) ||
+             document.getElementById(prefix + '-' + tabId + '-tab');
+  if (el) el.classList.add('active');
+}
+
+// Sidebar active
+function setActive(el) {
+  document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
   el.classList.add('active');
 }
 
-function filterLaws(q){
+// Search/filter
+function filterAll(q) {
   q = q.toLowerCase().trim();
-  document.querySelectorAll('.link-card').forEach(card=>{
-    if(!q){card.style.display='flex';return;}
-    const kw = (card.dataset.keywords||'') + card.textContent.toLowerCase();
-    card.style.display = kw.includes(q) ? 'flex' : 'none';
+  document.querySelectorAll('.sec-card').forEach(card => {
+    const kw = (card.dataset.kw || '') + card.textContent.toLowerCase();
+    card.style.display = (!q || kw.includes(q)) ? 'flex' : 'none';
   });
-  // Show/hide section headings based on visible cards
-  document.querySelectorAll('.law-section').forEach(sec=>{
-    const visible = [...sec.querySelectorAll('.link-card')].some(c=>c.style.display!=='none');
-    sec.style.display = visible ? 'block' : 'none';
+  document.querySelectorAll('.law-block').forEach(block => {
+    const visible = [...block.querySelectorAll('.sec-card')].some(c => c.style.display !== 'none');
+    block.style.display = visible ? 'block' : (!q ? 'block' : 'none');
   });
 }
 
-// Show/hide back to top
-window.addEventListener('scroll',()=>{
-  const btn = document.querySelector('.back-top');
+// Back to top
+window.addEventListener('scroll', () => {
+  const btn = document.querySelector('.btt');
   btn.style.display = window.scrollY > 400 ? 'flex' : 'none';
 });
-document.querySelector('.back-top').style.display='none';
 
-// Tab active on scroll
-const sections = document.querySelectorAll('.law-section[id]');
-const tabBtns = document.querySelectorAll('.tab-btn');
-window.addEventListener('scroll', ()=>{
+// Sidebar scroll sync
+const blocks = document.querySelectorAll('.law-block[id]');
+window.addEventListener('scroll', () => {
   let cur = '';
-  sections.forEach(s=>{
-    if(window.scrollY >= s.offsetTop - 120) cur = s.id;
-  });
-  tabBtns.forEach(b=>{
-    b.classList.toggle('active', b.getAttribute('href')==='#'+cur);
+  blocks.forEach(b => { if (window.scrollY >= b.offsetTop - 80) cur = b.id; });
+  document.querySelectorAll('.sb-link').forEach(l => {
+    l.classList.toggle('active', l.getAttribute('href') === '#' + cur);
   });
 });
 </script>

@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Sign in or create your MyBBT account — India's professional toolkit for CA, CS, Lawyers."/>
+<title>Login — MyBBT Professional Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#e2192c;--red2:#c01020;
+  --dark:#0a0f1e;--dark2:#111827;--dark3:#1f2937;
+  --card:#111827;--card2:#1a2435;
+  --text:#f9fafb;--text2:#d1d5db;--text3:#9ca3af;
+  --blue:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#8b5cf6;
+  --border:rgba(255,255,255,.08);
+  --input-bg:#0d1526;--input-border:rgba(255,255,255,.12);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);
+  overflow-x:hidden;line-height:1.5;min-height:100vh}
+
+/* ── TOP NAV ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(10,15,30,.9);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);padding:0 5vw}
+.nav-inner{max-width:1200px;margin:0 auto;height:58px;display:flex;align-items:center;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-mark{width:32px;height:32px;flex-shrink:0}
+.logo-text{font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.02em}
+.logo-text span{color:var(--red)}
+.nav-back{margin-left:auto;display:flex;align-items:center;gap:6px;
+  padding:7px 16px;border-radius:8px;font-size:.84rem;font-weight:500;
+  color:var(--text2);text-decoration:none;transition:all .2s;
+  background:rgba(255,255,255,.05);border:1px solid var(--border)}
+.nav-back:hover{background:rgba(255,255,255,.1);color:#fff}
+
+/* ── BACKGROUND ── */
+.page-bg{position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse 70% 60% at 20% 50%, rgba(226,25,44,.10) 0%, transparent 65%),
+             radial-gradient(ellipse 50% 50% at 80% 60%, rgba(59,130,246,.07) 0%, transparent 60%),
+             linear-gradient(180deg,#0a0f1e 0%,#0d1628 100%)}
+.page-grid{position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+                   linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+  background-size:60px 60px}
+
+/* ── MAIN LAYOUT ── */
+.auth-wrapper{position:relative;z-index:1;min-height:100vh;
+  display:grid;grid-template-columns:1fr 1fr;padding-top:58px}
+
+/* ── LEFT PANEL ── */
+.left-panel{
+  background:linear-gradient(135deg, rgba(226,25,44,.06) 0%, rgba(10,15,30,.6) 100%);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:60px 48px;position:relative;overflow:hidden}
+.left-globe{position:absolute;right:-60px;bottom:-60px;width:280px;height:280px;
+  opacity:.12;pointer-events:none}
+.left-globe svg{animation:spinGlobe 40s linear infinite}
+@keyframes spinGlobe{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+.brand-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;
+  background:rgba(226,25,44,.15);border:1px solid rgba(226,25,44,.3);border-radius:20px;
+  font-size:.74rem;font-weight:600;color:#fca5a5;margin-bottom:28px;letter-spacing:.04em;
+  width:fit-content}
+.brand-badge::before{content:'🇮🇳';font-size:.9rem}
+.brand-heading{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;line-height:1.15;
+  margin-bottom:12px;letter-spacing:-.03em}
+.brand-heading .highlight{
+  background:linear-gradient(135deg, #e2192c 0%, #f97316 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.brand-sub{font-size:.92rem;color:var(--text3);margin-bottom:36px;line-height:1.65;max-width:360px}
+
+/* Feature list */
+.features-list{list-style:none;display:flex;flex-direction:column;gap:14px}
+.feat-item{display:flex;align-items:flex-start;gap:14px}
+.feat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-size:1.1rem;flex-shrink:0;margin-top:1px}
+.feat-icon.red{background:rgba(226,25,44,.15)}
+.feat-icon.blue{background:rgba(59,130,246,.15)}
+.feat-icon.green{background:rgba(34,197,94,.15)}
+.feat-icon.orange{background:rgba(245,158,11,.15)}
+.feat-icon.purple{background:rgba(139,92,246,.15)}
+.feat-icon.teal{background:rgba(20,184,166,.15)}
+.feat-text-name{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.feat-text-desc{font-size:.78rem;color:var(--text3)}
+
+/* ── RIGHT PANEL ── */
+.right-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 48px}
+.auth-card{width:100%;max-width:420px}
+
+/* Tabs */
+.tab-bar{display:flex;background:var(--input-bg);border:1px solid var(--input-border);
+  border-radius:12px;padding:4px;margin-bottom:32px}
+.tab-btn{flex:1;padding:10px 16px;border:none;background:transparent;
+  border-radius:9px;font-size:.88rem;font-weight:600;color:var(--text3);
+  cursor:pointer;transition:all .2s;font-family:inherit}
+.tab-btn.active{background:var(--red);color:#fff;
+  box-shadow:0 2px 12px rgba(226,25,44,.35)}
+.tab-btn:not(.active):hover{color:var(--text);background:rgba(255,255,255,.05)}
+
+/* Form */
+.form-panel{display:none}
+.form-panel.active{display:block}
+.form-title{font-size:1.45rem;font-weight:800;letter-spacing:-.02em;margin-bottom:6px}
+.form-sub{font-size:.84rem;color:var(--text3);margin-bottom:28px}
+
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:.82rem;font-weight:600;color:var(--text2);margin-bottom:7px}
+.form-input{width:100%;padding:11px 14px;background:var(--input-bg);
+  border:1px solid var(--input-border);border-radius:10px;color:var(--text);
+  font-size:.9rem;font-family:inherit;transition:all .2s;outline:none}
+.form-input:focus{border-color:rgba(226,25,44,.5);
+  box-shadow:0 0 0 3px rgba(226,25,44,.08)}
+.form-input::placeholder{color:var(--text3)}
+.form-input.error{border-color:rgba(226,25,44,.7);
+  box-shadow:0 0 0 3px rgba(226,25,44,.1)}
+
+.forgot-link{display:block;text-align:right;font-size:.78rem;color:var(--text3);
+  text-decoration:none;margin-top:6px;transition:color .2s}
+.forgot-link:hover{color:var(--red)}
+
+/* Error/Success messages */
+.msg-box{padding:12px 16px;border-radius:10px;font-size:.84rem;font-weight:500;
+  margin-bottom:18px;display:none;align-items:flex-start;gap:10px;line-height:1.5}
+.msg-box.error{background:rgba(226,25,44,.12);border:1px solid rgba(226,25,44,.3);color:#fca5a5;display:flex}
+.msg-box.success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#86efac;display:flex}
+.msg-box.info{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#93c5fd;display:flex}
+.msg-icon{font-size:1rem;flex-shrink:0;margin-top:.05rem}
+
+/* Buttons */
+.btn-auth{width:100%;padding:13px 20px;border-radius:10px;border:none;cursor:pointer;
+  font-size:.95rem;font-weight:700;font-family:inherit;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:9px}
+.btn-auth.primary{background:var(--red);color:#fff;
+  box-shadow:0 4px 20px rgba(226,25,44,.28)}
+.btn-auth.primary:hover:not(:disabled){background:var(--red2);transform:translateY(-1px);
+  box-shadow:0 6px 28px rgba(226,25,44,.38)}
+.btn-auth.primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-auth.google{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  color:var(--text);margin-bottom:18px}
+.btn-auth.google:hover:not(:disabled){background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
+.btn-auth.google:disabled{opacity:.6;cursor:not-allowed}
+
+.divider-or{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--text3);font-size:.78rem}
+.divider-or::before,.divider-or::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Loading spinner */
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Terms */
+.terms-note{font-size:.72rem;color:var(--text3);text-align:center;margin-top:18px;line-height:1.6}
+.terms-note a{color:var(--text3);text-decoration:underline;transition:color .2s}
+.terms-note a:hover{color:var(--text)}
+
+/* Password toggle */
+.input-wrap{position:relative}
+.input-wrap .form-input{padding-right:44px}
+.pw-toggle{position:absolute;right:13px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--text3);
+  font-size:1rem;padding:2px;transition:color .2s;line-height:1}
+.pw-toggle:hover{color:var(--text2)}
+
+/* ── VERIFY EMAIL STATE ── */
+.verify-card{text-align:center;padding:16px 0}
+.verify-icon{font-size:3.5rem;margin-bottom:16px;line-height:1}
+.verify-title{font-size:1.25rem;font-weight:800;margin-bottom:8px}
+.verify-desc{font-size:.86rem;color:var(--text3);line-height:1.65;margin-bottom:24px;max-width:340px;margin-left:auto;margin-right:auto}
+.verify-resend{font-size:.82rem;color:var(--text3);margin-top:12px}
+.verify-resend a{color:var(--red);text-decoration:none;cursor:pointer}
+.verify-resend a:hover{text-decoration:underline}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .auth-wrapper{grid-template-columns:1fr}
+  .left-panel{display:none}
+}
+@media(max-width:520px){
+  .right-panel{padding:40px 24px}
+  .auth-card{max-width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND -->
+<div class="page-bg"></div>
+<div class="page-grid"></div>
+
+<!-- TOP NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="logo">
+      <svg class="logo-mark" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="17" stroke="#e2192c" stroke-width="1.5" fill="none"/>
+        <ellipse cx="18" cy="18" rx="8" ry="17" stroke="#e2192c" stroke-width="1" fill="none" opacity=".5"/>
+        <line x1="1" y1="18" x2="35" y2="18" stroke="#e2192c" stroke-width="1" opacity=".5"/>
+        <line x1="1" y1="12" x2="35" y2="12" stroke="#e2192c" stroke-width=".8" opacity=".35"/>
+        <line x1="1" y1="24" x2="35" y2="24" stroke="#e2192c" stroke-width=".8" opacity=".35"/>
+        <circle cx="18" cy="18" r="3" fill="#e2192c"/>
+        <line x1="18" y1="18" x2="28" y2="8" stroke="#e2192c" stroke-width=".8" opacity=".6" stroke-dasharray="2,2"/>
+        <line x1="18" y1="18" x2="8" y2="26" stroke="#e2192c" stroke-width=".8" opacity=".6" stroke-dasharray="2,2"/>
+        <circle cx="28" cy="8" r="2" fill="#f97316"/>
+        <circle cx="8" cy="26" r="2" fill="#3b82f6"/>
+      </svg>
+      <span class="logo-text">My<span>BBT</span></span>
+    </a>
+    <a href="/pdf-tools" class="nav-back">← Back to Tools</a>
+  </div>
+</nav>
+
+<!-- MAIN WRAPPER -->
+<div class="auth-wrapper">
+
+  <!-- ── LEFT PANEL ── -->
+  <div class="left-panel">
+    <!-- Decorative background globe -->
+    <div class="left-globe">
+      <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="200" cy="200" r="190" stroke="rgba(226,25,44,.6)" stroke-width="1.5"/>
+        <ellipse cx="200" cy="200" rx="80" ry="190" stroke="rgba(226,25,44,.4)" stroke-width="1"/>
+        <ellipse cx="200" cy="200" rx="150" ry="190" stroke="rgba(226,25,44,.25)" stroke-width="1"/>
+        <line x1="10" y1="200" x2="390" y2="200" stroke="rgba(226,25,44,.3)" stroke-width="1"/>
+        <line x1="10" y1="130" x2="390" y2="130" stroke="rgba(226,25,44,.18)" stroke-width="1"/>
+        <line x1="10" y1="270" x2="390" y2="270" stroke="rgba(226,25,44,.18)" stroke-width="1"/>
+        <circle cx="200" cy="200" r="8" fill="#e2192c" opacity=".8"/>
+        <circle cx="120" cy="100" r="5" fill="#3b82f6" opacity=".7"/>
+        <circle cx="300" cy="140" r="5" fill="#22c55e" opacity=".7"/>
+        <circle cx="80" cy="260" r="5" fill="#f59e0b" opacity=".7"/>
+        <circle cx="330" cy="280" r="5" fill="#8b5cf6" opacity=".7"/>
+        <line x1="200" y1="200" x2="120" y2="100" stroke="rgba(59,130,246,.4)" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="200" y1="200" x2="300" y2="140" stroke="rgba(34,197,94,.4)" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="200" y1="200" x2="80" y2="260" stroke="rgba(245,158,11,.4)" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="200" y1="200" x2="330" y2="280" stroke="rgba(139,92,246,.4)" stroke-width="1" stroke-dasharray="4,4"/>
+      </svg>
+    </div>
+
+    <!-- Brand -->
+    <div class="brand-badge">Made for Corporate Professionals · India</div>
+    <h1 class="brand-heading">
+      Your Professional<br/>
+      <span class="highlight">Toolkit Awaits</span>
+    </h1>
+    <p class="brand-sub">
+      Join thousands of CAs, CS, Lawyers and Finance professionals using MyBBT to work smarter every day.
+    </p>
+
+    <!-- Feature list -->
+    <ul class="features-list">
+      <li class="feat-item">
+        <div class="feat-icon red">📄</div>
+        <div>
+          <div class="feat-text-name">30+ PDF Tools</div>
+          <div class="feat-text-desc">Merge, split, compress, OCR, sign and more</div>
+        </div>
+      </li>
+      <li class="feat-item">
+        <div class="feat-icon purple">🤖</div>
+        <div>
+          <div class="feat-text-name">AI Summarizer &amp; Translator</div>
+          <div class="feat-text-desc">Instantly summarize legal docs in any language</div>
+        </div>
+      </li>
+      <li class="feat-item">
+        <div class="feat-icon blue">⚖️</div>
+        <div>
+          <div class="feat-text-name">Corporate Laws Hub</div>
+          <div class="feat-text-desc">Companies Act, SEBI, FEMA, IBC and more</div>
+        </div>
+      </li>
+      <li class="feat-item">
+        <div class="feat-icon orange">🧾</div>
+        <div>
+          <div class="feat-text-name">GST Tools</div>
+          <div class="feat-text-desc">GSTR reconciliation, analysis and filing prep</div>
+        </div>
+      </li>
+      <li class="feat-item">
+        <div class="feat-icon green">🔒</div>
+        <div>
+          <div class="feat-text-name">Secure &amp; Private</div>
+          <div class="feat-text-desc">Files processed locally, never stored on servers</div>
+        </div>
+      </li>
+      <li class="feat-item">
+        <div class="feat-icon teal">✨</div>
+        <div>
+          <div class="feat-text-name">Free to Use</div>
+          <div class="feat-text-desc">No subscription, no hidden costs — always free</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ── RIGHT PANEL ── -->
+  <div class="right-panel">
+    <div class="auth-card">
+
+      <!-- Tab bar -->
+      <div class="tab-bar">
+        <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+        <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Create Account</button>
+      </div>
+
+      <!-- ═══ LOGIN FORM ═══ -->
+      <div class="form-panel active" id="panel-login">
+        <h2 class="form-title">Welcome back</h2>
+        <p class="form-sub">Sign in to your MyBBT account</p>
+
+        <div class="msg-box" id="login-msg">
+          <span class="msg-icon"></span>
+          <span id="login-msg-text"></span>
+        </div>
+
+        <!-- Google Sign-in -->
+        <button class="btn-auth google" id="login-google-btn" onclick="signInWithGoogle()">
+          <svg width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M43.6 20.5H42V20H24V28H35.3C33.65 32.65 29.3 36 24 36C17.37 36 12 30.63 12 24C12 17.37 17.37 12 24 12C27.06 12 29.84 13.12 31.96 14.96L37.6 9.32C34.04 6.05 29.26 4 24 4C12.95 4 4 12.95 4 24C4 35.05 12.95 44 24 44C35.05 44 44 35.05 44 24C44 22.82 43.87 21.67 43.6 20.5Z" fill="#FFC107"/>
+            <path d="M6.3 14.69L12.88 19.51C14.65 15.1 18.96 12 24 12C27.06 12 29.84 13.12 31.96 14.96L37.6 9.32C34.04 6.05 29.26 4 24 4C16.32 4 9.65 8.34 6.3 14.69Z" fill="#FF3D00"/>
+            <path d="M24 44C29.16 44 33.86 42.02 37.4 38.78L31.22 33.57C29.18 35.08 26.7 36 24 36C18.72 36 14.38 32.67 12.72 28.04L6.19 33.07C9.5 39.55 16.19 44 24 44Z" fill="#4CAF50"/>
+            <path d="M43.6 20.5H42V20H24V28H35.3C34.51 30.24 33.07 32.18 31.22 33.57L31.23 33.56L37.41 38.77C36.97 39.17 44 34 44 24C44 22.82 43.87 21.67 43.6 20.5Z" fill="#1976D2"/>
+          </svg>
+          Continue with Google
+        </button>
+
+        <div class="divider-or">or sign in with email</div>
+
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email Address</label>
+            <input class="form-input" type="email" id="login-email"
+              placeholder="you@example.com" autocomplete="email" required/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <div class="input-wrap">
+              <input class="form-input" type="password" id="login-password"
+                placeholder="Enter your password" autocomplete="current-password" required/>
+              <button type="button" class="pw-toggle" onclick="togglePw('login-password',this)" title="Show/hide password">👁</button>
+            </div>
+            <a href="#" class="forgot-link" onclick="handleForgotPassword(event)">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn-auth primary" id="login-submit-btn">
+            Sign In →
+          </button>
+        </form>
+
+        <p class="terms-note">
+          Don't have an account?
+          <a href="#" onclick="switchTab('register'); return false;">Create one free</a>
+        </p>
+      </div>
+
+      <!-- ═══ REGISTER FORM ═══ -->
+      <div class="form-panel" id="panel-register">
+        <h2 class="form-title">Create account</h2>
+        <p class="form-sub">Join MyBBT — it's completely free</p>
+
+        <!-- Verify email screen (hidden initially) -->
+        <div class="verify-card" id="verify-screen" style="display:none">
+          <div class="verify-icon">📬</div>
+          <div class="verify-title">Verify your email</div>
+          <p class="verify-desc">
+            We've sent a verification link to your inbox. Please check your email and click the link to activate your account.
+          </p>
+          <button class="btn-auth primary" onclick="window.location.href='/'">Go to Tools →</button>
+          <p class="verify-resend" style="margin-top:14px">
+            Didn't get it? <a onclick="resendVerification()">Resend email</a>
+          </p>
+        </div>
+
+        <!-- Register form (shown initially) -->
+        <div id="register-form-wrap">
+          <div class="msg-box" id="reg-msg">
+            <span class="msg-icon"></span>
+            <span id="reg-msg-text"></span>
+          </div>
+
+          <!-- Google Sign-up -->
+          <button class="btn-auth google" id="reg-google-btn" onclick="signInWithGoogle()">
+            <svg width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M43.6 20.5H42V20H24V28H35.3C33.65 32.65 29.3 36 24 36C17.37 36 12 30.63 12 24C12 17.37 17.37 12 24 12C27.06 12 29.84 13.12 31.96 14.96L37.6 9.32C34.04 6.05 29.26 4 24 4C12.95 4 4 12.95 4 24C4 35.05 12.95 44 24 44C35.05 44 44 35.05 44 24C44 22.82 43.87 21.67 43.6 20.5Z" fill="#FFC107"/>
+              <path d="M6.3 14.69L12.88 19.51C14.65 15.1 18.96 12 24 12C27.06 12 29.84 13.12 31.96 14.96L37.6 9.32C34.04 6.05 29.26 4 24 4C16.32 4 9.65 8.34 6.3 14.69Z" fill="#FF3D00"/>
+              <path d="M24 44C29.16 44 33.86 42.02 37.4 38.78L31.22 33.57C29.18 35.08 26.7 36 24 36C18.72 36 14.38 32.67 12.72 28.04L6.19 33.07C9.5 39.55 16.19 44 24 44Z" fill="#4CAF50"/>
+              <path d="M43.6 20.5H42V20H24V28H35.3C34.51 30.24 33.07 32.18 31.22 33.57L31.23 33.56L37.41 38.77C36.97 39.17 44 34 44 24C44 22.82 43.87 21.67 43.6 20.5Z" fill="#1976D2"/>
+            </svg>
+            Sign up with Google
+          </button>
+
+          <div class="divider-or">or register with email</div>
+
+          <form id="register-form" onsubmit="handleRegister(event)">
+            <div class="form-group">
+              <label class="form-label" for="reg-name">Full Name</label>
+              <input class="form-input" type="text" id="reg-name"
+                placeholder="Rahul Sharma" autocomplete="name" required/>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-email">Email Address</label>
+              <input class="form-input" type="email" id="reg-email"
+                placeholder="you@example.com" autocomplete="email" required/>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-password">Password</label>
+              <div class="input-wrap">
+                <input class="form-input" type="password" id="reg-password"
+                  placeholder="At least 8 characters" autocomplete="new-password" required minlength="8"/>
+                <button type="button" class="pw-toggle" onclick="togglePw('reg-password',this)" title="Show/hide">👁</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-confirm">Confirm Password</label>
+              <div class="input-wrap">
+                <input class="form-input" type="password" id="reg-confirm"
+                  placeholder="Repeat your password" autocomplete="new-password" required/>
+                <button type="button" class="pw-toggle" onclick="togglePw('reg-confirm',this)" title="Show/hide">👁</button>
+              </div>
+            </div>
+            <button type="submit" class="btn-auth primary" id="reg-submit-btn">
+              Create Account →
+            </button>
+          </form>
+
+          <p class="terms-note">
+            Already have an account?
+            <a href="#" onclick="switchTab('login'); return false;">Sign in</a>
+            <br/>
+            By registering you agree to our
+            <a href="/privacy" target="_blank">Privacy Policy</a> &amp;
+            <a href="/terms" target="_blank">Terms of Use</a>
+          </p>
+        </div>
+      </div>
+
+    </div><!-- /auth-card -->
+  </div><!-- /right-panel -->
+</div><!-- /auth-wrapper -->
+
+
+<!-- ═══════════════════════════════════════════
+     FIREBASE SDK (v9 compat)
+═══════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+/* ── FIREBASE CONFIG — Replace with your actual values ── */
+const firebaseConfig = {
+  apiKey: 'YOUR_API_KEY',
+  authDomain: 'YOUR_PROJECT.firebaseapp.com',
+  projectId: 'YOUR_PROJECT_ID',
+  storageBucket: 'YOUR_PROJECT.appspot.com',
+  messagingSenderId: 'YOUR_SENDER_ID',
+  appId: 'YOUR_APP_ID'
+};
+
+/* ── Init Firebase ── */
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+/* ── Auth state: redirect logged-in users ── */
+auth.onAuthStateChanged(user => {
+  if (user) {
+    // Redirect to home if already signed in
+    window.location.replace('/');
+  }
+});
+
+/* ─────────────────────────────────
+   UI HELPERS
+───────────────────────────────── */
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('panel-login').classList.toggle('active', tab === 'login');
+  document.getElementById('panel-register').classList.toggle('active', tab === 'register');
+  clearMsg('login-msg');
+  clearMsg('reg-msg');
+}
+
+function showMsg(boxId, textId, type, icon, text) {
+  const box = document.getElementById(boxId);
+  const txt = document.getElementById(textId);
+  box.className = 'msg-box ' + type;
+  box.querySelector('.msg-icon').textContent = icon;
+  txt.textContent = text;
+}
+
+function clearMsg(boxId) {
+  const box = document.getElementById(boxId);
+  box.className = 'msg-box';
+}
+
+function setLoading(btnId, loading, label='') {
+  const btn = document.getElementById(btnId);
+  if (loading) {
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> Please wait…';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = label;
+  }
+}
+
+function togglePw(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+/* ─────────────────────────────────
+   ERROR MESSAGE MAP
+───────────────────────────────── */
+function friendlyError(code) {
+  const map = {
+    'auth/user-not-found':        'No account found with this email. Please register first.',
+    'auth/wrong-password':        'Incorrect password. Please try again or reset it.',
+    'auth/invalid-email':         'Please enter a valid email address.',
+    'auth/invalid-credential':    'Invalid email or password. Please check and try again.',
+    'auth/email-already-in-use':  'An account with this email already exists. Try signing in.',
+    'auth/weak-password':         'Password must be at least 8 characters.',
+    'auth/too-many-requests':     'Too many failed attempts. Please wait a few minutes and try again.',
+    'auth/network-request-failed':'Network error. Please check your internet connection.',
+    'auth/popup-closed-by-user':  'Google sign-in was cancelled. Please try again.',
+    'auth/cancelled-popup-request':'Only one popup allowed at a time.',
+    'auth/popup-blocked':         'Popup was blocked by your browser. Please allow popups for this site.',
+    'auth/account-exists-with-different-credential': 'An account already exists with this email using a different sign-in method.',
+  };
+  return map[code] || 'Something went wrong. Please try again.';
+}
+
+/* ─────────────────────────────────
+   LOGIN
+───────────────────────────────── */
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  clearMsg('login-msg');
+  setLoading('login-submit-btn', true);
+
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    // onAuthStateChanged will redirect
+  } catch(err) {
+    showMsg('login-msg', 'login-msg-text', 'error', '⚠️', friendlyError(err.code));
+    setLoading('login-submit-btn', false, 'Sign In →');
+  }
+}
+
+/* ─────────────────────────────────
+   REGISTER
+───────────────────────────────── */
+async function handleRegister(e) {
+  e.preventDefault();
+  const name     = document.getElementById('reg-name').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const confirm  = document.getElementById('reg-confirm').value;
+
+  clearMsg('reg-msg');
+
+  if (password !== confirm) {
+    showMsg('reg-msg','reg-msg-text','error','⚠️','Passwords do not match. Please re-enter.');
+    document.getElementById('reg-confirm').classList.add('error');
+    return;
+  }
+  document.getElementById('reg-confirm').classList.remove('error');
+  setLoading('reg-submit-btn', true);
+
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, password);
+    // Set display name
+    await cred.user.updateProfile({ displayName: name });
+    // Send verification email
+    await cred.user.sendEmailVerification();
+    // Show verify screen
+    document.getElementById('register-form-wrap').style.display = 'none';
+    document.getElementById('verify-screen').style.display = 'block';
+  } catch(err) {
+    showMsg('reg-msg','reg-msg-text','error','⚠️', friendlyError(err.code));
+    setLoading('reg-submit-btn', false, 'Create Account →');
+  }
+}
+
+/* ─────────────────────────────────
+   GOOGLE SIGN-IN / SIGN-UP
+───────────────────────────────── */
+async function signInWithGoogle() {
+  const loginBtn = document.getElementById('login-google-btn');
+  const regBtn   = document.getElementById('reg-google-btn');
+  if (loginBtn) loginBtn.disabled = true;
+  if (regBtn) regBtn.disabled = true;
+
+  try {
+    await auth.signInWithPopup(googleProvider);
+    // onAuthStateChanged handles redirect
+  } catch(err) {
+    const msg = friendlyError(err.code);
+    showMsg('login-msg','login-msg-text','error','⚠️', msg);
+    showMsg('reg-msg','reg-msg-text','error','⚠️', msg);
+    if (loginBtn) loginBtn.disabled = false;
+    if (regBtn) regBtn.disabled = false;
+  }
+}
+
+/* ─────────────────────────────────
+   FORGOT PASSWORD
+───────────────────────────────── */
+async function handleForgotPassword(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) {
+    showMsg('login-msg','login-msg-text','error','⚠️','Enter your email address above first.');
+    return;
+  }
+  clearMsg('login-msg');
+  try {
+    await auth.sendPasswordResetEmail(email);
+    showMsg('login-msg','login-msg-text','success','✅',
+      `Password reset email sent to ${email}. Check your inbox.`);
+  } catch(err) {
+    showMsg('login-msg','login-msg-text','error','⚠️', friendlyError(err.code));
+  }
+}
+
+/* ─────────────────────────────────
+   RESEND VERIFICATION
+───────────────────────────────── */
+async function resendVerification() {
+  const user = auth.currentUser;
+  if (!user) return;
+  try {
+    await user.sendEmailVerification();
+    alert('Verification email resent! Please check your inbox.');
+  } catch(err) {
+    alert('Could not resend. Please wait a moment and try again.');
+  }
+}
+</script>
+</body>
+</html>

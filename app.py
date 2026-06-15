@@ -88,6 +88,15 @@ def laws_page():
     return render_template('laws.html')
 
 
+@app.route('/login')
+def login_page():
+    return render_template('login.html')
+
+
+@app.route('/dashboard')
+def dashboard_page():
+    return render_template('dashboard.html')
+
 
 # ─────────────────────────────────────────
 # FILE MANAGER

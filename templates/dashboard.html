@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Your MyBBT Dashboard — Professional tools for CA, CS, Lawyers."/>
+<title>Dashboard — MyBBT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#e2192c;--red2:#c01020;
+  --dark:#0a0f1e;--dark2:#111827;--dark3:#1f2937;
+  --card:#111827;--card2:#1a2435;
+  --text:#f9fafb;--text2:#d1d5db;--text3:#9ca3af;
+  --blue:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#8b5cf6;
+  --teal:#14b8a6;
+  --border:rgba(255,255,255,.08);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);
+  overflow-x:hidden;line-height:1.5;min-height:100vh}
+
+/* ── AUTH GATE ── */
+#auth-loading{position:fixed;inset:0;z-index:999;background:var(--dark);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.gate-spinner{width:40px;height:40px;border:3px solid rgba(226,25,44,.2);
+  border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite}
+.gate-text{font-size:.9rem;color:var(--text3)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── NAV ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(10,15,30,.9);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);padding:0 5vw}
+.nav-inner{max-width:1200px;margin:0 auto;height:60px;display:flex;align-items:center;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-mark{width:34px;height:34px;flex-shrink:0}
+.logo-text{font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.02em}
+.logo-text span{color:var(--red)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.user-chip{display:flex;align-items:center;gap:9px;padding:6px 14px 6px 6px;
+  background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:24px}
+.user-avatar{width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--red),#f97316);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden}
+.user-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.user-name{font-size:.83rem;font-weight:600;color:var(--text2);max-width:120px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-logout{padding:7px 16px;border:1px solid rgba(226,25,44,.35);border-radius:8px;
+  background:rgba(226,25,44,.08);color:#fca5a5;font-size:.82rem;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-logout:hover{background:rgba(226,25,44,.18);border-color:rgba(226,25,44,.6);color:#fff}
+
+/* ── PAGE ── */
+.page{padding-top:60px}
+.page-bg{position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse 80% 50% at 50% 0%, rgba(226,25,44,.07) 0%, transparent 60%),
+             linear-gradient(180deg,#0a0f1e 0%,#0d1628 100%)}
+.content{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:44px 5vw 80px}
+
+/* ── WELCOME HERO ── */
+.welcome-hero{background:linear-gradient(135deg,var(--card) 0%,var(--card2) 100%);
+  border:1px solid var(--border);border-radius:18px;
+  padding:36px 40px;margin-bottom:36px;position:relative;overflow:hidden}
+.welcome-hero::before{content:'';position:absolute;right:-20px;top:-20px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle, rgba(226,25,44,.12) 0%, transparent 70%);
+  pointer-events:none}
+.welcome-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
+  background:rgba(226,25,44,.15);border:1px solid rgba(226,25,44,.3);border-radius:20px;
+  font-size:.72rem;font-weight:700;color:#fca5a5;margin-bottom:14px;letter-spacing:.04em}
+.welcome-title{font-size:clamp(1.5rem,3vw,2.1rem);font-weight:900;
+  letter-spacing:-.03em;margin-bottom:6px}
+.welcome-title span{
+  background:linear-gradient(135deg,#e2192c 0%,#f97316 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.welcome-email{font-size:.86rem;color:var(--text3);display:flex;align-items:center;gap:6px}
+.verified-badge{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;
+  font-weight:600;color:#86efac;background:rgba(34,197,94,.1);
+  border:1px solid rgba(34,197,94,.25);border-radius:12px;padding:2px 8px}
+.unverified-badge{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;
+  font-weight:600;color:#fde68a;background:rgba(245,158,11,.1);
+  border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:2px 8px;cursor:pointer}
+.welcome-stats{display:flex;gap:24px;flex-wrap:wrap;margin-top:24px}
+.wstat{text-align:left;padding:12px 20px;background:rgba(255,255,255,.04);
+  border:1px solid var(--border);border-radius:10px}
+.wstat-num{font-size:1.5rem;font-weight:900;color:#fff;line-height:1}
+.wstat-num span{color:var(--red)}
+.wstat-lbl{font-size:.72rem;color:var(--text3);margin-top:2px}
+
+/* ── SECTION HEADER ── */
+.sec-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--red);margin-bottom:8px}
+.sec-title{font-size:1.15rem;font-weight:800;letter-spacing:-.02em;margin-bottom:20px}
+
+/* ── TOOLS GRID ── */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:40px}
+.tool-card{display:flex;flex-direction:column;gap:0;
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:20px;text-decoration:none;color:inherit;transition:all .22s;cursor:pointer}
+.tool-card:hover{background:var(--card2);border-color:rgba(226,25,44,.3);
+  transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.tool-icon{font-size:1.7rem;margin-bottom:10px}
+.tool-name{font-size:.88rem;font-weight:700;color:#fff;margin-bottom:3px}
+.tool-desc{font-size:.74rem;color:var(--text3);line-height:1.4}
+.tool-arrow{font-size:.68rem;color:var(--red);margin-top:8px;font-weight:700}
+
+/* ── ADMIN SECTION ── */
+.admin-section{display:none;background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(139,92,246,.06));
+  border:1px solid rgba(245,158,11,.2);border-radius:16px;padding:28px 32px;margin-bottom:40px}
+.admin-header{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.admin-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
+  background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);
+  border-radius:20px;font-size:.72rem;font-weight:700;color:#fde68a;letter-spacing:.04em}
+.admin-title{font-size:1rem;font-weight:800}
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.admin-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;
+  padding:18px;text-decoration:none;color:inherit;transition:all .2s;display:block}
+.admin-card:hover{background:rgba(255,255,255,.07);border-color:rgba(245,158,11,.3)}
+.admin-card-title{font-size:.9rem;font-weight:700;margin-bottom:4px}
+.admin-card-desc{font-size:.76rem;color:var(--text3)}
+
+/* ── QUICK LINKS ── */
+.quick-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:40px}
+.quick-link{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;
+  color:var(--text2);text-decoration:none;font-size:.84rem;font-weight:500;transition:all .2s}
+.quick-link:hover{background:rgba(255,255,255,.09);color:#fff;
+  border-color:rgba(255,255,255,.15);transform:translateY(-1px)}
+
+/* ── FOOTER ── */
+.dash-footer{text-align:center;color:var(--text3);font-size:.78rem;
+  border-top:1px solid var(--border);padding-top:24px;margin-top:20px}
+.dash-footer a{color:var(--text3);text-decoration:none}
+.dash-footer a:hover{color:#fff}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  .welcome-hero{padding:24px 20px}
+  .content{padding:32px 20px 60px}
+  .user-name{display:none}
+  .tools-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+}
+</style>
+</head>
+<body>
+
+<!-- ── AUTH LOADING GATE ── -->
+<div id="auth-loading">
+  <svg width="48" height="48" viewBox="0 0 36 36" fill="none">
+    <circle cx="18" cy="18" r="17" stroke="#e2192c" stroke-width="1.5" fill="none"/>
+    <ellipse cx="18" cy="18" rx="8" ry="17" stroke="#e2192c" stroke-width="1" fill="none" opacity=".5"/>
+    <line x1="1" y1="18" x2="35" y2="18" stroke="#e2192c" stroke-width="1" opacity=".5"/>
+    <circle cx="18" cy="18" r="3" fill="#e2192c"/>
+    <line x1="18" y1="18" x2="28" y2="8" stroke="#e2192c" stroke-width=".8" opacity=".6" stroke-dasharray="2,2"/>
+    <circle cx="28" cy="8" r="2" fill="#f97316"/>
+    <circle cx="8" cy="26" r="2" fill="#3b82f6"/>
+  </svg>
+  <div class="gate-spinner"></div>
+  <div class="gate-text">Verifying your session…</div>
+</div>
+
+<div class="page-bg"></div>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="logo">
+      <svg class="logo-mark" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="17" stroke="#e2192c" stroke-width="1.5" fill="none"/>
+        <ellipse cx="18" cy="18" rx="8" ry="17" stroke="#e2192c" stroke-width="1" fill="none" opacity=".5"/>
+        <line x1="1" y1="18" x2="35" y2="18" stroke="#e2192c" stroke-width="1" opacity=".5"/>
+        <line x1="1" y1="12" x2="35" y2="12" stroke="#e2192c" stroke-width=".8" opacity=".35"/>
+        <line x1="1" y1="24" x2="35" y2="24" stroke="#e2192c" stroke-width=".8" opacity=".35"/>
+        <circle cx="18" cy="18" r="3" fill="#e2192c"/>
+        <line x1="18" y1="18" x2="28" y2="8" stroke="#e2192c" stroke-width=".8" opacity=".6" stroke-dasharray="2,2"/>
+        <line x1="18" y1="18" x2="8" y2="26" stroke="#e2192c" stroke-width=".8" opacity=".6" stroke-dasharray="2,2"/>
+        <circle cx="28" cy="8" r="2" fill="#f97316"/>
+        <circle cx="8" cy="26" r="2" fill="#3b82f6"/>
+      </svg>
+      <span class="logo-text">My<span>BBT</span></span>
+    </a>
+    <div class="nav-right">
+      <div class="user-chip">
+        <div class="user-avatar" id="nav-avatar">?</div>
+        <span class="user-name" id="nav-username">Loading…</span>
+      </div>
+      <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── PAGE CONTENT ── -->
+<div class="page">
+  <div class="content">
+
+    <!-- WELCOME HERO -->
+    <div class="welcome-hero">
+      <div class="welcome-badge">👤 My Dashboard</div>
+      <h1 class="welcome-title">Welcome back, <span id="display-name">there</span>!</h1>
+      <div class="welcome-email">
+        <span id="display-email" style="color:var(--text3)">Loading…</span>
+        <span id="email-verified-badge"></span>
+      </div>
+      <div class="welcome-stats">
+        <div class="wstat">
+          <div class="wstat-num">30<span>+</span></div>
+          <div class="wstat-lbl">PDF Tools available</div>
+        </div>
+        <div class="wstat">
+          <div class="wstat-num">6<span>+</span></div>
+          <div class="wstat-lbl">Law Categories</div>
+        </div>
+        <div class="wstat">
+          <div class="wstat-num">100<span>%</span></div>
+          <div class="wstat-lbl">Free forever</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK LINKS -->
+    <div class="sec-label">Quick Access</div>
+    <div class="quick-row">
+      <a href="/" class="quick-link">🏠 Home</a>
+      <a href="/pdf-tools" class="quick-link">📄 PDF Tools</a>
+      <a href="/gst-tools" class="quick-link">🧾 GST Tools</a>
+      <a href="/laws" class="quick-link">⚖️ Laws Hub</a>
+      <a href="/file-manager" class="quick-link">📁 File Manager</a>
+    </div>
+
+    <!-- TOOLS GRID -->
+    <div class="sec-label">PDF Tools</div>
+    <div class="sec-title">Your most-used tools</div>
+    <div class="tools-grid">
+      <a href="/pdf-tools#merge" class="tool-card">
+        <div class="tool-icon">📎</div>
+        <div class="tool-name">Merge PDF</div>
+        <div class="tool-desc">Combine multiple PDFs into one</div>
+        <div class="tool-arrow">→ Open</div>
+      </a>
+      <a href="/pdf-tools#split" class="tool-card">
+        <div class="tool-icon">✂️</div>
+        <div class="tool-name">Split PDF</div>
+        <div class="tool-desc">Extract pages or split by range</div>
+        <div class="tool-arrow">→ Open</div>
+      </a>
+      <a href="/pdf-tools#compress" class="tool-card">
+        <div class="tool-icon">🗜️</div>
+        <div class="tool-name">Compress PDF</div>
+        <div class="tool-desc">Reduce file size without quality loss</div>
+        <div class="tool-arrow">→ Open</div>
+      </a>
+      <a href="/pdf-tools#ocr" class="tool-card">
+        <div class="tool-icon">🔍</div>
+        <div class="tool-name">OCR PDF</div>
+        <div class="tool-desc">Extract text from scanned documents</div>
+        <div class="tool-arrow">→ Open</div>
+      </a>
+      <a href="/pdf-tools#protect" class="tool-card">
+        <div class="tool-icon">🔒</div>
+        <div class="tool-name">Protect PDF</div>
+        <div class="tool-desc">Add password protection</div>
+        <div class="tool-arrow">→ Open</div>
+      </a>
+      <a href="/pdf-tools#sign" class="tool-card">
+        <div class="tool-icon">✍️</div>
+        <div class="tool-name">Sign PDF</div>
+        <div class="tool-desc">Add digital signatures to documents</div>
+        <div class="tool-arrow">→ Open</div>
+      </a>
+      <a href="/pdf-tools#ai-summarize" class="tool-card">
+        <div class="tool-icon">🤖</div>
+        <div class="tool-name">AI Summarizer</div>
+        <div class="tool-desc">Instant AI-powered doc summary</div>
+        <div class="tool-arrow">→ Open</div>
+      </a>
+      <a href="/pdf-tools#watermark" class="tool-card">
+        <div class="tool-icon">🏷️</div>
+        <div class="tool-name">Watermark PDF</div>
+        <div class="tool-desc">Add text or image watermarks</div>
+        <div class="tool-arrow">→ Open</div>
+      </a>
+    </div>
+
+    <!-- GST TOOLS -->
+    <div class="sec-label">GST Tools</div>
+    <div class="sec-title">GST Reconciliation &amp; Analysis</div>
+    <div class="tools-grid">
+      <a href="/gst-tools#gstr1" class="tool-card">
+        <div class="tool-icon">📊</div>
+        <div class="tool-name">GSTR-1 Analysis</div>
+        <div class="tool-desc">Analyse outward supply data</div>
+        <div class="tool-arrow">→ Open</div>
+      </a>
+      <a href="/gst-tools#gstr2b" class="tool-card">
+        <div class="tool-icon">🔗</div>
+        <div class="tool-name">GSTR-2B Reco</div>
+        <div class="tool-desc">Reconcile purchase register with 2B</div>
+        <div class="tool-arrow">→ Open</div>
+      </a>
+      <a href="/gst-tools#gstr3b" class="tool-card">
+        <div class="tool-icon">📋</div>
+        <div class="tool-name">GSTR-3B Summary</div>
+        <div class="tool-desc">Tax liability computation</div>
+        <div class="tool-arrow">→ Open</div>
+      </a>
+      <a href="/gst-tools#credit-ledger" class="tool-card">
+        <div class="tool-icon">💳</div>
+        <div class="tool-name">Credit Ledger</div>
+        <div class="tool-desc">ITC credit ledger analysis</div>
+        <div class="tool-arrow">→ Open</div>
+      </a>
+    </div>
+
+    <!-- LAWS HUB -->
+    <div class="sec-label">Corporate Laws</div>
+    <div class="sec-title">Quick Law References</div>
+    <div class="tools-grid" style="margin-bottom:40px">
+      <a href="/laws#companies" class="tool-card">
+        <div class="tool-icon">🏛️</div>
+        <div class="tool-name">Companies Act</div>
+        <div class="tool-desc">2013 Act with sections & rules</div>
+        <div class="tool-arrow">→ Browse</div>
+      </a>
+      <a href="/laws#sebi" class="tool-card">
+        <div class="tool-icon">📈</div>
+        <div class="tool-name">SEBI Regulations</div>
+        <div class="tool-desc">Securities law & circulars</div>
+        <div class="tool-arrow">→ Browse</div>
+      </a>
+      <a href="/laws#ibc" class="tool-card">
+        <div class="tool-icon">⚖️</div>
+        <div class="tool-name">IBC 2016</div>
+        <div class="tool-desc">Insolvency & Bankruptcy Code</div>
+        <div class="tool-arrow">→ Browse</div>
+      </a>
+      <a href="/laws#fema" class="tool-card">
+        <div class="tool-icon">💱</div>
+        <div class="tool-name">FEMA</div>
+        <div class="tool-desc">Foreign exchange management</div>
+        <div class="tool-arrow">→ Browse</div>
+      </a>
+    </div>
+
+    <!-- ADMIN SECTION (JS-controlled visibility) -->
+    <div class="admin-section" id="admin-section">
+      <div class="admin-header">
+        <div class="admin-badge">🛡️ Admin Panel</div>
+        <h2 class="admin-title">Site Administration</h2>
+      </div>
+      <div class="admin-grid">
+        <a href="/admin/users" class="admin-card">
+          <div class="admin-card-title">👥 Manage Users</div>
+          <div class="admin-card-desc">View registered accounts, roles and activity</div>
+        </a>
+        <a href="/admin/analytics" class="admin-card">
+          <div class="admin-card-title">📊 Analytics</div>
+          <div class="admin-card-desc">Traffic, tool usage, and growth metrics</div>
+        </a>
+        <a href="/admin/content" class="admin-card">
+          <div class="admin-card-title">📝 Content Manager</div>
+          <div class="admin-card-desc">Manage laws, articles and site content</div>
+        </a>
+        <a href="/admin/settings" class="admin-card">
+          <div class="admin-card-title">⚙️ Site Settings</div>
+          <div class="admin-card-desc">Configuration, maintenance and more</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="dash-footer">
+      <p>MyBBT &copy; 2025 — India's Free Professional Toolkit &nbsp;·&nbsp;
+        <a href="/">Home</a> &nbsp;·&nbsp;
+        <a href="/privacy">Privacy</a> &nbsp;·&nbsp;
+        <a href="/terms">Terms</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     FIREBASE SDK (v9 compat)
+═══════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+/* ── FIREBASE CONFIG — Replace with your actual values ── */
+const firebaseConfig = {
+  apiKey: 'YOUR_API_KEY',
+  authDomain: 'YOUR_PROJECT.firebaseapp.com',
+  projectId: 'YOUR_PROJECT_ID',
+  storageBucket: 'YOUR_PROJECT.appspot.com',
+  messagingSenderId: 'YOUR_SENDER_ID',
+  appId: 'YOUR_APP_ID'
+};
+
+/* ── ADMIN EMAILS — add your admin email(s) here ── */
+const ADMIN_EMAILS = [
+  'admin@mybbt.in',
+  // 'your-email@gmail.com',
+];
+
+/* ── Init Firebase ── */
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+/* ── Auth Gate: redirect to /login if not authenticated ── */
+auth.onAuthStateChanged(user => {
+  const gate = document.getElementById('auth-loading');
+
+  if (!user) {
+    // Not logged in — bounce to login
+    window.location.replace('/login');
+    return;
+  }
+
+  // Populate UI with user data
+  populateDashboard(user);
+
+  // Hide loading gate
+  gate.style.opacity = '0';
+  gate.style.transition = 'opacity .3s';
+  setTimeout(() => gate.style.display = 'none', 320);
+});
+
+/* ── Populate dashboard with user info ── */
+function populateDashboard(user) {
+  const name      = user.displayName || extractName(user.email) || 'Professional';
+  const email     = user.email || '';
+  const photoURL  = user.photoURL || '';
+  const verified  = user.emailVerified;
+
+  // Name & email display
+  document.getElementById('display-name').textContent = name;
+  document.getElementById('display-email').textContent = email;
+  document.getElementById('nav-username').textContent  = name.split(' ')[0];
+
+  // Verified badge
+  const badgeEl = document.getElementById('email-verified-badge');
+  if (verified) {
+    badgeEl.innerHTML = '<span class="verified-badge">✅ Email verified</span>';
+  } else {
+    badgeEl.innerHTML = '<span class="unverified-badge" title="Click to resend verification" onclick="resendVerification()">⚠️ Unverified — click to verify</span>';
+  }
+
+  // Avatar
+  const avatarEl = document.getElementById('nav-avatar');
+  if (photoURL) {
+    avatarEl.innerHTML = `<img src="${photoURL}" alt="${name}" onerror="this.parentElement.textContent='${name[0].toUpperCase()}'"/>`;
+  } else {
+    avatarEl.textContent = name[0].toUpperCase();
+  }
+
+  // Admin section
+  if (ADMIN_EMAILS.includes(email.toLowerCase())) {
+    document.getElementById('admin-section').style.display = 'block';
+  }
+}
+
+/* ── Extract readable name from email ── */
+function extractName(email) {
+  if (!email) return 'Professional';
+  const local = email.split('@')[0];
+  return local.replace(/[._\-]/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+/* ── Logout ── */
+async function handleLogout() {
+  try {
+    await auth.signOut();
+    window.location.replace('/login');
+  } catch(err) {
+    alert('Error signing out: ' + err.message);
+  }
+}
+
+/* ── Resend email verification ── */
+async function resendVerification() {
+  const user = auth.currentUser;
+  if (!user) return;
+  try {
+    await user.sendEmailVerification();
+    alert('✅ Verification email sent! Please check your inbox.');
+  } catch(err) {
+    alert('Could not send verification email. Try again shortly.');
+  }
+}
+</script>
+</body>
+</html>
