@@ -63,11 +63,16 @@
             </div>
         </div>
 
-        <label>Advanced Matching Features</label>
+        <label style="margin-top: 15px; font-size: 1.1em;">Advanced Matching Features</label>
         <div class="toggles">
-          <label class="toggle-label"><input type="checkbox" name="pre_group" value="true"> Pre-Group Line Items</label>
+          <label class="toggle-label"><input type="checkbox" name="grouped_match" value="true" checked> Exact Group Match</label>
+          <label class="toggle-label"><input type="checkbox" name="rule_match" value="true" checked> Rule-Based Match</label>
           <label class="toggle-label"><input type="checkbox" name="fuzzy_invoice" value="true" checked> Fuzzy Invoice Matching</label>
           <label class="toggle-label"><input type="checkbox" name="vendor_fuzzy" value="true"> Vendor Name Fuzzy</label>
+          <label class="toggle-label"><input type="checkbox" name="pre_group" value="true"> Pre-Group Line Items</label>
+          <label class="toggle-label"><input type="checkbox" name="month_year_match" value="true" checked> Month/Year Match Fallback</label>
+          <label class="toggle-label"><input type="checkbox" name="pr_knockout" value="true" checked> Auto Knockoff (PR side)</label>
+          <label class="toggle-label"><input type="checkbox" name="2b_knockout" value="true" checked> Auto Knockoff (2B side)</label>
           <label class="toggle-label"><input type="checkbox" name="bank_match" value="true" checked> Bank-Entry Match</label>
           <label class="toggle-label"><input type="checkbox" name="bank_max_match" value="true" checked> Bank MAX MATCH</label>
         </div>

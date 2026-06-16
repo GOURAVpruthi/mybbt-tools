@@ -147,14 +147,15 @@ def api_reco_run():
             "features": {
                 "user_knockoff": True,
                 "pre_group": request.form.get("pre_group", "false") == "true",
-                "pr_knockout": True,
-                "grouped_match": True,
-                "rule_match": True,
-                "fuzzy_invoice": request.form.get("fuzzy_invoice", "true") == "true",
+                "pr_knockout": request.form.get("pr_knockout", "false") == "true",
+                "grouped_match": request.form.get("grouped_match", "false") == "true",
+                "rule_match": request.form.get("rule_match", "false") == "true",
+                "fuzzy_invoice": request.form.get("fuzzy_invoice", "false") == "true",
                 "vendor_fuzzy": request.form.get("vendor_fuzzy", "false") == "true",
-                "bank_match": request.form.get("bank_match", "true") == "true",
-                "bank_max_match": request.form.get("bank_max_match", "true") == "true",
-                "2b_knockout": True
+                "month_year_match": request.form.get("month_year_match", "false") == "true",
+                "bank_match": request.form.get("bank_match", "false") == "true",
+                "bank_max_match": request.form.get("bank_max_match", "false") == "true",
+                "2b_knockout": request.form.get("2b_knockout", "false") == "true"
             }
         }
         engine = GSTRecoEngine(cfg)

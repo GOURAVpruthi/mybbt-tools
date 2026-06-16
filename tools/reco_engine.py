@@ -82,9 +82,7 @@ except ImportError:
     OUTLOOK_OK = False
 
 
-# ═══════════════════════════════════════════════════════════════
 # PALETTE
-# ═══════════════════════════════════════════════════════════════
 C = {
     "bg":"#F8F9FA","bg_alt":"#F1F3F4","sidebar":"#1F1F1F","sb_hover":"#2D2D2D",
     "sb_active":"#2563EB","sb_text":"#E8EAED","sb_text2":"#9AA0A6",
@@ -101,9 +99,7 @@ FTB=("Segoe UI",10,"bold"); FT=("Segoe UI",10); FSM=("Segoe UI",9)
 FXS=("Segoe UI",8); FMO=("Consolas",9)
 
 
-# ═══════════════════════════════════════════════════════════════
 # DEFAULTS
-# ═══════════════════════════════════════════════════════════════
 KNOWN_COLS = [
     "GSTIN","Pan","Invoice Number","Invoice Date",
     "Total Tax","Total Tax Round","Invoice Prefix","Invoice Suffix",
@@ -157,9 +153,7 @@ DEFAULT_FEATURES = {
 RULES_FILE = os.path.join(os.path.expanduser("~"), ".gst_reco_v5.json")
 
 
-# ═══════════════════════════════════════════════════════════════
 # HELPERS
-# ═══════════════════════════════════════════════════════════════
 def get_fy(date):
     try:
         if pd.isna(date): return ""
@@ -266,9 +260,7 @@ def enrich_side_df(df, tol):
     return pd.concat(parts,ignore_index=True) if parts else df
 
 
-# ═══════════════════════════════════════════════════════════════
 # FUZZY INVOICE — 10-RULE DETERMINISTIC NORMALIZATION
-# ═══════════════════════════════════════════════════════════════
 _SEP_RE = re.compile(r'[-/\.\s:_]+')
 _LOOKALIKE = str.maketrans({'S':'5','L':'1','I':'1','O':'0','Z':'2','B':'8'})
 
@@ -400,9 +392,7 @@ def fuzzy_invoice_match(a_raw, b_raw):
     return (False, "")
 
 
-# ═══════════════════════════════════════════════════════════════
 # EMAIL SENDER
-# ═══════════════════════════════════════════════════════════════
 def send_email_outlook(recipient, subject, body, attachment_path):
     if not OUTLOOK_OK:
         return (False, "pywin32 not installed")
@@ -440,9 +430,7 @@ def send_email_smtp(host, port, user, password, recipient, subject, body, attach
         return (False, f"SMTP error: {e}")
 
 
-# ═══════════════════════════════════════════════════════════════
 # ANIMATION HELPER
-# ═══════════════════════════════════════════════════════════════
 def _hex_to_rgb(h):
     h = h.lstrip('#')
     return (int(h[0:2],16), int(h[2:4],16), int(h[4:6],16))
@@ -456,400 +444,6 @@ def smooth_bg(widget, target, steps=6, delay=14, prop="bg"):
     except Exception: pass
 
 
-# ═══════════════════════════════════════════════════════════════
-# WIDGETS
-# ═══════════════════════════════════════════════════════════════
-class Toggle(tk.Canvas):
-    W,H=46,24
-    def __init__(self,parent,var,on_change=None,**kw):
-        kw.setdefault("bg",C["bg"])
-        super().__init__(parent,width=self.W,height=self.H,bd=0,highlightthickness=0,cursor="hand2",**kw)
-        self.var=var; self.cb=on_change
-        self._knob = (self.W - self.H) if bool(self.var.get()) else 0
-        self._target = self._knob; self._anim_id = None
-        self.bind("<Button-1>",self._click)
-        var.trace_add("write",lambda *_: self._animate_to_state())
-        self._render()
-    def _click(self,_=None):
-        self.var.set(not self.var.get())
-        if self.cb: self.cb()
-    def _animate_to_state(self):
-        self._target = (self.W - self.H) if bool(self.var.get()) else 0
-        if self._anim_id:
-            try: self.after_cancel(self._anim_id)
-            except Exception: pass
-            self._anim_id = None
-        self._step()
-    def _step(self):
-        delta = self._target - self._knob
-        if abs(delta) < 0.5:
-            self._knob = self._target; self._render(); self._anim_id = None; return
-        self._knob += delta * 0.4
-        self._render()
-        self._anim_id = self.after(14, self._step)
-    def _render(self):
-        try:
-            self.delete("all"); on=bool(self.var.get())
-            ratio = self._knob / max(1,(self.W - self.H))
-            def blend(a,b,r):
-                ar,ag,ab = int(a[1:3],16),int(a[3:5],16),int(a[5:7],16)
-                br,bg,bb = int(b[1:3],16),int(b[3:5],16),int(b[5:7],16)
-                return f"#{int(ar+(br-ar)*r):02X}{int(ag+(bg-ag)*r):02X}{int(ab+(bb-ab)*r):02X}"
-            trk = blend("#D1D5DB", C["accent"], ratio)
-            r=self.H//2
-            self.create_oval(0,0,self.H,self.H,fill=trk,outline="")
-            self.create_oval(self.W-self.H,0,self.W,self.H,fill=trk,outline="")
-            self.create_rectangle(r,0,self.W-r,self.H,fill=trk,outline="")
-            kx = self._knob
-            self.create_oval(kx+3,4,kx+self.H-1,self.H-2,fill="#C0C0C0",outline="",stipple="gray25")
-            self.create_oval(kx+3,2,kx+self.H-3,self.H-4,fill="white",outline="")
-        except Exception: pass
-
-class Div(tk.Frame):
-    def __init__(self,parent,**kw):
-        kw.setdefault("bg",C["border"]); kw.setdefault("height",1)
-        super().__init__(parent,**kw)
-
-class Chip(tk.Label):
-    _S={"blue":(C["tag_blue"],C["accent"]),"green":(C["tag_green"],C["green"]),
-        "grey":(C["tag_grey"],C["text2"]),"red":(C["tag_red"],C["red"]),
-        "pink":(C["tag_pink"],C["pink"]),"yellow":(C["tag_yellow"],C["yellow"])}
-    def __init__(self,parent,text,color="grey",**kw):
-        bg,fg=self._S.get(color,self._S["grey"])
-        super().__init__(parent,text=text,font=FSM,bg=bg,fg=fg,padx=8,pady=3,**kw)
-
-class Btn(tk.Button):
-    _S={"default":(C["card_alt"],C["text"]),"primary":(C["accent"],"#FFFFFF"),
-        "danger":(C["red"],"#FFFFFF"),"ghost":(C["bg"],C["text2"]),
-        "success":(C["green"],"#FFFFFF"),"accent2":(C["accent2"],"#FFFFFF")}
-    def __init__(self,parent,text,command=None,style="default",**kw):
-        bg,fg=self._S.get(style,self._S["default"])
-        self._bg = bg; self._hover_bg = self._dk(bg, 0.90)
-        super().__init__(parent, text=text, font=FT, bg=bg, fg=fg,
-                         padx=16, pady=6, cursor="hand2", relief="flat", bd=0,
-                         borderwidth=0, highlightthickness=0, highlightbackground=bg,
-                         activebackground=self._dk(bg, 0.82), activeforeground=fg,
-                         command=command, **kw)
-        self.bind("<Enter>", self._on_enter)
-        self.bind("<Leave>", self._on_leave)
-        self._anim_id = None
-    def _on_enter(self, _e=None): self._animate_bg(self._hover_bg)
-    def _on_leave(self, _e=None): self._animate_bg(self._bg)
-    def _animate_bg(self, target, steps=4, delay=16):
-        try: current = self.cget("bg")
-        except Exception: return
-        try:
-            cr,cg,cb = int(current[1:3],16),int(current[3:5],16),int(current[5:7],16)
-            tr,tg,tb = int(target[1:3],16),int(target[3:5],16),int(target[5:7],16)
-        except Exception:
-            try: self.config(bg=target)
-            except Exception: pass
-            return
-        if self._anim_id:
-            try: self.after_cancel(self._anim_id)
-            except Exception: pass
-            self._anim_id = None
-        def step(i):
-            if i > steps:
-                try: self.config(bg=target)
-                except Exception: pass
-                return
-            ratio = i / steps
-            r = int(cr + (tr-cr)*ratio); g = int(cg + (tg-cg)*ratio); b = int(cb + (tb-cb)*ratio)
-            try: self.config(bg=f"#{r:02X}{g:02X}{b:02X}")
-            except Exception: return
-            self._anim_id = self.after(delay, lambda: step(i+1))
-        step(1)
-    @staticmethod
-    def _dk(h, factor=0.88):
-        try:
-            r,g,b=int(h[1:3],16),int(h[3:5],16),int(h[5:7],16)
-            return f"#{int(r*factor):02X}{int(g*factor):02X}{int(b*factor):02X}"
-        except Exception: return h
-
-
-# ═══════════════════════════════════════════════════════════════
-# DIALOGS
-# ═══════════════════════════════════════════════════════════════
-class MatchRuleDialog(tk.Toplevel):
-    def __init__(self,parent,rule=None):
-        super().__init__(parent); self.title("Match Rule"); self.configure(bg=C["bg"])
-        self.resizable(False,False); self.result=None; self._build(rule); self.grab_set(); self.wait_window()
-    def _build(self,rule):
-        tk.Label(self,text="Match Rule Editor",font=FH2,bg=C["bg"],fg=C["text"]).pack(padx=20,pady=(16,4),anchor="w")
-        Div(self).pack(fill="x",padx=12,pady=6)
-        tk.Label(self,text="Columns (Ctrl+click = multi-select):",font=FSM,bg=C["bg"],fg=C["text2"]).pack(anchor="w",padx=20)
-        lf=tk.Frame(self,bg=C["bg"]); lf.pack(padx=20,pady=4)
-        self.lb=tk.Listbox(lf,selectmode="extended",height=10,width=28,exportselection=False,
-                            font=FMO,bg=C["card"],fg=C["text"],bd=1,relief="flat",
-                            selectbackground=C["accent"],selectforeground="white")
-        sb=tk.Scrollbar(lf,orient="vertical",command=self.lb.yview); self.lb.config(yscrollcommand=sb.set)
-        self.lb.pack(side="left"); sb.pack(side="right",fill="y")
-        for c in KNOWN_COLS: self.lb.insert("end",c)
-        if rule:
-            for i,c in enumerate(KNOWN_COLS):
-                if c in rule["cols"]: self.lb.selection_set(i)
-        cf=tk.Frame(self,bg=C["bg"]); cf.pack(padx=20,pady=(4,0),fill="x")
-        tk.Label(cf,text="Custom col:",font=FSM,bg=C["bg"],fg=C["text2"]).pack(side="left")
-        self.cv=tk.StringVar()
-        tk.Entry(cf,textvariable=self.cv,font=FT,bg=C["card"],bd=1,relief="flat",width=14).pack(side="left",padx=6)
-        Btn(cf,"+ Add",command=self._add_custom,style="ghost").pack(side="left")
-        r2=tk.Frame(self,bg=C["bg"]); r2.pack(padx=20,pady=(10,4),fill="x")
-        tk.Label(r2,text="Label:",font=FTB,bg=C["bg"],fg=C["text"]).pack(side="left")
-        self.lv=tk.StringVar(value=rule["label"] if rule else "")
-        tk.Entry(r2,textvariable=self.lv,font=FT,bg=C["card"],bd=1,relief="flat",width=30).pack(side="left",padx=8)
-        r3=tk.Frame(self,bg=C["bg"]); r3.pack(padx=20,pady=(4,4),fill="x")
-        tk.Label(r3,text="Custom Remark (optional):",font=FSM,bg=C["bg"],fg=C["text2"]).pack(side="left")
-        self.rv=tk.StringVar(value=rule.get("remark","") if rule else "")
-        tk.Entry(r3,textvariable=self.rv,font=FT,bg=C["card"],bd=1,relief="flat",width=28).pack(side="left",padx=8)
-        tk.Label(self,text="  e.g. 'State Mismatch', 'Low confidence – verify'",font=FSM,bg=C["bg"],fg=C["text2"]).pack(anchor="w",padx=20)
-        Div(self).pack(fill="x",padx=12,pady=8)
-        bf=tk.Frame(self,bg=C["bg"]); bf.pack(padx=20,pady=(0,16))
-        Btn(bf,"✔  Save",command=self._ok,style="primary").pack(side="left",padx=4)
-        Btn(bf,"Cancel",command=self.destroy).pack(side="left")
-    def _add_custom(self):
-        c=self.cv.get().strip()
-        if c and c not in self.lb.get(0,"end"): self.lb.insert("end",c); self.lb.selection_set("end")
-        self.cv.set("")
-    def _ok(self):
-        sel=[self.lb.get(i) for i in self.lb.curselection()]
-        if not sel: messagebox.showwarning("Validation","Select at least one column.",parent=self); return
-        self.result={"cols":sel,"label":self.lv.get().strip() or "+".join(sel),"enabled":True,"remark":self.rv.get().strip()}
-        self.destroy()
-
-
-class KnockoutRuleDialog(tk.Toplevel):
-    KO_COLS=["Pan","GSTIN","Invoice Number","State","Month Year","Vendor Name","Invoice Prefix"]
-    def __init__(self,parent,rule=None):
-        super().__init__(parent); self.title("Knockout Rule"); self.configure(bg=C["bg"])
-        self.resizable(False,False); self.result=None; self._build(rule); self.grab_set(); self.wait_window()
-    def _build(self,rule):
-        tk.Label(self,text="Knockout Rule Editor",font=FH2,bg=C["bg"],fg=C["text"]).pack(padx=20,pady=(16,4),anchor="w")
-        tk.Label(self,text="Entries sharing these columns whose taxes sum to zero are knocked off.",
-                 font=FSM,bg=C["bg"],fg=C["text2"],wraplength=400).pack(padx=20,anchor="w")
-        Div(self).pack(fill="x",padx=12,pady=8)
-        tk.Label(self,text="Group-by Columns:",font=FSM,bg=C["bg"],fg=C["text2"]).pack(anchor="w",padx=20,pady=(0,2))
-        lf=tk.Frame(self,bg=C["bg"]); lf.pack(padx=20,pady=4)
-        self.lb=tk.Listbox(lf,selectmode="extended",height=8,width=26,exportselection=False,
-                            font=FMO,bg=C["card"],fg=C["text"],bd=1,relief="flat",
-                            selectbackground=C["accent"],selectforeground="white")
-        sb=tk.Scrollbar(lf,orient="vertical",command=self.lb.yview); self.lb.config(yscrollcommand=sb.set)
-        self.lb.pack(side="left"); sb.pack(side="right",fill="y")
-        for c in self.KO_COLS: self.lb.insert("end",c)
-        if rule:
-            for i,c in enumerate(self.KO_COLS):
-                if c in rule.get("cols",[]): self.lb.selection_set(i)
-        of=tk.Frame(self,bg=C["bg"]); of.pack(padx=20,pady=(10,4),fill="x")
-        tk.Label(of,text="Enforce Tax-Head Separation\n(IGST ≠ CGST+SGST):",
-                 font=FSM,bg=C["bg"],fg=C["text"]).grid(row=0,column=0,sticky="w",pady=6)
-        self.th=tk.BooleanVar(value=rule.get("tax_head",True) if rule else True)
-        Toggle(of,self.th,bg=C["bg"]).grid(row=0,column=1,padx=16,sticky="w")
-        tk.Label(of,text="Max entries to combine\n(any number ≥ 1):",
-                 font=FSM,bg=C["bg"],fg=C["text"]).grid(row=1,column=0,sticky="w",pady=6)
-        self.mc=tk.IntVar(value=rule.get("max_combo",3) if rule else 3)
-        mc_frame=tk.Frame(of,bg=C["bg"]); mc_frame.grid(row=1,column=1,sticky="w",padx=16)
-        tk.Spinbox(mc_frame,from_=1,to=99,increment=1,textvariable=self.mc,
-                   width=6,font=FT,bg=C["bg"],relief="flat",bd=1).pack(side="left")
-        tk.Label(mc_frame,text="  (1=single  2=pairs  3=triplets  …)",
-                 font=FSM,bg=C["bg"],fg=C["text2"]).pack(side="left")
-        r2=tk.Frame(self,bg=C["bg"]); r2.pack(padx=20,pady=(10,4),fill="x")
-        tk.Label(r2,text="Label:",font=FTB,bg=C["bg"],fg=C["text"]).pack(side="left")
-        self.lv=tk.StringVar(value=rule["label"] if rule else "")
-        tk.Entry(r2,textvariable=self.lv,font=FT,bg=C["card"],bd=1,relief="flat",width=28).pack(side="left",padx=8)
-        r3=tk.Frame(self,bg=C["bg"]); r3.pack(padx=20,pady=(4,4),fill="x")
-        tk.Label(r3,text="Custom Remark:",font=FSM,bg=C["bg"],fg=C["text2"]).pack(side="left")
-        self.rv=tk.StringVar(value=rule.get("remark","") if rule else "")
-        tk.Entry(r3,textvariable=self.rv,font=FT,bg=C["card"],bd=1,relief="flat",width=28).pack(side="left",padx=8)
-        Div(self).pack(fill="x",padx=12,pady=8)
-        bf=tk.Frame(self,bg=C["bg"]); bf.pack(padx=20,pady=(0,16))
-        Btn(bf,"✔  Save",command=self._ok,style="primary").pack(side="left",padx=4)
-        Btn(bf,"Cancel",command=self.destroy).pack(side="left")
-    def _ok(self):
-        sel=[self.KO_COLS[i] for i in self.lb.curselection()]
-        if not sel: messagebox.showwarning("Validation","Select at least one column.",parent=self); return
-        self.result={"cols":sel,"label":self.lv.get().strip() or "+".join(sel),"enabled":True,
-                     "tax_head":self.th.get(),"max_combo":self.mc.get(),"remark":self.rv.get().strip()}
-        self.destroy()
-
-
-# ═══════════════════════════════════════════════════════════════
-# RULES TABLE
-# ═══════════════════════════════════════════════════════════════
-class RulesTable(tk.Frame):
-    def __init__(self,parent,rules,dialog_cls,extra_cols=(),**kw):
-        kw.setdefault("bg",C["bg"])
-        super().__init__(parent,**kw)
-        self.rules=rules; self.dialog_cls=dialog_cls; self.extra=extra_cols; self._build()
-    def _build(self):
-        tb=tk.Frame(self,bg=C["bg"]); tb.pack(fill="x",pady=(0,6))
-        for lbl,cmd in [("+ Add",self._add),("✏ Edit",self._edit),
-                         ("🗑 Delete",self._del),("⬆ Up",self._up),
-                         ("⬇ Down",self._dn),("⏸ Toggle",self._tog)]:
-            Btn(tb,lbl,command=cmd).pack(side="left",padx=2)
-        cols=("no","active","label","columns","remark")+self.extra
-        self.tv=ttk.Treeview(self,columns=cols,show="headings",selectmode="browse",height=16)
-        self.tv.heading("no",text="#");      self.tv.column("no",width=34,anchor="center",stretch=False)
-        self.tv.heading("active",text="On"); self.tv.column("active",width=44,anchor="center",stretch=False)
-        self.tv.heading("label",text="Label"); self.tv.column("label",width=200)
-        self.tv.heading("columns",text="Columns"); self.tv.column("columns",width=280)
-        self.tv.heading("remark",text="Remark"); self.tv.column("remark",width=160)
-        for ec in self.extra:
-            self.tv.heading(ec,text=ec.replace("_"," ").title())
-            self.tv.column(ec,width=90,anchor="center")
-        sb=ttk.Scrollbar(self,orient="vertical",command=self.tv.yview)
-        self.tv.configure(yscrollcommand=sb.set)
-        self.tv.pack(side="left",fill="both",expand=True)
-        sb.pack(side="right",fill="y")
-        self.tv.tag_configure("off",foreground=C["text2"])
-        self._refresh()
-    def _refresh(self):
-        self.tv.delete(*self.tv.get_children())
-        for i,r in enumerate(self.rules):
-            on=r.get("enabled",True)
-            vals=(i+1,"✅" if on else "—",r["label"],"  |  ".join(r["cols"]),r.get("remark",""))
-            for ec in self.extra: vals+=(str(r.get(ec,"")),)
-            self.tv.insert("","end",iid=str(i),values=vals,tags=(("off",) if not on else ()))
-    def _sel(self):
-        s=self.tv.selection(); return int(s[0]) if s else None
-    def _add(self):
-        d=self.dialog_cls(self)
-        if d.result: self.rules.append(d.result); self._refresh()
-    def _edit(self):
-        idx=self._sel()
-        if idx is None: return
-        d=self.dialog_cls(self,self.rules[idx])
-        if d.result: self.rules[idx]=d.result; self._refresh()
-    def _del(self):
-        idx=self._sel()
-        if idx is None: return
-        if messagebox.askyesno("Delete","Delete this rule?",parent=self): self.rules.pop(idx); self._refresh()
-    def _up(self):
-        idx=self._sel()
-        if idx and idx>0: self.rules.insert(idx-1,self.rules.pop(idx)); self._refresh(); self.tv.selection_set(str(idx-1))
-    def _dn(self):
-        idx=self._sel()
-        if idx is not None and idx<len(self.rules)-1: self.rules.insert(idx+1,self.rules.pop(idx)); self._refresh(); self.tv.selection_set(str(idx+1))
-    def _tog(self):
-        idx=self._sel()
-        if idx is None: return
-        self.rules[idx]["enabled"]=not self.rules[idx].get("enabled",True); self._refresh()
-
-
-# ═══════════════════════════════════════════════════════════════
-# EXCEL FORMATTER
-# ═══════════════════════════════════════════════════════════════
-_CLR={
-    "Matched":"D1FAE5","Amount Mismatch":"FEF3C7",
-    "Excess in PR":"FEE2E2","Excess in 2B":"DBEAFE",
-    "Grouped Match":"DBEAFE","Grouped Amount Mismatch":"FEF3C7",
-    "Fuzzy Match":"D1FAE5","Vendor Fuzzy Match":"FCE7F3",
-    "Bank Match":"FEF3C7",
-    "PR Knockout":"F3F4F6","2B Knockout":"F3F4F6",
-    "Only in PR":"FEE2E2","Only in GSTR2B":"DBEAFE",
-    "Invoice mismatch under PAN":"FEF3C7",
-    "Different GSTIN for same PAN":"FDE68A","Mismatch":"FEF3C7",
-}
-
-def _insert_client_banner(ws, client_name):
-    if not OPENPYXL_OK or not client_name: return 0
-    ws.insert_rows(1, 2)
-    last_col = ws.max_column if ws.max_column > 1 else 8
-    last_col_letter = get_column_letter(last_col)
-    ws["A1"] = client_name
-    ws["A1"].font = Font(bold=True, size=16, color="FFFFFF", name="Calibri")
-    ws["A1"].fill = PatternFill("solid", fgColor="4F46E5")
-    ws["A1"].alignment = Alignment(horizontal="center", vertical="center")
-    ws.merge_cells(f"A1:{last_col_letter}1")
-    ws.row_dimensions[1].height = 30
-    ws["A2"] = f"GST Reconciliation Report  |  Generated: {datetime.datetime.now().strftime('%d %b %Y  %H:%M')}"
-    ws["A2"].font = Font(italic=True, size=10, color="312E81", name="Calibri")
-    ws["A2"].fill = PatternFill("solid", fgColor="EEF2FF")
-    ws["A2"].alignment = Alignment(horizontal="center", vertical="center")
-    ws.merge_cells(f"A2:{last_col_letter}2")
-    ws.row_dimensions[2].height = 20
-    return 2
-
-def _fmt_sheet(ws, status_col=None, client_name=""):
-    if not OPENPYXL_OK: return
-    banner_rows = _insert_client_banner(ws, client_name) if client_name else 0
-    header_row = banner_rows + 1
-    HF=PatternFill("solid",fgColor="4F46E5")
-    HFT=Font(bold=True,color="FFFFFF",size=10,name="Calibri")
-    HA=Alignment(horizontal="center",vertical="center",wrap_text=True)
-    BDR=Border(left=Side(style="thin",color="E5E7EB"),right=Side(style="thin",color="E5E7EB"),
-               top=Side(style="thin",color="E5E7EB"),bottom=Side(style="thin",color="E5E7EB"))
-    si=None
-    if status_col:
-        for i,cell in enumerate(ws[header_row],1):
-            if str(cell.value)==status_col: si=i; break
-    for cell in ws[header_row]: cell.fill=HF; cell.font=HFT; cell.alignment=HA; cell.border=BDR
-    ws.row_dimensions[header_row].height=28
-    ws.freeze_panes=ws.cell(row=header_row+1,column=1).coordinate
-    for row in ws.iter_rows(min_row=header_row+1):
-        st=row[si-1].value if si else None
-        fhex=_CLR.get(str(st),"FFFFFF") if st else "FFFFFF"
-        rf=PatternFill("solid",fgColor=fhex)
-        for cell in row: cell.fill=rf; cell.border=BDR; cell.alignment=Alignment(vertical="center")
-    for col in ws.columns:
-        letter=get_column_letter(col[0].column)
-        mx=max((len(str(c.value or "")) for c in col),default=10)
-        ws.column_dimensions[letter].width=min(max(mx+2,10),40)
-    _append_footer(ws)
-
-def _append_footer(ws):
-    if not OPENPYXL_OK: return
-    last_col = ws.max_column if ws.max_column > 1 else 8
-    last_col_letter = get_column_letter(last_col)
-    foot_row = ws.max_row + 2
-    ws.cell(row=foot_row, column=1, value="✨  Made by Creative Ideas  ✨")
-    cell = ws.cell(row=foot_row, column=1)
-    cell.font = Font(bold=True, italic=True, size=10, color="06B6D4", name="Calibri")
-    cell.fill = PatternFill("solid", fgColor="1E1B4B")
-    cell.alignment = Alignment(horizontal="center", vertical="center")
-    ws.merge_cells(start_row=foot_row, start_column=1, end_row=foot_row, end_column=last_col)
-    ws.row_dimensions[foot_row].height = 22
-
-def _fmt_dashboard(ws, client_name=""):
-    if not OPENPYXL_OK: return
-    ws.insert_rows(1,3)
-    ws["A1"]=client_name if client_name else "GST RECONCILIATION SUMMARY"
-    ws["A1"].font=Font(bold=True,size=18,color="FFFFFF",name="Calibri")
-    ws["A1"].fill=PatternFill("solid",fgColor="4F46E5")
-    ws["A1"].alignment=Alignment(horizontal="center",vertical="center")
-    ws.merge_cells("A1:C1"); ws.row_dimensions[1].height=40
-    ws["A2"]="GST Reconciliation Summary" if client_name else ""
-    ws["A2"].font=Font(bold=True,size=11,color="312E81",name="Calibri")
-    ws["A2"].fill=PatternFill("solid",fgColor="E0E7FF")
-    ws["A2"].alignment=Alignment(horizontal="center",vertical="center")
-    ws.merge_cells("A2:C2"); ws.row_dimensions[2].height=20
-    ws["A3"]=f"Generated: {datetime.datetime.now().strftime('%d %b %Y  %H:%M')}"
-    ws["A3"].font=Font(italic=True,size=9,color="6B7280"); ws["A3"].alignment=Alignment(horizontal="center")
-    ws.merge_cells("A3:C3"); ws.row_dimensions[3].height=16
-    HF=PatternFill("solid",fgColor="4F46E5"); HFT=Font(bold=True,color="FFFFFF",size=10,name="Calibri")
-    HA=Alignment(horizontal="center",vertical="center",wrap_text=True)
-    BDR=Border(left=Side(style="thin",color="E5E7EB"),right=Side(style="thin",color="E5E7EB"),
-               top=Side(style="thin",color="E5E7EB"),bottom=Side(style="thin",color="E5E7EB"))
-    for cell in ws[4]: cell.fill=HF; cell.font=HFT; cell.alignment=HA; cell.border=BDR
-    ws.row_dimensions[4].height=26
-    mc={"Only in PR":"FEE2E2","Only in GSTR-2B":"DBEAFE","Grouped Matches (rows)":"DBEAFE",
-        "Rule-Based Matches":"D1FAE5","Fuzzy Matches":"D1FAE5","Vendor Fuzzy Matches":"FCE7F3",
-        "Bank-Entry Matches":"FEF3C7",
-        "PR Internal Knockout (rows)":"F3F4F6","2B Internal Knockout (rows)":"F3F4F6",
-        "Client":"E0E7FF"}
-    fills=["FAFBFF","FFFFFF"]
-    for i,row in enumerate(ws.iter_rows(min_row=5)):
-        fhex=mc.get(str(row[0].value or ""),fills[i%2])
-        for cell in row:
-            cell.fill=PatternFill("solid",fgColor=fhex); cell.border=BDR
-            cell.alignment=Alignment(vertical="center")
-            if cell.column==2: cell.font=Font(bold=True,color="111827")
-    ws.column_dimensions["A"].width=44; ws.column_dimensions["B"].width=24; ws.freeze_panes="A5"
-    _append_footer(ws)
-
-
-# ═══════════════════════════════════════════════════════════════
-# ENGINE
-# ═══════════════════════════════════════════════════════════════
 class GSTRecoEngine:
     DEFAULT_BANK_KEYWORDS = [
         "BANK","HDFC","ICICI","AXIS","SBI","STATE BANK","KOTAK","YES BANK",
