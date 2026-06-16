@@ -88,8 +88,8 @@ def laws_page():
     return render_template('laws.html')
 
 
-@app.route('/gst-tools')
-def gst_tools_page():
+@app.route('/reco')
+def reco_page():
     return render_template('reco_tool.html')
 
 
