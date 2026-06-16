@@ -374,42 +374,55 @@ function setupGSTTool(cfg) {
     if (cfg.extraData) cfg.extraData(fd);
 
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> Processing...';
+    btn.innerHTML = '<span class="spinner"></span> Uploading & Processing...';
     if (prog) { prog.style.display = 'block'; prog.querySelector('.progress-fill').style.width = '60%'; }
 
     try {
       const resp = await fetch(cfg.api, { method: 'POST', body: fd });
       const data = await resp.json();
-      if (prog) prog.style.display = 'none';
-      btn.disabled = false;
-      btn.innerHTML = cfg.btnLabel || 'Process';
-
-      if (data.success) {
-        let html = `<div class="alert alert-success">
-          <strong>✅ ${data.message || 'Done!'}</strong>
-          ${data.ok !== undefined ? `<br>Processed: ${data.ok}/${data.total} PDFs` : ''}
-          ${data.files_processed !== undefined ? `<br>Files: ${data.files_processed}` : ''}
-          ${(data.errors && data.errors.length) ? `<br><span style="color:#f59e0b">⚠ ${data.errors.length} error(s): ${data.errors.join('; ')}</span>` : ''}
-          <br><br>
-          <a href="/api/gst/download/${data.filename}" class="btn btn-primary btn-sm">⬇ Download Excel Report</a>
-        </div>`;
-        if (data.logs && data.logs.length) {
-          html += `<details style="margin-top:8px"><summary style="cursor:pointer;font-size:12px;color:var(--text-muted)">View processing log</summary>
-            <div style="background:var(--surface-2);padding:10px;font-size:11px;font-family:monospace;border-radius:4px;max-height:150px;overflow-y:auto;margin-top:6px">${data.logs.join('<br>')}</div>
-          </details>`;
-        }
-        res.innerHTML = html; res.style.display = 'block';
-        // Reset
-        files = []; updateUI(); input.value = '';
-      } else {
-        res.innerHTML = `<div class="alert alert-error"><strong>❌ Error:</strong> ${data.error}</div>`;
-        res.style.display = 'block';
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to start background task');
       }
+
+      const taskId = data.task_id;
+      
+      // Poll for completion
+      const pollInterval = setInterval(async () => {
+        try {
+          const statResp = await fetch(`/api/reco/status/${taskId}`);
+          const statData = await statResp.json();
+          
+          if (statData.status === 'processing') {
+            btn.innerHTML = '<span class="spinner"></span> Working... (Do not close)';
+          } else if (statData.status === 'done') {
+            clearInterval(pollInterval);
+            if (prog) prog.style.display = 'none';
+            btn.disabled = false;
+            btn.innerHTML = cfg.btnLabel || 'Process';
+            
+            let html = `<div class="alert alert-success">
+              <strong>✅ ${statData.message || 'Done!'}</strong>
+              <br><br>
+              <a href="/api/reco/download/${taskId}" class="btn btn-primary btn-sm">⬇ Download Excel Report</a>
+            </div>`;
+            res.innerHTML = html; res.style.display = 'block';
+            files = []; updateUI(); input.value = '';
+          } else if (statData.status === 'error') {
+            clearInterval(pollInterval);
+            throw new Error(statData.error || 'Processing failed');
+          }
+        } catch (err) {
+          clearInterval(pollInterval);
+          throw err;
+        }
+      }, 3000);
+
     } catch(err) {
       if (prog) prog.style.display = 'none';
       btn.disabled = false;
       btn.innerHTML = cfg.btnLabel || 'Process';
-      res.innerHTML = `<div class="alert alert-error">Network error: ${err.message}</div>`;
+      res.innerHTML = `<div class="alert alert-error">Error: ${err.message}</div>`;
       res.style.display = 'block';
     }
   });

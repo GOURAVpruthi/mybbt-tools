@@ -67,7 +67,7 @@ class GSTTools:
             def _log(msg, level='info'):
                 logs.append(msg)
 
-            ok, fail, total, _ = e.process_pdfs(
+            ok, fail, total, _ = e._GSTR1_NS["process_pdfs"](
                 tmp_dir, Path(out_path),
                 on_progress=None,
                 on_log=_log
@@ -139,35 +139,42 @@ class GSTTools:
         """
         try:
             e = _get_engine()
-            # GSTR-3B engine is in _GSTR3B_NS namespace
-            ns = e._GSTR3B_NS
-            all_data = []
-            errors = []
+            tmp_dir = Path(self.upload_folder) / f"gstr3b_tmp_{_ts()}"
+            tmp_dir.mkdir(exist_ok=True)
 
             for p in input_paths:
-                try:
-                    meta, rows = ns['parse_pdf'](p)
-                    all_data.append({
-                        'meta': meta, 'rows': rows,
-                        'source_file': Path(p).name,
-                        'status': 'OK', 'notes': ''
-                    })
-                except Exception as ex:
-                    errors.append(f"{Path(p).name}: {ex}")
-
-            if not all_data:
-                return {'success': False, 'error': 'No valid GSTR-3B PDFs found. ' + '; '.join(errors)}
+                shutil.copy2(p, tmp_dir / Path(p).name)
 
             out_name = f"GSTR3B_Consolidated_{_ts()}.xlsx"
             out_path = os.path.join(self.output_folder, out_name)
-            ns['write_excel'](all_data, out_path)
+
+            logs = []
+            def _log(msg, level='info'):
+                logs.append(msg)
+
+            ok, fail, total, _ = e._GSTR3B_NS["process_pdfs"](
+                tmp_dir, Path(out_path),
+                on_progress=None,
+                on_log=_log
+            )
+
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+
+            if ok == 0 and fail > 0:
+                return {
+                    'success': False,
+                    'error': f'All {fail} PDF(s) failed to process. Check that files are GSTR-3B PDFs from GST portal.',
+                    'logs': logs
+                }
 
             return {
                 'success': True,
                 'filename': out_name,
-                'files_processed': len(all_data),
-                'errors': errors,
-                'message': f'✅ {len(all_data)} GSTR-3B PDF(s) consolidated successfully.'
+                'ok': ok,
+                'fail': fail,
+                'total': total,
+                'logs': logs,
+                'message': f'✅ Processed {ok}/{total} PDFs successfully. Excel report ready.'
             }
 
         except Exception as ex:

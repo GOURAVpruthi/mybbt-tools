@@ -653,133 +653,135 @@ def gst_tools_page():
     return render_template('gst_tools.html')
 
 
+def run_gst_task(task_id, func, *args):
+    try:
+        result = func(*args)
+        if isinstance(result, dict) and result.get('success'):
+            TASKS[task_id] = {
+                "status": "done",
+                "out_path": os.path.join(OUTPUT_FOLDER, result['filename']),
+                "message": result.get('message', 'Completed')
+            }
+        else:
+            TASKS[task_id] = {
+                "status": "error",
+                "error": result.get('error', 'Unknown error') if isinstance(result, dict) else str(result)
+            }
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        TASKS[task_id] = {"status": "error", "error": str(e)}
+
+
 @app.route('/api/gst/gstr1', methods=['POST'])
 def process_gstr1():
-    """GSTR-1 PDFs → Consolidated Excel (supports multiple files)"""
     files = request.files.getlist('files') or ([request.files['file']] if 'file' in request.files else [])
     if not files or not files[0].filename:
         return jsonify({'success': False, 'error': 'Please upload GSTR-1 PDF file(s)'}), 400
     saved = save_uploaded_files(files, 'gst')
-    try:
-        result = gst_tools.process_gstr1(saved)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+    task_id = str(uuid.uuid4())
+    TASKS[task_id] = {"status": "processing"}
+    threading.Thread(target=run_gst_task, args=(task_id, gst_tools.process_gstr1, saved)).start()
+    return jsonify({'success': True, 'task_id': task_id})
 
 
 @app.route('/api/gst/gstr2b', methods=['POST'])
 def process_gstr2b():
-    """GSTR-2B Excel files → Consolidated Excel (supports multiple files)"""
     files = request.files.getlist('files') or ([request.files['file']] if 'file' in request.files else [])
     if not files or not files[0].filename:
         return jsonify({'success': False, 'error': 'Please upload GSTR-2B Excel file(s)'}), 400
     saved = save_uploaded_files(files, 'gst')
-    try:
-        result = gst_tools.process_gstr2b(saved)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+    task_id = str(uuid.uuid4())
+    TASKS[task_id] = {"status": "processing"}
+    threading.Thread(target=run_gst_task, args=(task_id, gst_tools.process_gstr2b, saved)).start()
+    return jsonify({'success': True, 'task_id': task_id})
 
 
 @app.route('/api/gst/gstr2b-reco', methods=['POST'])
 def process_gstr2b_reco():
-    """PR vs GSTR-2B reconciliation"""
     gstr2b_files = request.files.getlist('gstr2b_files')
     pr_files = request.files.getlist('pr_files')
     if not gstr2b_files or not gstr2b_files[0].filename:
         return jsonify({'success': False, 'error': 'GSTR-2B file(s) required'}), 400
     saved_2b = save_uploaded_files(gstr2b_files, 'gst')
     saved_pr = save_uploaded_files(pr_files, 'gst') if pr_files and pr_files[0].filename else []
-    try:
-        result = gst_tools.reconcile_gstr2b(saved_2b, saved_pr)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+    task_id = str(uuid.uuid4())
+    TASKS[task_id] = {"status": "processing"}
+    threading.Thread(target=run_gst_task, args=(task_id, gst_tools.reconcile_gstr2b, saved_2b, saved_pr)).start()
+    return jsonify({'success': True, 'task_id': task_id})
 
 
 @app.route('/api/gst/gstr3b', methods=['POST'])
 def process_gstr3b():
-    """GSTR-3B PDFs → Consolidated Excel (supports multiple files)"""
     files = request.files.getlist('files') or ([request.files['file']] if 'file' in request.files else [])
     if not files or not files[0].filename:
         return jsonify({'success': False, 'error': 'Please upload GSTR-3B PDF file(s)'}), 400
     saved = save_uploaded_files(files, 'gst')
-    try:
-        result = gst_tools.process_gstr3b(saved)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+    task_id = str(uuid.uuid4())
+    TASKS[task_id] = {"status": "processing"}
+    threading.Thread(target=run_gst_task, args=(task_id, gst_tools.process_gstr3b, saved)).start()
+    return jsonify({'success': True, 'task_id': task_id})
 
 
 @app.route('/api/gst/gstr9', methods=['POST'])
 def process_gstr9():
-    """GSTR-9/9C PDFs → Consolidated Excel (supports multiple files)"""
     files = request.files.getlist('files') or ([request.files['file']] if 'file' in request.files else [])
     if not files or not files[0].filename:
         return jsonify({'success': False, 'error': 'Please upload GSTR-9/9C PDF file(s)'}), 400
     saved = save_uploaded_files(files, 'gst')
-    try:
-        result = gst_tools.process_gstr9(saved)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+    task_id = str(uuid.uuid4())
+    TASKS[task_id] = {"status": "processing"}
+    threading.Thread(target=run_gst_task, args=(task_id, gst_tools.process_gstr9, saved)).start()
+    return jsonify({'success': True, 'task_id': task_id})
 
 
 @app.route('/api/gst/tax-comparison', methods=['POST'])
 def process_tax_comparison():
-    """Tax Comparison Excel files → Consolidated (supports multiple)"""
     files = request.files.getlist('files') or ([request.files['file']] if 'file' in request.files else [])
     if not files or not files[0].filename:
         return jsonify({'success': False, 'error': 'Please upload Tax Comparison Excel file(s)'}), 400
     saved = save_uploaded_files(files, 'gst')
     mode = request.form.get('mode', 'all')
-    try:
-        result = gst_tools.process_tax_comparison(saved, mode)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+    task_id = str(uuid.uuid4())
+    TASKS[task_id] = {"status": "processing"}
+    threading.Thread(target=run_gst_task, args=(task_id, gst_tools.process_tax_comparison, saved, mode)).start()
+    return jsonify({'success': True, 'task_id': task_id})
 
 
 @app.route('/api/gst/ecrrs', methods=['POST'])
 def process_ecrrs():
-    """ECRRS CSV files → Consolidated Excel"""
     files = request.files.getlist('files') or ([request.files['file']] if 'file' in request.files else [])
     if not files or not files[0].filename:
         return jsonify({'success': False, 'error': 'Please upload ECRRS CSV file(s)'}), 400
     saved = save_uploaded_files(files, 'gst')
-    try:
-        result = gst_tools.process_ecrrs(saved)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+    task_id = str(uuid.uuid4())
+    TASKS[task_id] = {"status": "processing"}
+    threading.Thread(target=run_gst_task, args=(task_id, gst_tools.process_ecrrs, saved)).start()
+    return jsonify({'success': True, 'task_id': task_id})
 
 
 @app.route('/api/gst/credit-ledger', methods=['POST'])
 def process_credit_ledger():
-    """Electronic Credit Ledger CSVs → Consolidated Excel"""
     files = request.files.getlist('files') or ([request.files['file']] if 'file' in request.files else [])
     if not files or not files[0].filename:
         return jsonify({'success': False, 'error': 'Please upload Credit Ledger CSV file(s)'}), 400
     saved = save_uploaded_files(files, 'gst')
-    try:
-        result = gst_tools.process_credit_ledger(saved)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+    task_id = str(uuid.uuid4())
+    TASKS[task_id] = {"status": "processing"}
+    threading.Thread(target=run_gst_task, args=(task_id, gst_tools.process_credit_ledger, saved)).start()
+    return jsonify({'success': True, 'task_id': task_id})
 
 
 @app.route('/api/gst/cash-ledger', methods=['POST'])
 def process_cash_ledger():
-    """Electronic Cash Ledger CSVs → Consolidated Excel"""
     files = request.files.getlist('files') or ([request.files['file']] if 'file' in request.files else [])
     if not files or not files[0].filename:
         return jsonify({'success': False, 'error': 'Please upload Cash Ledger CSV file(s)'}), 400
     saved = save_uploaded_files(files, 'gst')
-    try:
-        result = gst_tools.process_cash_ledger(saved)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+    task_id = str(uuid.uuid4())
+    TASKS[task_id] = {"status": "processing"}
+    threading.Thread(target=run_gst_task, args=(task_id, gst_tools.process_cash_ledger, saved)).start()
+    return jsonify({'success': True, 'task_id': task_id})
 
 
 @app.route('/api/gst/pr-2b-reco', methods=['POST'])
