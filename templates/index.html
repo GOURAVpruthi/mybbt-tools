@@ -73,20 +73,13 @@ h1.hero-title .highlight{
   background:linear-gradient(135deg, #e2192c 0%, #f97316 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero-sub{font-size:1.05rem;color:var(--text2);margin-bottom:36px;line-height:1.7;max-width:520px}
-.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px}
-.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;
-  background:var(--red);color:#fff;border-radius:10px;font-weight:700;font-size:.95rem;
-  text-decoration:none;transition:all .2s;box-shadow:0 4px 20px rgba(226,25,44,.3)}
-.btn-primary:hover{background:var(--red2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(226,25,44,.4)}
-.btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;
-  background:rgba(255,255,255,.08);border:1px solid var(--border);color:#fff;
-  border-radius:10px;font-weight:600;font-size:.95rem;text-decoration:none;transition:all .2s}
-.btn-secondary:hover{background:rgba(255,255,255,.13);transform:translateY(-2px)}
-.hero-stats{display:flex;gap:32px;flex-wrap:wrap}
-.hstat{text-align:left}
-.hstat-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
-.hstat-num span{color:var(--red)}
-.hstat-lbl{font-size:.75rem;color:var(--text3);margin-top:2px}
+.hero-cards{display:flex;flex-direction:column;gap:16px;margin-bottom:40px;width:100%}
+.hcard{display:flex;align-items:center;gap:16px;padding:16px 20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;text-decoration:none;color:inherit;transition:all .2s;backdrop-filter:blur(10px)}
+.hcard:hover{background:rgba(255,255,255,.08);border-color:var(--red);transform:translateX(5px);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.hcard-icon{font-size:1.8rem;background:rgba(255,255,255,.05);width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:10px;flex-shrink:0}
+.hcard-title{font-weight:700;font-size:1.05rem;color:#fff;margin-bottom:4px}
+.hcard-desc{font-size:.85rem;color:var(--text3)}
+@media(min-width:768px){ .hero-cards{flex-direction:row;} .hcard{flex:1;min-width:200px;} .hcard:hover{transform:translateY(-5px)} }
 
 /* ── TOOLS SECTION ── */
 .section{padding:80px 5vw;max-width:1200px;margin:0 auto}
@@ -234,17 +227,31 @@ footer{background:rgba(0,0,0,.4);border-top:1px solid var(--border);padding:40px
     </h1>
     <p class="hero-sub">
       Free online toolkit for CAs, CS, Lawyers, and Finance professionals.
-      PDF tools, GST processing, Corporate Law references — all in one place. No signup required.
+      Everything you need in one place. No setup required.
     </p>
-    <div class="hero-btns">
-      <a href="/pdf-tools" class="btn-primary">📄 Explore PDF Tools →</a>
-      <a href="/laws" class="btn-secondary">⚖️ Corporate Laws</a>
-    </div>
-    <div class="hero-stats">
-      <div class="hstat"><div class="hstat-num">30<span>+</span></div><div class="hstat-lbl">PDF Tools</div></div>
-      <div class="hstat"><div class="hstat-num">100<span>%</span></div><div class="hstat-lbl">Free & Secure</div></div>
-      <div class="hstat"><div class="hstat-num">6<span>+</span></div><div class="hstat-lbl">Law Categories</div></div>
-      <div class="hstat"><div class="hstat-num">0</div><div class="hstat-lbl">Signup Needed</div></div>
+    
+    <div class="hero-cards">
+      <a href="/pdf-tools" class="hcard">
+        <div class="hcard-icon">📄</div>
+        <div class="hcard-info">
+          <div class="hcard-title">PDF Tools</div>
+          <div class="hcard-desc">Merge, OCR, Compress & Edit</div>
+        </div>
+      </a>
+      <a href="/gst-tools" class="hcard">
+        <div class="hcard-icon">📊</div>
+        <div class="hcard-info">
+          <div class="hcard-title">GST & Reco</div>
+          <div class="hcard-desc">Advanced 2A/2B vs PR Match</div>
+        </div>
+      </a>
+      <a href="/laws" class="hcard">
+        <div class="hcard-icon">⚖️</div>
+        <div class="hcard-info">
+          <div class="hcard-title">Corporate Laws</div>
+          <div class="hcard-desc">GST, IT, CA & IND AS Hub</div>
+        </div>
+      </a>
     </div>
   </div>
 </section>

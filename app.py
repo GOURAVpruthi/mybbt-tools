@@ -88,6 +88,11 @@ def laws_page():
     return render_template('laws.html')
 
 
+@app.route('/gst-tools')
+def gst_tools_page():
+    return render_template('reco_tool.html')
+
+
 @app.route('/login')
 def login_page():
     return render_template('login.html')
@@ -117,6 +122,51 @@ def file_manager_page():
 
 
 # ── New clean API routes (used by upgraded UI) ──────────────────────────
+
+@app.route('/api/reco/run', methods=['POST'])
+def api_reco_run():
+    if 'pr_file' not in request.files or 'b2_file' not in request.files:
+        return jsonify({'success': False, 'error': 'Both PR and 2B files are required'}), 400
+    
+    pr_file = request.files['pr_file']
+    b2_file = request.files['b2_file']
+    
+    import tempfile
+    pr_path = os.path.join(tempfile.gettempdir(), 'pr_' + secure_filename(pr_file.filename))
+    b2_path = os.path.join(tempfile.gettempdir(), '2b_' + secure_filename(b2_file.filename))
+    out_path = os.path.join(tempfile.gettempdir(), f"GST_Reco_Output_{int(time.time())}.xlsx")
+    
+    pr_file.save(pr_path)
+    b2_file.save(b2_path)
+    
+    try:
+        from tools.reco_engine import GSTRecoEngine
+        cfg = {
+            "amount_tolerance": float(request.form.get("amount_tolerance", 10)),
+            "pct_tolerance": float(request.form.get("pct_tolerance", 5)),
+            "features": {
+                "user_knockoff": True,
+                "pre_group": request.form.get("pre_group", "false") == "true",
+                "pr_knockout": True,
+                "grouped_match": True,
+                "rule_match": True,
+                "fuzzy_invoice": request.form.get("fuzzy_invoice", "true") == "true",
+                "vendor_fuzzy": request.form.get("vendor_fuzzy", "false") == "true",
+                "bank_match": request.form.get("bank_match", "true") == "true",
+                "bank_max_match": request.form.get("bank_max_match", "true") == "true",
+                "2b_knockout": True
+            }
+        }
+        engine = GSTRecoEngine(cfg)
+        engine.run(pr_path, b2_path, out_path, client_name=request.form.get("client_name", ""))
+        
+        return send_file(out_path, as_attachment=True, download_name='GST_Reco_Output.xlsx')
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/api/files/upload', methods=['POST'])
 def files_upload():
     if 'files' not in request.files:

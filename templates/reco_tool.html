@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GST Reco Pro - MyBBT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #e2192c; --dark: #0a0f1e; --card: #111827;
+      --text: #f9fafb; --text2: #9ca3af; --border: rgba(255,255,255,0.1);
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); margin: 0; }
+    .container { max-width: 800px; margin: 40px auto; padding: 20px; }
+    h1 { margin-bottom: 10px; }
+    p { color: var(--text2); margin-bottom: 30px; }
+    .card { background: var(--card); border: 1px solid var(--border); padding: 30px; border-radius: 12px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-weight: 500; margin-bottom: 8px; }
+    input[type="file"], input[type="text"], input[type="number"] {
+      width: 100%; padding: 10px; background: rgba(0,0,0,0.2); border: 1px solid var(--border);
+      color: white; border-radius: 8px; box-sizing: border-box;
+    }
+    .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; margin-bottom: 30px; }
+    .toggle-label { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; cursor: pointer; }
+    input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--red); }
+    .btn { background: var(--red); color: white; border: none; padding: 14px 24px; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.2s; }
+    .btn:hover { background: #c01020; }
+    .back { color: var(--red); text-decoration: none; margin-bottom: 20px; display: inline-block; font-weight: 500; }
+    #status { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; }
+    .status-info { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+    .status-error { background: rgba(226, 25, 44, 0.1); color: #fca5a5; border: 1px solid rgba(226, 25, 44, 0.2); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/" class="back">← Back to Home</a>
+    <h1>GST Reconciliation Pro</h1>
+    <p>Advanced PR vs 2A/2B matching engine. Upload your files to get started.</p>
+    
+    <div class="card">
+      <form id="recoForm">
+        <div class="form-group">
+          <label>Purchase Register (PR) Excel</label>
+          <input type="file" name="pr_file" accept=".xlsx,.xls,.csv" required>
+        </div>
+        <div class="form-group">
+          <label>GSTR-2B Excel</label>
+          <input type="file" name="b2_file" accept=".xlsx,.xls,.csv" required>
+        </div>
+        <div class="form-group">
+          <label>Client Name (Optional, for Dashboard)</label>
+          <input type="text" name="client_name" placeholder="E.g., ABC Private Limited">
+        </div>
+        
+        <div style="display:flex; gap: 20px;">
+            <div class="form-group" style="flex:1;">
+              <label>Amount Tolerance (₹)</label>
+              <input type="number" name="amount_tolerance" value="10" step="0.01">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label>Percent Tolerance (%)</label>
+              <input type="number" name="pct_tolerance" value="5" step="0.1">
+            </div>
+        </div>
+
+        <label>Advanced Matching Features</label>
+        <div class="toggles">
+          <label class="toggle-label"><input type="checkbox" name="pre_group" value="true"> Pre-Group Line Items</label>
+          <label class="toggle-label"><input type="checkbox" name="fuzzy_invoice" value="true" checked> Fuzzy Invoice Matching</label>
+          <label class="toggle-label"><input type="checkbox" name="vendor_fuzzy" value="true"> Vendor Name Fuzzy</label>
+          <label class="toggle-label"><input type="checkbox" name="bank_match" value="true" checked> Bank-Entry Match</label>
+          <label class="toggle-label"><input type="checkbox" name="bank_max_match" value="true" checked> Bank MAX MATCH</label>
+        </div>
+        
+        <button type="submit" class="btn" id="submitBtn">Run Reconciliation</button>
+      </form>
+      <div id="status"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('recoForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const status = document.getElementById('status');
+      
+      btn.innerText = 'Processing... (This may take a minute)';
+      btn.disabled = true;
+      status.style.display = 'block';
+      status.className = 'status-info';
+      status.innerText = 'Uploading files and running reconciliation algorithm...';
+      
+      const formData = new FormData(e.target);
+      
+      try {
+        const response = await fetch('/api/reco/run', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          const contentDisp = response.headers.get('Content-Disposition');
+          let filename = 'GST_Reconciliation.xlsx';
+          if (contentDisp && contentDisp.includes('filename=')) {
+              filename = contentDisp.split('filename=')[1].replace(/"/g, '');
+          }
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+          
+          status.className = 'status-info';
+          status.innerText = 'Reconciliation complete! File downloaded successfully.';
+        } else {
+          const res = await response.json();
+          throw new Error(res.error || 'Server error');
+        }
+      } catch (err) {
+        status.className = 'status-error';
+        status.innerText = 'Error: ' + err.message;
+      } finally {
+        btn.innerText = 'Run Reconciliation';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
