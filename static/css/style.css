@@ -34,6 +34,39 @@
   --transition:     all .2s ease;
 }
 
+[data-theme="dark"] {
+  --primary:        #3b82f6;
+  --primary-dark:   #2563eb;
+  --primary-light:  #1e3a8a;
+  --secondary:      #10b981;
+  --accent:         #f97316;
+  --danger:         #ef4444;
+  --warning:        #f59e0b;
+
+  --bg:             #0a0f1e;
+  --surface:        #111827;
+  --surface-2:      #1f2937;
+  --border:         #374151;
+
+  --text:           #f9fafb;
+  --text-muted:     #9ca3af;
+  --text-light:     #6b7280;
+  
+  --shadow:         0 1px 3px rgba(0,0,0,.3), 0 4px 12px rgba(0,0,0,.2);
+}
+
+@keyframes glittering {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+[data-theme="light"] body {
+  background: linear-gradient(-45deg, #f3f6fc, #e8f0fe, #fff0f5, #e0f7fa);
+  background-size: 400% 400%;
+  animation: glittering 15s ease infinite;
+}
+
 /* ── Reset ───────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }

@@ -11,8 +11,11 @@ import time
 import base64
 import zipfile
 import shutil
+import threading
+import traceback
+import sys
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash, session
+from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash, session, send_from_directory, abort
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 
@@ -45,6 +48,20 @@ ALLOWED_EXTENSIONS = {
 # Ensure folders exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+
+# Global dictionary to track background tasks
+TASKS = {}
+
+def process_reco(task_id, pr_path, b2_path, out_path, client_name, cfg, email_cfg):
+    try:
+        from tools.reco_engine import GSTRecoEngine
+        engine = GSTRecoEngine(cfg)
+        engine.run(pr_path, b2_path, out_path, client_name=client_name, email_cfg=email_cfg)
+        TASKS[task_id] = {"status": "done", "out_path": out_path}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        TASKS[task_id] = {"status": "error", "message": str(e)}
 
 # Initialize tool handlers
 file_mgr = FileManager(UPLOAD_FOLDER, OUTPUT_FOLDER)
@@ -140,7 +157,6 @@ def api_reco_run():
     b2_file.save(b2_path)
     
     try:
-        from tools.reco_engine import GSTRecoEngine
         cfg = {
             "amount_tolerance": float(request.form.get("amount_tolerance", 10)),
             "pct_tolerance": float(request.form.get("pct_tolerance", 5)),
@@ -158,14 +174,42 @@ def api_reco_run():
                 "2b_knockout": request.form.get("2b_knockout", "false") == "true"
             }
         }
-        engine = GSTRecoEngine(cfg)
-        engine.run(pr_path, b2_path, out_path, client_name=request.form.get("client_name", ""))
         
-        return send_file(out_path, as_attachment=True, download_name='GST_Reco_Output.xlsx')
+        email_cfg = None
+        if request.form.get("email_enabled", "false") == "true":
+            email_cfg = {
+                "to": request.form.get("email_to", ""),
+                "host": request.form.get("smtp_host", "smtp.gmail.com"),
+                "port": int(request.form.get("smtp_port", 587)),
+                "user": request.form.get("smtp_user", ""),
+                "pass": request.form.get("smtp_pass", "")
+            }
+
+        client_name = request.form.get("client_name", "")
+        task_id = str(uuid.uuid4())
+        
+        TASKS[task_id] = {"status": "processing"}
+        
+        thread = threading.Thread(target=process_reco, args=(task_id, pr_path, b2_path, out_path, client_name, cfg, email_cfg))
+        thread.start()
+        
+        return jsonify({'success': True, 'task_id': task_id})
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/reco/status/<task_id>', methods=['GET'])
+def api_reco_status(task_id):
+    if task_id not in TASKS:
+        return jsonify({"status": "error", "message": "Invalid Task ID"}), 404
+    return jsonify(TASKS[task_id])
+
+@app.route('/api/reco/download/<task_id>', methods=['GET'])
+def api_reco_download(task_id):
+    if task_id not in TASKS or TASKS[task_id]["status"] != "done":
+        abort(404)
+    out_path = TASKS[task_id]["out_path"]
+    return send_file(out_path, as_attachment=True, download_name='GST_Reco_Output.xlsx')
 
 
 @app.route('/api/files/upload', methods=['POST'])
