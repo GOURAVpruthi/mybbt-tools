@@ -109,19 +109,25 @@ KNOWN_COLS = [
 PREGROUP_DEFAULT_COLS = ["GSTIN","Invoice Number","Invoice Date"]
 
 DEFAULT_MATCH_RULES = [
-    {"cols":["GSTIN","Invoice Number","Invoice Date","Total Tax"], "label":"GSTIN+Invoice+Date+Tax", "enabled":True},
-    {"cols":["GSTIN","Invoice Number","Total Tax"],                "label":"GSTIN+Invoice+Tax",      "enabled":True},
-    {"cols":["GSTIN","Invoice Number","Invoice Date"],             "label":"GSTIN+Invoice+Date",     "enabled":True},
-    {"cols":["GSTIN","Invoice Number"],                            "label":"GSTIN+Invoice",          "enabled":True},
-    {"cols":["Pan","Invoice Number","Invoice Date","Total Tax"],   "label":"PAN+Invoice+Date+Tax",   "enabled":True},
-    {"cols":["Pan","Invoice Number","Total Tax"],                  "label":"PAN+Invoice+Tax",        "enabled":True},
-    {"cols":["Pan","Invoice Number","Invoice Date"],               "label":"PAN+Invoice+Date",       "enabled":True},
-    {"cols":["Pan","Invoice Number"],                              "label":"PAN+Invoice",            "enabled":True},
-    {"cols":["Invoice Number","Total Tax"],                        "label":"Invoice+Tax",            "enabled":True, "check_uniqueness": True},
-    {"cols":["GSTIN","Month Year","Total Tax"],                    "label":"GSTIN+MonthYear+Tax",    "enabled":True},
-    {"cols":["Pan","Month Year","Total Tax"],                      "label":"PAN+MonthYear+Tax",      "enabled":True},
-    {"cols":["GSTIN","Total Tax"],                                 "label":"GSTIN+Tax",              "enabled":True, "low_confidence": True},
-    {"cols":["Pan","Total Tax"],                                   "label":"PAN+Tax",                "enabled":True, "low_confidence": True},
+    {"cols":["GSTIN","Invoice Number","Invoice Date","Total Tax"],    "label":"GSTIN+Invoice+Date+Tax",       "enabled":True, "remark":"[1] Perfect Match"},
+    {"cols":["GSTIN","Invoice Number","Total Tax"],                   "label":"GSTIN+Invoice+Tax",            "enabled":True, "remark":"[2] Match - Date differs"},
+    {"cols":["GSTIN","Invoice Date","Total Tax"],                     "label":"GSTIN+Date+Tax",               "enabled":True, "remark":"[3] Match - Tax differs"},
+    {"cols":["GSTIN","Invoice Number"],                               "label":"GSTIN+Invoice",                "enabled":True, "remark":"[4] Match - Tax & Date differ"},
+    {"cols":["Pan","Invoice Number","Invoice Date","Total Tax"],      "label":"PAN+Invoice+Date+Tax",         "enabled":True, "remark":"[5] PAN Match - GSTIN check needed"},
+    {"cols":["Pan","Invoice Number","Total Tax"],                     "label":"PAN+Invoice+Tax",              "enabled":True, "remark":"[6] PAN Match - Date differs"},
+    {"cols":["Pan","Invoice Date","Total Tax"],                       "label":"PAN+Date+Tax",                 "enabled":True, "remark":"[7] PAN Match - Tax differs"},
+    {"cols":["Pan","Invoice Number"],                                 "label":"PAN+Invoice",                  "enabled":True, "remark":"[8] PAN Match - Tax & Date differ"},
+    {"cols":["Invoice Number","Total Tax"],                           "label":"Invoice+Tax",                  "enabled":True, "remark":"[9] Match - GSTIN/PAN mismatch"},
+    {"cols":["Invoice Prefix","Invoice Suffix","Total Tax"],          "label":"Prefix+Suffix+Tax",            "enabled":True, "remark":"[10] Prefix/Suffix Match"},
+    {"cols":["GSTIN","Invoice Prefix","Invoice Suffix","Total Tax"],  "label":"GSTIN+Prefix+Suffix+Tax",      "enabled":True, "remark":"[11] GSTIN+Prefix/Suffix Match"},
+    {"cols":["Pan","Invoice Prefix","Invoice Suffix","Total Tax"],    "label":"PAN+Prefix+Suffix+Tax",        "enabled":True, "remark":"[12] PAN+Prefix/Suffix Match"},
+    {"cols":["GSTIN","Total Tax Round"],                              "label":"GSTIN+RoundedTax",             "enabled":True, "remark":"[13] Rounding Difference Match"},
+    {"cols":["Pan","Total Tax Round"],                                "label":"PAN+RoundedTax",               "enabled":True, "remark":"[14] PAN+Rounding Match"},
+    {"cols":["GSTIN","Month Year","Total Tax"],                       "label":"GSTIN+MonthYear+Tax",          "enabled":True, "remark":"[15] Month-Year Aggregate Match"},
+    {"cols":["Pan","Month Year","Total Tax"],                         "label":"PAN+MonthYear+Tax",            "enabled":True, "remark":"[16] PAN+Month-Year Match"},
+    {"cols":["GSTIN","Total Tax"],                                    "label":"GSTIN+Tax",                    "enabled":True, "remark":"[17] GSTIN+Tax Match - Inv No differs"},
+    {"cols":["Pan","Total Tax"],                                      "label":"PAN+Tax",                      "enabled":True, "remark":"[18] PAN+Tax Match - Inv No differs"},
+    {"cols":["GSTIN","State","Total Tax"],                            "label":"GSTIN+State+Tax",              "enabled":False,"remark":"[19] GSTIN+State+Tax Match"},
 ]
 
 DEFAULT_KO_RULES = {
@@ -339,129 +345,6 @@ def asym_strip_variants(inv):
     if base is not None:
         out |= norm_variants(base)
     return out
-
-
-import re
-
-def invoice_uniqueness_score(inv_no, pr_pool, b2_pool):
-    """
-    Returns: HIGH / MEDIUM / LOW / SKIP
-    SKIP  -> single-digit, pure numeric, appears in >3 different PANs
-    LOW   -> 2-3 different PANs, or length < 4 chars
-    MEDIUM -> unique PAN, but length < 6 chars
-    HIGH  -> appears in exactly 1 PAN, length >= 6 chars, has alpha chars
-    """
-    inv_no_str = str(inv_no).replace(' ', '')
-    inv_len = len(inv_no_str)
-    has_alpha = bool(re.search(r'[a-zA-Z]', inv_no_str))
-    
-    # We look at the original pools for PANs
-    norm_inv = str(inv_no).strip().upper()
-    pr_matches = pr_pool[pr_pool['Invoice Number'] == norm_inv]
-    distinct_pans = pr_matches['Pan'].nunique() if 'Pan' in pr_matches.columns else 1
-    
-    if distinct_pans > 3 or inv_len <= 2: return 'SKIP'
-    if distinct_pans > 1 or inv_len < 4: return 'LOW'  
-    if inv_len < 6 and not has_alpha: return 'MEDIUM'
-    return 'HIGH'
-
-
-def classify_match(r, rule_label, match_type="EXACT", tol=1.0):
-    """
-    Classifies a matched row according to v3.0 Remark Codes.
-    match_type can be EXACT, FUZZY, GROUPED, BANK
-    """
-    amt_diff = abs(r.get('Total Tax_PR', 0) - r.get('Total Tax_2B', 0))
-    is_amt_match = amt_diff <= tol
-    
-    # Extract Dates
-    d_pr = r.get('Invoice Date_PR')
-    d_2b = r.get('Invoice Date_2B')
-    try:
-        if str(d_pr).lower() == "nat" or str(d_pr).strip() == "": d_pr = None
-        if str(d_2b).lower() == "nat" or str(d_2b).strip() == "": d_2b = None
-    except: pass
-    
-    fy_pr = r.get('_FY_PR', '')
-    fy_2b = r.get('_FY_2B', '')
-    
-    diff_fy = (fy_pr != fy_2b) and bool(fy_pr) and bool(fy_2b)
-    diff_month = False
-    diff_date = False
-    
-    if d_pr is not None and d_2b is not None:
-        try:
-            if d_pr.month != d_2b.month or d_pr.year != d_2b.year:
-                diff_month = True
-            elif d_pr != d_2b:
-                diff_date = True
-        except: pass
-            
-    # Tax Head checks
-    igst_pr = pd.to_numeric(r.get('IGST_PR', 0), errors='coerce') or 0
-    cgst_pr = pd.to_numeric(r.get('CGST_PR', 0), errors='coerce') or 0
-    sgst_pr = pd.to_numeric(r.get('SGST_PR', 0), errors='coerce') or 0
-    igst_2b = pd.to_numeric(r.get('IGST_2B', 0), errors='coerce') or 0
-    cgst_2b = pd.to_numeric(r.get('CGST_2B', 0), errors='coerce') or 0
-    sgst_2b = pd.to_numeric(r.get('SGST_2B', 0), errors='coerce') or 0
-    
-    is_igst_pr = igst_pr > (cgst_pr + sgst_pr)
-    is_igst_2b = igst_2b > (cgst_2b + sgst_2b)
-    diff_head = is_igst_pr != is_igst_2b
-    
-    st_pr = str(r.get('State_PR', '')).strip().upper()
-    st_2b = str(r.get('State_2B', '')).strip().upper()
-    diff_state = st_pr != st_2b and bool(st_pr) and bool(st_2b)
-    
-    if match_type == "FUZZY":
-        return ("Matched", "8", f"8 — M-FUZ — Matched — Fuzzy Invoice No — Verify Correctness")
-    if match_type == "GROUPED":
-        return ("Matched", "9", f"9 — M-GRP — Matched — Grouped Match")
-    if match_type == "BANK":
-        v_str = "Balanced" if is_amt_match else f"Variance ₹{amt_diff:.2f}"
-        return ("Matched", "10", f"10 — M-BNK — Matched — Bank/Max Match — {v_str}")
-        
-    if is_amt_match:
-        if diff_fy: return ("Matched", "7", f"7 — M-DFY — Matched — Different FY (PR: {fy_pr} | 2B: {fy_2b}) — Verify ITC Eligibility u/s 16(4)")
-        if diff_head and diff_state: return ("Matched", "4", "4 — M-DHS — Matched — Tax Head + State Both Mismatch — Manual Review Recommended")
-        if diff_head: return ("Matched", "2", f"2 — M-DH — Matched — Tax Head Mismatch (PR: {'IGST' if is_igst_pr else 'CGST+SGST'} | 2B: {'IGST' if is_igst_2b else 'CGST+SGST'})")
-        if diff_state: return ("Matched", "3", f"3 — M-DS — Matched — State Mismatch (PR: {st_pr} | 2B: {st_2b})")
-        if diff_month: return ("Matched", "5", f"5 — M-DM — Matched — Different Month")
-        if diff_date: return ("Matched", "6", f"6 — M-DD — Matched — Date Variance (Same Month)")
-        return ("Matched", "1", "1 — M — Matched — Perfect — All Fields Identical")
-    else:
-        excess_pr = amt_diff if (pd.to_numeric(r.get('Total Tax_PR', 0), errors='coerce') or 0) > (pd.to_numeric(r.get('Total Tax_2B', 0), errors='coerce') or 0) else 0
-        excess_2b = amt_diff if (pd.to_numeric(r.get('Total Tax_2B', 0), errors='coerce') or 0) > (pd.to_numeric(r.get('Total Tax_PR', 0), errors='coerce') or 0) else 0
-        p_str = "Excess in PR" if excess_pr else "Excess in 2B"
-        code_base = 11 if excess_pr else 12
-        v = excess_pr or excess_2b
-        
-        if diff_fy:
-            c = 17 if excess_pr else 18
-            return ("Amt Mismatch", str(c), f"{c} — AM-DFY — Amt Mismatch + Different FY — {p_str} ₹{v:.2f}")
-        if diff_head:
-            c = 13 if excess_pr else 14
-            return ("Amt Mismatch", str(c), f"{c} — AM-DH — Amt Mismatch + Tax Head Mismatch — {p_str} ₹{v:.2f}")
-        if diff_state:
-            c = 15 if excess_pr else 16
-            return ("Amt Mismatch", str(c), f"{c} — AM-DS — Amt Mismatch + State Mismatch — {p_str} ₹{v:.2f}")
-            
-        rem = "AM-EP" if excess_pr else "AM-E2B"
-        return ("Amt Mismatch", str(code_base), f"{code_base} — {rem} — Amt Mismatch — {p_str} ₹{v:.2f}")
-
-
-def vendor_name_similarity(name_pr, name_2b):
-    """Quick check if vendor names are plausibly same"""
-    if not name_pr or not name_2b: return 'UNKNOWN'
-    np = str(name_pr).strip().upper(); nb = str(name_2b).strip().upper()
-    if np == nb: return 'EXACT'
-    # Word overlap
-    wp = set(np.split()); wb = set(nb.split())
-    if not wp or not wb: return 'LOW'
-    overlap = len(wp & wb) / max(len(wp), len(wb))
-    if overlap > 0.7: return 'HIGH'
-    if overlap > 0.4: return 'MEDIUM'
-    return 'LOW'
 
 def _segment_equal(a_segs, b_segs):
     if len(a_segs) != len(b_segs): return False
@@ -775,50 +658,25 @@ class GSTRecoEngine:
 
     def _rules(self,pr,b2):
         if pr.empty or b2.empty: return pd.DataFrame(), pr, b2
-        self.log(f"  [Rules] {len(self.mrules)} rules \u2026")
+        self.log(f"  [Rules] {len(self.mrules)} rules …")
         frames,ps,bs=[],[],[]
-        
-        # Save original pools for uniqueness check
-        pr_pool = pr.copy()
-        b2_pool = b2.copy()
-        
         for rule in self.mrules:
             cols=rule["cols"]; rmk=rule.get("remark","")
             if not(set(cols)<=set(pr.columns) and set(cols)<=set(b2.columns)): continue
-            pw=pr[~pr["UID"].isin(ps)].copy(); bw=b2[~b2["UID"].isin(bs)].copy()
-            
-            if rule.get("check_uniqueness"):
-                pw['inv_score'] = pw['Invoice Number'].apply(lambda x: invoice_uniqueness_score(x, pr_pool, b2_pool))
-                pw = pw[pw['inv_score'].isin(['HIGH', 'MEDIUM'])]
-                
+            pw=pr[~pr["UID"].isin(ps)]; bw=b2[~b2["UID"].isin(bs)]
             mg=pd.merge(pw,bw,on=cols,how="inner",suffixes=("_PR","_2B"))
             if mg.empty: continue
-            
-            if rule.get("check_uniqueness"):
-                mg['vendor_sim'] = mg.apply(lambda r: vendor_name_similarity(r.get('Vendor Name_PR'), r.get('Vendor Name_2B')), axis=1)
-                mg = mg[mg['vendor_sim'] != 'LOW']
-                if mg.empty: continue
-                
             if "Total Tax_PR" in mg.columns and "Total Tax_2B" in mg.columns:
-                res = mg.apply(lambda r: classify_match(r, rule["label"], "EXACT", self.tol), axis=1)
-                mg["Match_Status"] = [x[0] for x in res]
-                mg["Reco_Remark_Code"] = [x[1] for x in res]
-                mg["Match_Remark"] = [x[2] for x in res]
-            else: 
-                mg["Match_Status"]="Matched"
-                mg["Reco_Remark_Code"]="1"
-                mg["Match_Remark"]="1 — M — Matched — Perfect — All Fields Identical"
-                
-            mg["Matched_On"]=rule["label"]
-            mg["Match_Pass"]="STEP_RULES"
+                mg["Match Status"]=mg.apply(
+                    lambda r: "Matched" if self._amt_ok(r["Total Tax_PR"],r["Total Tax_2B"]) else "Amount Mismatch",axis=1)
+            else: mg["Match Status"]="Matched"
+            mg["Matched On"]=rule["label"]
             mg["Common_UID"]=[self._uid("RULE") for _ in range(len(mg))]
-            mg["Confidence"] = "LOW" if rule.get("low_confidence") else "HIGH"
-            
+            if rmk: mg["Match_Remark"]=rmk
             mg=enrich_merged(mg,self.tol)
             frames.append(mg)
             if "UID_PR" in mg.columns: ps.extend(mg["UID_PR"].dropna().unique().tolist())
             if "UID_2B" in mg.columns: bs.extend(mg["UID_2B"].dropna().unique().tolist())
-            
         combined=pd.concat(frames,ignore_index=True) if frames else pd.DataFrame()
         pr=pr[~pr["UID"].isin(ps)]; b2=b2[~b2["UID"].isin(bs)]
         self.log(f"  [Rules] {len(combined)} rows"); return combined,pr,b2
@@ -1608,23 +1466,6 @@ class GSTRecoEngine:
 
         # Single file early exit logic
         single_file_mode = pr_file is None or gstr2b_file is None
-
-        pr_nil = pd.DataFrame()
-        b2_nil = pd.DataFrame()
-        if not single_file_mode:
-            # IMPROVEMENT 5: Extract NIL Tax Entries before matching
-            if not pr.empty:
-                pr_nil_mask = pr["Total Tax"].abs() < 0.01
-                pr_nil = pr[pr_nil_mask].copy()
-                pr = pr[~pr_nil_mask]
-                if not pr_nil.empty: pr_nil["Match_Remark"] = "0 — NIL — Zero Tax Entry — No ITC Impact"
-            if not b2.empty:
-                b2_nil_mask = b2["Total Tax"].abs() < 0.01
-                b2_nil = b2[b2_nil_mask].copy()
-                b2 = b2[~b2_nil_mask]
-                if not b2_nil.empty: b2_nil["Match_Remark"] = "0 — NIL — Zero Tax Entry — No ITC Impact"
-            if not pr_nil.empty or not b2_nil.empty:
-                self.log(f"\n⏩ Separated NIL Tax entries: PR:{len(pr_nil)} 2B:{len(b2_nil)}")
         
         if f.get("pre_group",False) and not single_file_mode:
             self.log("\n🔄 Step 0 — Pre-Group Line Items")
@@ -1675,8 +1516,6 @@ class GSTRecoEngine:
             b2_ko,b2=self._knockout(b2,self.b2_ko,"2B",60000); t_b2+=len(b2_ko)
         else: self.log("\n⏭ Step 7 — 2B Knockout DISABLED or SKIP")
 
-
-
         # Vectorized mapping of UID to Match_Remark for Original Sheets
         def extract_uids(df, uid_col):
             if uid_col not in df.columns: return pd.Series(dtype=str)
@@ -1690,9 +1529,7 @@ class GSTRecoEngine:
             return s.set_index(uid_col)['Match_Remark']
 
         all_uid_series = []
-        pr_nil = locals().get('pr_nil', pd.DataFrame())
-        b2_nil = locals().get('b2_nil', pd.DataFrame())
-        for df in [grp, rule, fuz, vnd, bnk, pr_ko, b2_ko, ko_pr, ko_b2, pr, b2, unmatched_pr, unmatched_b2, pr_nil, b2_nil]:
+        for df in [grp, rule, fuz, vnd, bnk, pr_ko, b2_ko, ko_pr, ko_b2, pr, b2, unm]:
             if df.empty: continue
             if 'UID_PR' in df.columns: all_uid_series.append(extract_uids(df, 'UID_PR'))
             if 'UID_2B' in df.columns: all_uid_series.append(extract_uids(df, 'UID_2B'))
@@ -1709,21 +1546,41 @@ class GSTRecoEngine:
             self.b2_raw.insert(0, "Reco_Remark", self.b2_raw["UID"].map(uid_to_remark).fillna("Unknown or Leftover"))
             self.b2_raw.drop(columns=["UID", "Source"], inplace=True, errors="ignore")
 
-        import sys
-        sys.path.append(r"C:\Users\hp\.gemini\antigravity\scratch\mybbt-tools\tools")
-        from v3_excel import build_v3_excel
-        
-        pr_nil = locals().get('pr_nil', pd.DataFrame())
-        b2_nil = locals().get('b2_nil', pd.DataFrame())
-        
+        with pd.ExcelWriter(output_file,engine="openpyxl") as wr:
+            if hasattr(self, 'pr_raw') and not self.pr_raw.empty:
+                self.pr_raw.to_excel(wr, sheet_name="Original_PR_Status", index=False)
+            if hasattr(self, 'b2_raw') and not self.b2_raw.empty:
+                self.b2_raw.to_excel(wr, sheet_name="Original_2B_Status", index=False)
+                
+            if not all_m.empty:  self._reorder_matched_cols(all_m).to_excel(wr,sheet_name="All_Matched",     index=False)
+            if not grp.empty:    self._reorder_matched_cols(grp).to_excel(wr,  sheet_name="Grouped_Matched",  index=False)
+            if not rule.empty:   self._reorder_matched_cols(rule).to_excel(wr, sheet_name="Rule_Matched",     index=False)
+            if not fuz.empty:    self._reorder_matched_cols(fuz).to_excel(wr,  sheet_name="Fuzzy_Matched",    index=False)
+            if not vnd.empty:    self._reorder_matched_cols(vnd).to_excel(wr,  sheet_name="Vendor_Fuzzy",     index=False)
+            if not bnk.empty:    self._reorder_matched_cols(bnk).to_excel(wr,  sheet_name="Bank_Matched",     index=False)
+            if not pr_ko.empty:  pr_ko.to_excel(wr,sheet_name="PR_Knockout",      index=False)
+            if not b2_ko.empty:  b2_ko.to_excel(wr,sheet_name="2B_Knockout",      index=False)
+            
+            if not pr.empty:
+                pr_out = pr.copy()
+                pr_out.insert(0, "Match_Remark", "Leftover in PR / Not in 2B")
+                pr_out.to_excel(wr,sheet_name="Only_in_PR", index=False)
+            if not b2.empty:
+                b2_out = b2.copy()
+                b2_out.insert(0, "Match_Remark", "Leftover in 2B / Not in PR")
+                b2_out.to_excel(wr,sheet_name="Only_in_GSTR2B", index=False)
+                
+            if not ko_pr.empty:  ko_pr.to_excel(wr,sheet_name="KnockOff_PR",index=False)
+            if not ko_b2.empty:  ko_b2.to_excel(wr,sheet_name="KnockOff_2B",index=False)
+            
+            if not analysis_df.empty: analysis_df.to_excel(wr, sheet_name="Analysis", index=False)
+            if not tbc_df.empty: self._reorder_matched_cols(tbc_df).to_excel(wr, sheet_name="To_Be_Checked", index=False)
+            if not unm.empty:
+                unm_out = self._reorder_matched_cols(unm) if "Total Tax_PR" in unm.columns else unm
+                unm_out.to_excel(wr,sheet_name="Unmatched_Summary",index=False)
+            dash_df.to_excel(wr,sheet_name="Dashboard",index=False)
 
-        build_v3_excel(output_file, self, 
-                       pr_pool, 
-                       b2_pool, 
-                       all_m, pr_nil, b2_nil, 
-                       unmatched_pr, unmatched_b2)
-        
-
+        if OPENPYXL_OK: self._fmt_wb(output_file)
         prog(100, f"✅ Saved → {output_file}")
         self.log(f"\n✅ Saved → {output_file}")
 

@@ -52,11 +52,28 @@ os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 # Global dictionary to track background tasks
 TASKS = {}
 
+import time
+
 def process_reco(task_id, pr_path, b2_path, out_path, client_name, cfg, email_cfg):
     try:
         from tools.reco_engine import GSTRecoEngine
+        
+        start_time = time.time()
+        
+        def on_progress(msg, pct):
+            elapsed = time.time() - start_time
+            eta = -1
+            if pct > 0:
+                total_est = elapsed / (pct / 100.0)
+                eta = max(0, total_est - elapsed)
+            
+            TASKS[task_id]["status"] = "processing"
+            TASKS[task_id]["message"] = msg
+            TASKS[task_id]["percent"] = pct
+            TASKS[task_id]["eta"] = int(eta)
+            
         engine = GSTRecoEngine(cfg)
-        engine.run(pr_path, b2_path, out_path, client_name=client_name, email_cfg=email_cfg)
+        engine.run(pr_path, b2_path, out_path, client_name=client_name, email_cfg=email_cfg, on_progress=on_progress)
         TASKS[task_id] = {"status": "done", "out_path": out_path}
     except Exception as e:
         import traceback
@@ -142,24 +159,31 @@ def file_manager_page():
 
 @app.route('/api/reco/run', methods=['POST'])
 def api_reco_run():
-    if 'pr_file' not in request.files or 'b2_file' not in request.files:
-        return jsonify({'success': False, 'error': 'Both PR and 2B files are required'}), 400
+    if 'pr_file' not in request.files and 'b2_file' not in request.files:
+        return jsonify({'success': False, 'error': 'At least one file (PR or 2B) is required'}), 400
     
-    pr_file = request.files['pr_file']
-    b2_file = request.files['b2_file']
+    pr_file = request.files.get('pr_file')
+    b2_file = request.files.get('b2_file')
+    
+    if (not pr_file or not pr_file.filename) and (not b2_file or not b2_file.filename):
+        return jsonify({'success': False, 'error': 'At least one valid file (PR or 2B) is required'}), 400
     
     import tempfile
-    pr_path = os.path.join(tempfile.gettempdir(), 'pr_' + secure_filename(pr_file.filename))
-    b2_path = os.path.join(tempfile.gettempdir(), '2b_' + secure_filename(b2_file.filename))
+    pr_path = os.path.join(tempfile.gettempdir(), 'pr_' + secure_filename(pr_file.filename)) if pr_file and pr_file.filename else None
+    b2_path = os.path.join(tempfile.gettempdir(), '2b_' + secure_filename(b2_file.filename)) if b2_file and b2_file.filename else None
     out_path = os.path.join(tempfile.gettempdir(), f"GST_Reco_Output_{int(time.time())}.xlsx")
     
-    pr_file.save(pr_path)
-    b2_file.save(b2_path)
+    if pr_path: pr_file.save(pr_path)
+    if b2_path: b2_file.save(b2_path)
     
     try:
         cfg = {
             "amount_tolerance": float(request.form.get("amount_tolerance", 10)),
             "pct_tolerance": float(request.form.get("pct_tolerance", 5)),
+            "bank_max_match_exhaust_side": request.form.get("bank_max_match_exhaust_side", "2B"),
+            "bank_max_match_strategy": request.form.get("bank_max_match_strategy", "ALL_VS_ALL"),
+            "bank_match_relax_head": request.form.get("bank_match_relax_head", "true") == "true",
+            "bank_max_match_variance_pct": float(request.form.get("bank_max_match_variance_pct", 10000)),
             "features": {
                 "user_knockoff": True,
                 "pre_group": request.form.get("pre_group", "false") == "true",
@@ -174,6 +198,17 @@ def api_reco_run():
                 "2b_knockout": request.form.get("2b_knockout", "false") == "true"
             }
         }
+        
+        if request.form.get("match_rules"):
+            try: cfg["match_rules"] = json.loads(request.form.get("match_rules"))
+            except: pass
+        if request.form.get("pr_ko_rules"):
+            try: cfg["pr_ko_rules"] = json.loads(request.form.get("pr_ko_rules"))
+            except: pass
+        if request.form.get("b2_ko_rules"):
+            try: cfg["b2_ko_rules"] = json.loads(request.form.get("b2_ko_rules"))
+            except: pass
+
         
         email_cfg = None
         if request.form.get("email_enabled", "false") == "true":
@@ -201,7 +236,7 @@ def api_reco_run():
 @app.route('/api/reco/status/<task_id>', methods=['GET'])
 def api_reco_status(task_id):
     if task_id not in TASKS:
-        return jsonify({"status": "error", "message": "Invalid Task ID"}), 404
+        return jsonify({"status": "error", "message": "Server restarted. Please refresh the page and run again."}), 404
     return jsonify(TASKS[task_id])
 
 @app.route('/api/reco/download/<task_id>', methods=['GET'])
@@ -210,6 +245,71 @@ def api_reco_download(task_id):
         abort(404)
     out_path = TASKS[task_id]["out_path"]
     return send_file(out_path, as_attachment=True, download_name='GST_Reco_Output.xlsx')
+
+@app.route('/api/reco/template', methods=['GET'])
+def api_reco_template():
+    import pandas as pd
+    import io
+    import openpyxl
+    from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
+    
+    file_type = request.args.get('type', 'pr').lower()
+    if file_type not in ['pr', '2b']:
+        file_type = 'pr'
+        
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df = pd.DataFrame(columns=[
+            "Serial No", "GSTIN", "Pan", "Vendor Name", "Invoice Number", 
+            "Invoice Date", "Taxable Value", "IGST", "CGST", "SGST", 
+            "Compcess Value", "Total Tax", "Invoice Value", "Knock Off", 
+            "State", "Remarks", "Is Bank"
+        ])
+        
+        sheet_name = 'Purchase_Register' if file_type == 'pr' else 'GSTR_2B'
+        df.to_excel(writer, sheet_name=sheet_name, index=False, startrow=2)
+        
+        workbook = writer.book
+        worksheet = writer.sheets[sheet_name]
+        
+        # Row 1: MYBBT Branding
+        worksheet.merge_cells('A1:Q1')
+        cell = worksheet.cell(row=1, column=1)
+        cell.value = "MYBBT Business Bluetooth — Professional CA Firm Intelligence Engine"
+        cell.font = Font(name='Segoe UI', size=16, bold=True, color="FFFFFF")
+        cell.fill = PatternFill(start_color="1E293B", end_color="1E293B", fill_type="solid")
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+        worksheet.row_dimensions[1].height = 30
+        
+        # Row 2: Template Type
+        worksheet.merge_cells('A2:Q2')
+        cell2 = worksheet.cell(row=2, column=1)
+        cell2.value = f"DATA TEMPLATE : {'PURCHASE REGISTER (PR)' if file_type == 'pr' else 'GSTR-2B'}"
+        cell2.font = Font(name='Segoe UI', size=12, bold=True, color="333333")
+        cell2.fill = PatternFill(start_color="F1F5F9", end_color="F1F5F9", fill_type="solid")
+        cell2.alignment = Alignment(horizontal="center", vertical="center")
+        worksheet.row_dimensions[2].height = 20
+        
+        # Row 3: Headers
+        header_font = Font(name='Segoe UI', bold=True, color="FFFFFF")
+        header_fill = PatternFill(start_color="2563EB", end_color="2563EB", fill_type="solid")
+        thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+        
+        for col_num, value in enumerate(df.columns.values, 1):
+            c = worksheet.cell(row=3, column=col_num)
+            c.font = header_font
+            c.fill = header_fill
+            c.alignment = Alignment(horizontal="center", vertical="center")
+            c.border = thin_border
+            
+            # Auto-adjust column width
+            worksheet.column_dimensions[openpyxl.utils.get_column_letter(col_num)].width = max(len(str(value)) + 2, 12)
+            
+    output.seek(0)
+    filename = 'MYBBT_PR_Template.xlsx' if file_type == 'pr' else 'MYBBT_2B_Template.xlsx'
+    return send_file(output, as_attachment=True, download_name=filename, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+
 
 
 @app.route('/api/files/upload', methods=['POST'])

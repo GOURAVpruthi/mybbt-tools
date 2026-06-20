@@ -3,26 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Corporate Tools Suite — Professional productivity tools for GST workers and corporate teams. PDF, Excel, GST reconciliation tools in one place.">
-  <title>{% block title %}Corporate Tools Suite{% endblock %}</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+  <meta name="description" content="MYBBT Business Bluetooth — Professional Tools. Zero Friction.">
+  <title>{% block title %}MYBBT Business Bluetooth{% endblock %}</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  
+  <!-- Fonts: Space Grotesk (Hero), Inter (Body), JetBrains Mono (Data) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet"/>
+  
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   {% block extra_css %}{% endblock %}
 </head>
-<body data-page="{% block page_id %}{% endblock %}" data-theme="light">
+<body data-page="{% block page_id %}{% endblock %}">
 
+<!-- Inner pages use app-wrapper, index.html will override this entirely -->
+{% block content_wrapper %}
 <div id="app-wrapper">
-
   <!-- Sidebar Overlay (Mobile) -->
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <!-- ── SIDEBAR ──────────────────────────────────────────── -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <div class="logo-icon">CT</div>
+      <div class="logo-icon">M</div>
       <div class="logo-text">
-        Corporate Tools
-        <span>Professional Suite</span>
+        MYBBT
+        <span>Business Bluetooth</span>
       </div>
     </div>
 
@@ -76,67 +83,40 @@
         <span class="badge badge-primary" style="margin-left:auto;font-size:10px">7</span>
       </a>
     </nav>
-
-    <div class="sidebar-footer">
-      <strong>Corporate Tools Suite</strong><br>
-      v1.0 &bull; All rights reserved
-    </div>
   </aside>
 
   <!-- ── MAIN CONTENT ──────────────────────────────────────── -->
   <div class="main-content">
-
-    <!-- Topbar -->
     <header class="topbar">
-      <div class="topbar-left">
+      <div class="topbar-left" style="display:flex;align-items:center;">
         <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
         <div>
-          <div class="topbar-title">{% block topbar_title %}Corporate Tools Suite{% endblock %}</div>
+          <div class="topbar-title">{% block topbar_title %}Business Bluetooth{% endblock %}</div>
           <div class="topbar-breadcrumb">{% block topbar_breadcrumb %}{% endblock %}</div>
         </div>
       </div>
-      <div class="topbar-right" style="display:flex; align-items:center; gap: 15px;">
-        <button id="theme-toggle" class="btn" style="background: var(--surface-2); color: var(--text); padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 14px; border: 1px solid var(--border); box-shadow: var(--shadow);">
-          🌙 Dark Mode
-        </button>
-        <span class="topbar-badge">🇮🇳 GST Ready</span>
-        <span class="topbar-badge">v1.0</span>
+      <div class="topbar-right" style="margin-left:auto; display:flex; align-items:center;">
+        <!-- Theme toggle removed for clean Light Theme spec -->
       </div>
     </header>
 
-    <!-- Page Body -->
     <main class="page-body">
       {% block content %}{% endblock %}
     </main>
-
   </div>
 </div>
+{% endblock %}
 
 <!-- Toast Container -->
 <div id="toast-container"></div>
 
+<!-- Libraries -->
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<script>
-  const themeToggle = document.getElementById('theme-toggle');
-  const body = document.body;
-  
-  // Load saved theme
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  body.setAttribute('data-theme', savedTheme);
-  themeToggle.innerText = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
-
-  themeToggle.addEventListener('click', () => {
-    const isDark = body.getAttribute('data-theme') === 'dark';
-    const newTheme = isDark ? 'light' : 'dark';
-    body.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    themeToggle.innerText = newTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
-  });
-</script>
+<!-- Theme script removed -->
 {% block extra_js %}{% endblock %}
 </body>
 </html>

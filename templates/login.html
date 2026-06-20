@@ -5,176 +5,160 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="Sign in or create your MyBBT account — India's professional toolkit for CA, CS, Lawyers."/>
 <title>Login — MyBBT Professional Tools</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --red:#e2192c;--red2:#c01020;
-  --dark:#0a0f1e;--dark2:#111827;--dark3:#1f2937;
-  --card:#111827;--card2:#1a2435;
-  --text:#f9fafb;--text2:#d1d5db;--text3:#9ca3af;
-  --blue:#3b82f6;--green:#22c55e;--orange:#f59e0b;--purple:#8b5cf6;
-  --border:rgba(255,255,255,.08);
-  --input-bg:#0d1526;--input-border:rgba(255,255,255,.12);
+  --primary: #4F46E5;
+  --primary-light: rgba(79, 70, 229, 0.1);
+  --teal: #0D9488;
+  --bg: #FAFAFA;
+  --surface: #FFFFFF;
+  --surface-2: #F4F4F5;
+  --border: #E4E4E7;
+  --border-hover: #D4D4D8;
+  --text: #18181B;
+  --text-muted: #71717A;
+  --text-light: #A1A1AA;
+  --danger: #EF4444;
+  --success: #10B981;
 }
+
 html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);
-  overflow-x:hidden;line-height:1.5;min-height:100vh}
+body{
+  font-family:'Inter',sans-serif;
+  background: radial-gradient(circle at 50% -20%, rgba(79, 70, 229, 0.05) 0%, rgba(37, 99, 235, 0.02) 40%, #FAFAFA 100%);
+  background-attachment: fixed;
+  color:var(--text);
+  overflow-x:hidden;line-height:1.5;min-height:100vh;
+}
 
 /* ── TOP NAV ── */
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;
-  background:rgba(10,15,30,.9);backdrop-filter:blur(14px);
+  background:rgba(5, 5, 16, 0.5);backdrop-filter:blur(14px);
   border-bottom:1px solid var(--border);padding:0 5vw}
-.nav-inner{max-width:1200px;margin:0 auto;height:58px;display:flex;align-items:center;gap:20px}
+.nav-inner{max-width:1440px;margin:0 auto;height:80px;display:flex;align-items:center;gap:20px}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-.logo-mark{width:32px;height:32px;flex-shrink:0}
-.logo-text{font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-.02em}
-.logo-text span{color:var(--red)}
+.logo-text{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:900;letter-spacing:-0.05em;
+  background:linear-gradient(90deg, var(--purple), var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .nav-back{margin-left:auto;display:flex;align-items:center;gap:6px;
-  padding:7px 16px;border-radius:8px;font-size:.84rem;font-weight:500;
-  color:var(--text2);text-decoration:none;transition:all .2s;
-  background:rgba(255,255,255,.05);border:1px solid var(--border)}
-.nav-back:hover{background:rgba(255,255,255,.1);color:#fff}
+  padding:8px 20px;border-radius:6px;font-size:14px;font-weight:500;
+  color:var(--text-muted);text-decoration:none;transition:all .3s;
+  border:1px solid var(--border); background: var(--surface); backdrop-filter:blur(10px);}
+.nav-back:hover{background:var(--surface-2);color:var(--text); border-color:var(--border-hover);}
 
-/* ── BACKGROUND ── */
-.page-bg{position:fixed;inset:0;z-index:0;
-  background:radial-gradient(ellipse 70% 60% at 20% 50%, rgba(226,25,44,.10) 0%, transparent 65%),
-             radial-gradient(ellipse 50% 50% at 80% 60%, rgba(59,130,246,.07) 0%, transparent 60%),
-             linear-gradient(180deg,#0a0f1e 0%,#0d1628 100%)}
-.page-grid{position:fixed;inset:0;z-index:0;
-  background-image:linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
-                   linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
-  background-size:60px 60px}
+/* Theme toggle removed */
+
 
 /* ── MAIN LAYOUT ── */
 .auth-wrapper{position:relative;z-index:1;min-height:100vh;
-  display:grid;grid-template-columns:1fr 1fr;padding-top:58px}
+  display:grid;grid-template-columns:1fr 1fr;padding-top:80px; max-width: 1440px; margin: 0 auto;}
 
 /* ── LEFT PANEL ── */
 .left-panel{
-  background:linear-gradient(135deg, rgba(226,25,44,.06) 0%, rgba(10,15,30,.6) 100%);
-  border-right:1px solid var(--border);
   display:flex;flex-direction:column;justify-content:center;
-  padding:60px 48px;position:relative;overflow:hidden}
-.left-globe{position:absolute;right:-60px;bottom:-60px;width:280px;height:280px;
-  opacity:.12;pointer-events:none}
-.left-globe svg{animation:spinGlobe 40s linear infinite}
-@keyframes spinGlobe{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  padding:60px;position:relative;overflow:hidden;}
 
 .brand-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;
-  background:rgba(226,25,44,.15);border:1px solid rgba(226,25,44,.3);border-radius:20px;
-  font-size:.74rem;font-weight:600;color:#fca5a5;margin-bottom:28px;letter-spacing:.04em;
-  width:fit-content}
-.brand-badge::before{content:'🇮🇳';font-size:.9rem}
-.brand-heading{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;line-height:1.15;
-  margin-bottom:12px;letter-spacing:-.03em}
+  background:rgba(52, 211, 153, 0.1);border:1px solid rgba(52, 211, 153, 0.3);border-radius:20px;
+  font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--teal);margin-bottom:28px;}
+.brand-heading{font-family:'Space Grotesk',sans-serif;font-size:clamp(2rem,4vw,3.5rem);font-weight:900;line-height:1.1;
+  margin-bottom:16px;letter-spacing:-.03em;}
 .brand-heading .highlight{
-  background:linear-gradient(135deg, #e2192c 0%, #f97316 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.brand-sub{font-size:.92rem;color:var(--text3);margin-bottom:36px;line-height:1.65;max-width:360px}
+  color: var(--primary);
+}
+.brand-sub{font-size:16px;color:var(--text-muted);margin-bottom:40px;line-height:1.6;max-width:400px}
 
 /* Feature list */
-.features-list{list-style:none;display:flex;flex-direction:column;gap:14px}
-.feat-item{display:flex;align-items:flex-start;gap:14px}
-.feat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;
-  justify-content:center;font-size:1.1rem;flex-shrink:0;margin-top:1px}
-.feat-icon.red{background:rgba(226,25,44,.15)}
-.feat-icon.blue{background:rgba(59,130,246,.15)}
-.feat-icon.green{background:rgba(34,197,94,.15)}
-.feat-icon.orange{background:rgba(245,158,11,.15)}
-.feat-icon.purple{background:rgba(139,92,246,.15)}
-.feat-icon.teal{background:rgba(20,184,166,.15)}
-.feat-text-name{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:2px}
-.feat-text-desc{font-size:.78rem;color:var(--text3)}
+.features-list{list-style:none;display:flex;flex-direction:column;gap:20px}
+.feat-item{display:flex;align-items:flex-start;gap:16px; background: var(--surface); padding: 16px; border-radius: 12px; border: 1px solid var(--border); backdrop-filter:blur(10px);}
+.feat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.feat-text-name{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px}
+.feat-text-desc{font-size:13px;color:var(--text-muted)}
 
 /* ── RIGHT PANEL ── */
 .right-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:60px 48px}
-.auth-card{width:100%;max-width:420px}
+  padding:60px}
+.auth-card{width:100%;max-width:420px; background: var(--surface); border: 1px solid var(--border); padding: 40px; border-radius: 16px; backdrop-filter:blur(20px); box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
 
 /* Tabs */
-.tab-bar{display:flex;background:var(--input-bg);border:1px solid var(--input-border);
-  border-radius:12px;padding:4px;margin-bottom:32px}
-.tab-btn{flex:1;padding:10px 16px;border:none;background:transparent;
-  border-radius:9px;font-size:.88rem;font-weight:600;color:var(--text3);
-  cursor:pointer;transition:all .2s;font-family:inherit}
-.tab-btn.active{background:var(--red);color:#fff;
-  box-shadow:0 2px 12px rgba(226,25,44,.35)}
-.tab-btn:not(.active):hover{color:var(--text);background:rgba(255,255,255,.05)}
+.tab-bar{display:flex;background:rgba(0,0,0,0.3);border:1px solid var(--border);
+  border-radius:8px;padding:4px;margin-bottom:32px}
+.tab-btn{flex:1;padding:12px;border:none;background:transparent;
+  border-radius:6px;font-size:14px;font-weight:600;color:var(--text-muted);
+  cursor:pointer;transition:all .3s;}
+.tab-btn.active{background:var(--primary);color:#fff;
+  box-shadow:0 4px 15px rgba(79, 70, 229, 0.2);}
+.tab-btn:not(.active):hover{color:var(--text);background:var(--surface-2)}
 
 /* Form */
 .form-panel{display:none}
 .form-panel.active{display:block}
-.form-title{font-size:1.45rem;font-weight:800;letter-spacing:-.02em;margin-bottom:6px}
-.form-sub{font-size:.84rem;color:var(--text3);margin-bottom:28px}
+.form-title{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:800;margin-bottom:8px}
+.form-sub{font-size:14px;color:var(--text-muted);margin-bottom:32px}
 
-.form-group{margin-bottom:18px}
-.form-label{display:block;font-size:.82rem;font-weight:600;color:var(--text2);margin-bottom:7px}
-.form-input{width:100%;padding:11px 14px;background:var(--input-bg);
-  border:1px solid var(--input-border);border-radius:10px;color:var(--text);
-  font-size:.9rem;font-family:inherit;transition:all .2s;outline:none}
-.form-input:focus{border-color:rgba(226,25,44,.5);
-  box-shadow:0 0 0 3px rgba(226,25,44,.08)}
-.form-input::placeholder{color:var(--text3)}
-.form-input.error{border-color:rgba(226,25,44,.7);
-  box-shadow:0 0 0 3px rgba(226,25,44,.1)}
+.form-group{margin-bottom:20px}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px}
+.form-input{width:100%;padding:14px 16px;background:var(--bg);
+  border:1px solid var(--border);border-radius:8px;color:var(--text);
+  font-size:14px;transition:all .3s;outline:none}
+.form-input:focus{border-color:var(--primary);
+  box-shadow:0 0 0 3px var(--primary-light)}
+.form-input::placeholder{color:var(--text-light)}
+.form-input.error{border-color:var(--danger);}
 
-.forgot-link{display:block;text-align:right;font-size:.78rem;color:var(--text3);
-  text-decoration:none;margin-top:6px;transition:color .2s}
-.forgot-link:hover{color:var(--red)}
+.forgot-link{display:block;text-align:right;font-size:13px;color:var(--text-muted);
+  text-decoration:none;margin-top:8px;transition:color .3s}
+.forgot-link:hover{color:var(--teal)}
 
 /* Error/Success messages */
-.msg-box{padding:12px 16px;border-radius:10px;font-size:.84rem;font-weight:500;
-  margin-bottom:18px;display:none;align-items:flex-start;gap:10px;line-height:1.5}
-.msg-box.error{background:rgba(226,25,44,.12);border:1px solid rgba(226,25,44,.3);color:#fca5a5;display:flex}
-.msg-box.success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#86efac;display:flex}
-.msg-box.info{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#93c5fd;display:flex}
-.msg-icon{font-size:1rem;flex-shrink:0;margin-top:.05rem}
+.msg-box{padding:14px;border-radius:8px;font-size:13px;font-weight:500;
+  margin-bottom:20px;display:none;align-items:flex-start;gap:10px;line-height:1.5}
+.msg-box.error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;display:flex}
+.msg-box.success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6ee7b7;display:flex}
 
 /* Buttons */
-.btn-auth{width:100%;padding:13px 20px;border-radius:10px;border:none;cursor:pointer;
-  font-size:.95rem;font-weight:700;font-family:inherit;transition:all .2s;
-  display:flex;align-items:center;justify-content:center;gap:9px}
-.btn-auth.primary{background:var(--red);color:#fff;
-  box-shadow:0 4px 20px rgba(226,25,44,.28)}
-.btn-auth.primary:hover:not(:disabled){background:var(--red2);transform:translateY(-1px);
-  box-shadow:0 6px 28px rgba(226,25,44,.38)}
+.btn-auth{width:100%;padding:14px;border-radius:8px;border:none;cursor:pointer;
+  font-size:14px;font-weight:600;transition:all .3s;
+  display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-auth.primary{background:var(--primary);color:#fff;
+  box-shadow:0 4px 15px rgba(79, 70, 229, 0.2);}
+.btn-auth.primary:hover:not(:disabled){transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(79, 70, 229, 0.3);}
 .btn-auth.primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.btn-auth.google{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-  color:var(--text);margin-bottom:18px}
-.btn-auth.google:hover:not(:disabled){background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
-.btn-auth.google:disabled{opacity:.6;cursor:not-allowed}
 
-.divider-or{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--text3);font-size:.78rem}
+.btn-auth.google{background:var(--surface);border:1px solid var(--border);
+  color:var(--text);margin-bottom:24px}
+.btn-auth.google:hover:not(:disabled){background:var(--surface-2);border-color:var(--border-hover)}
+
+.divider-or{display:flex;align-items:center;gap:12px;margin:24px 0;color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:0.1em;}
 .divider-or::before,.divider-or::after{content:'';flex:1;height:1px;background:var(--border)}
 
 /* Loading spinner */
-.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
-  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.spinner{width:16px;height:16px;border:2px solid var(--border);
+  border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* Terms */
-.terms-note{font-size:.72rem;color:var(--text3);text-align:center;margin-top:18px;line-height:1.6}
-.terms-note a{color:var(--text3);text-decoration:underline;transition:color .2s}
-.terms-note a:hover{color:var(--text)}
+.terms-note{font-size:12px;color:var(--text-muted);text-align:center;margin-top:24px;line-height:1.6}
+.terms-note a{color:var(--teal);text-decoration:none;}
+.terms-note a:hover{text-decoration:underline;}
 
 /* Password toggle */
 .input-wrap{position:relative}
-.input-wrap .form-input{padding-right:44px}
-.pw-toggle{position:absolute;right:13px;top:50%;transform:translateY(-50%);
-  background:none;border:none;cursor:pointer;color:var(--text3);
-  font-size:1rem;padding:2px;transition:color .2s;line-height:1}
-.pw-toggle:hover{color:var(--text2)}
+.pw-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:16px;}
+.pw-toggle:hover{color:var(--text)}
 
 /* ── VERIFY EMAIL STATE ── */
-.verify-card{text-align:center;padding:16px 0}
-.verify-icon{font-size:3.5rem;margin-bottom:16px;line-height:1}
-.verify-title{font-size:1.25rem;font-weight:800;margin-bottom:8px}
-.verify-desc{font-size:.86rem;color:var(--text3);line-height:1.65;margin-bottom:24px;max-width:340px;margin-left:auto;margin-right:auto}
-.verify-resend{font-size:.82rem;color:var(--text3);margin-top:12px}
-.verify-resend a{color:var(--red);text-decoration:none;cursor:pointer}
-.verify-resend a:hover{text-decoration:underline}
+.verify-card{text-align:center;}
+.verify-icon{font-size:48px;margin-bottom:20px;}
+.verify-title{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:800;margin-bottom:12px}
+.verify-desc{font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:32px;}
+.verify-resend{font-size:13px;color:var(--text-muted);margin-top:16px}
+.verify-resend a{color:var(--teal);cursor:pointer}
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
@@ -182,34 +166,21 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);
   .left-panel{display:none}
 }
 @media(max-width:520px){
-  .right-panel{padding:40px 24px}
-  .auth-card{max-width:100%}
+  .right-panel{padding:20px}
+  .auth-card{padding: 30px 20px;}
 }
 </style>
 </head>
 <body>
 
 <!-- BACKGROUND -->
-<div class="page-bg"></div>
 <div class="page-grid"></div>
 
 <!-- TOP NAV -->
 <nav class="nav">
   <div class="nav-inner">
     <a href="/" class="logo">
-      <svg class="logo-mark" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="18" cy="18" r="17" stroke="#e2192c" stroke-width="1.5" fill="none"/>
-        <ellipse cx="18" cy="18" rx="8" ry="17" stroke="#e2192c" stroke-width="1" fill="none" opacity=".5"/>
-        <line x1="1" y1="18" x2="35" y2="18" stroke="#e2192c" stroke-width="1" opacity=".5"/>
-        <line x1="1" y1="12" x2="35" y2="12" stroke="#e2192c" stroke-width=".8" opacity=".35"/>
-        <line x1="1" y1="24" x2="35" y2="24" stroke="#e2192c" stroke-width=".8" opacity=".35"/>
-        <circle cx="18" cy="18" r="3" fill="#e2192c"/>
-        <line x1="18" y1="18" x2="28" y2="8" stroke="#e2192c" stroke-width=".8" opacity=".6" stroke-dasharray="2,2"/>
-        <line x1="18" y1="18" x2="8" y2="26" stroke="#e2192c" stroke-width=".8" opacity=".6" stroke-dasharray="2,2"/>
-        <circle cx="28" cy="8" r="2" fill="#f97316"/>
-        <circle cx="8" cy="26" r="2" fill="#3b82f6"/>
-      </svg>
-      <span class="logo-text">My<span>BBT</span></span>
+      <span class="logo-text" style="background:var(--primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">MYBBT</span>
     </a>
     <a href="/pdf-tools" class="nav-back">← Back to Tools</a>
   </div>
@@ -220,35 +191,15 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);
 
   <!-- ── LEFT PANEL ── -->
   <div class="left-panel">
-    <!-- Decorative background globe -->
-    <div class="left-globe">
-      <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="200" cy="200" r="190" stroke="rgba(226,25,44,.6)" stroke-width="1.5"/>
-        <ellipse cx="200" cy="200" rx="80" ry="190" stroke="rgba(226,25,44,.4)" stroke-width="1"/>
-        <ellipse cx="200" cy="200" rx="150" ry="190" stroke="rgba(226,25,44,.25)" stroke-width="1"/>
-        <line x1="10" y1="200" x2="390" y2="200" stroke="rgba(226,25,44,.3)" stroke-width="1"/>
-        <line x1="10" y1="130" x2="390" y2="130" stroke="rgba(226,25,44,.18)" stroke-width="1"/>
-        <line x1="10" y1="270" x2="390" y2="270" stroke="rgba(226,25,44,.18)" stroke-width="1"/>
-        <circle cx="200" cy="200" r="8" fill="#e2192c" opacity=".8"/>
-        <circle cx="120" cy="100" r="5" fill="#3b82f6" opacity=".7"/>
-        <circle cx="300" cy="140" r="5" fill="#22c55e" opacity=".7"/>
-        <circle cx="80" cy="260" r="5" fill="#f59e0b" opacity=".7"/>
-        <circle cx="330" cy="280" r="5" fill="#8b5cf6" opacity=".7"/>
-        <line x1="200" y1="200" x2="120" y2="100" stroke="rgba(59,130,246,.4)" stroke-width="1" stroke-dasharray="4,4"/>
-        <line x1="200" y1="200" x2="300" y2="140" stroke="rgba(34,197,94,.4)" stroke-width="1" stroke-dasharray="4,4"/>
-        <line x1="200" y1="200" x2="80" y2="260" stroke="rgba(245,158,11,.4)" stroke-width="1" stroke-dasharray="4,4"/>
-        <line x1="200" y1="200" x2="330" y2="280" stroke="rgba(139,92,246,.4)" stroke-width="1" stroke-dasharray="4,4"/>
-      </svg>
-    </div>
+    <!-- Decorative background globe removed for 3D universe -->
 
-    <!-- Brand -->
-    <div class="brand-badge">Made for Corporate Professionals · India</div>
+    <div class="brand-badge">Made for CA Professionals · India</div>
     <h1 class="brand-heading">
       Your Professional<br/>
       <span class="highlight">Toolkit Awaits</span>
     </h1>
     <p class="brand-sub">
-      Join thousands of CAs, CS, Lawyers and Finance professionals using MyBBT to work smarter every day.
+      Join thousands of CAs, CS, and Finance professionals using MYBBT to command their practice.
     </p>
 
     <!-- Feature list -->
@@ -470,8 +421,8 @@ googleProvider.setCustomParameters({ prompt: 'select_account' });
 auth.onAuthStateChanged(user => {
   if (user) {
     localStorage.setItem('mybbt_is_logged_in', 'true');
-    // Redirect to home if already signed in
-    window.location.replace('/');
+    // Redirect to dashboard if already signed in
+    window.location.replace('/dashboard');
   } else {
     localStorage.removeItem('mybbt_is_logged_in');
   }
@@ -649,5 +600,7 @@ async function resendVerification() {
   }
 }
 </script>
+
+<!-- Theme script removed -->
 </body>
 </html>

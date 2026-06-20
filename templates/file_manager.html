@@ -47,22 +47,23 @@
 
     <!-- Tab 1: Normal file upload -->
     <div class="tab-content active" id="tab-upload-files">
-      <div class="upload-zone" id="fm-drop-zone" style="padding:36px">
-        <input type="file" id="fm-file-input" multiple>
-        <div style="font-size:42px;margin-bottom:10px">📂</div>
-        <h3 style="margin:0 0 6px">Drop files here or click to browse</h3>
-        <p style="color:var(--text-muted);font-size:13px">All file types supported &bull; Up to 100MB per file &bull; Multiple files at once</p>
+      <div class="upload-box" id="fm-drop-zone" style="position:relative; overflow:hidden;">
+        <input type="file" id="fm-file-input" multiple style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:10;">
+        <div class="upload-icon">📂</div>
+        <div class="upload-title">Drop files here or click to browse</div>
+        <div class="upload-sub">All file types supported &bull; Up to 100MB per file &bull; Multiple files at once</div>
+        <div class="upload-btn-fake">Choose Files</div>
       </div>
     </div>
 
     <!-- Tab 2: Folder upload (browser folder picker) -->
     <div class="tab-content" id="tab-upload-folder">
-      <div class="upload-zone" id="fm-folder-zone" style="padding:36px;cursor:pointer" onclick="document.getElementById('fm-folder-input').click()">
-        <input type="file" id="fm-folder-input" multiple webkitdirectory style="display:none">
-        <div style="font-size:42px;margin-bottom:10px">🗂️</div>
-        <h3 style="margin:0 0 6px">Click to Select a Folder</h3>
-        <p style="color:var(--text-muted);font-size:13px">Folder ke andar ki saari files upload ho jayengi &bull; Sub-folders bhi</p>
-        <div style="margin-top:12px;background:var(--surface-2);display:inline-block;padding:8px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:600">📁 Browse Folder</div>
+      <div class="upload-box" id="fm-folder-zone" style="position:relative; overflow:hidden;">
+        <input type="file" id="fm-folder-input" multiple webkitdirectory style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:10;">
+        <div class="upload-icon">🗂️</div>
+        <div class="upload-title">Select a Folder</div>
+        <div class="upload-sub">All nested files and sub-folders will be uploaded automatically</div>
+        <div class="upload-btn-fake">Choose Folder</div>
       </div>
     </div>
 

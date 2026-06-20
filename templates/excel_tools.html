@@ -19,11 +19,12 @@
       <span class="badge badge-primary">Excel &amp; CSV</span>
     </div>
     <div class="card-body">
-      <div class="upload-zone" id="excel-zone">
-        <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" multiple>
-        <div class="upload-zone-icon">📊</div>
-        <h3>Drop Excel / CSV files here</h3>
-        <p>Supports .xlsx, .xls, .csv formats</p>
+      <div class="upload-box" id="excel-zone" style="position:relative; overflow:hidden;">
+        <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" multiple style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:10;">
+        <div class="upload-icon">📊</div>
+        <div class="upload-title">Drop Excel / CSV files here</div>
+        <div class="upload-sub">Supports .xlsx, .xls, .csv formats</div>
+        <div class="upload-btn-fake">Choose Files</div>
       </div>
       <div class="file-list" id="excel-file-list" style="margin-top:16px;max-height:280px;overflow-y:auto"></div>
     </div>

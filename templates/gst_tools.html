@@ -50,11 +50,12 @@
         </div>
         <div class="form-group">
           <label class="form-label">📂 Upload GSTR-1 PDFs (one or multiple months)</label>
-          <div class="upload-zone" id="gstr1-zone" style="padding:30px">
-            <input type="file" id="gstr1-input" accept=".pdf" multiple>
-            <div style="font-size:36px;margin-bottom:10px">📋</div>
-            <p style="font-size:14px;font-weight:600">Drop GSTR-1 PDFs here or click to browse</p>
-            <small style="color:var(--text-light)">Multiple files supported • All months will be consolidated</small>
+          <div class="upload-box" id="gstr1-zone" style="position:relative; overflow:hidden;">
+            <input type="file" id="gstr1-input" accept=".pdf" multiple style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:10;">
+            <div class="upload-icon">📋</div>
+            <div class="upload-title">Drop GSTR-1 PDFs here or click to browse</div>
+            <div class="upload-sub">Multiple files supported • All months will be consolidated</div>
+            <div class="upload-btn-fake">Choose PDFs</div>
           </div>
           <div id="gstr1-selected" style="display:none;margin-top:10px" class="badge badge-success"></div>
         </div>
@@ -90,11 +91,12 @@
         </div>
         <div class="form-group">
           <label class="form-label">📂 Upload GSTR-2B Excel Files (multiple months)</label>
-          <div class="upload-zone" id="gstr2b-zone" style="padding:30px">
-            <input type="file" id="gstr2b-input" accept=".xlsx,.xls" multiple>
-            <div style="font-size:36px;margin-bottom:10px">🔄</div>
-            <p style="font-size:14px;font-weight:600">Drop GSTR-2B Excel files here</p>
-            <small style="color:var(--text-light)">Multiple months supported • Auto-deduplication included</small>
+          <div class="upload-box" id="gstr2b-zone" style="position:relative; overflow:hidden;">
+            <input type="file" id="gstr2b-input" accept=".xlsx,.xls" multiple style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:10;">
+            <div class="upload-icon">🔄</div>
+            <div class="upload-title">Drop GSTR-2B Excel files here</div>
+            <div class="upload-sub">Multiple months supported • Auto-deduplication included</div>
+            <div class="upload-btn-fake">Choose Excels</div>
           </div>
           <div id="gstr2b-selected" style="display:none;margin-top:10px" class="badge badge-success"></div>
         </div>
