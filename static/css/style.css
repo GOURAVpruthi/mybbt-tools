@@ -12,10 +12,10 @@
   --amber:          #D97706; /* Warning Amber */
   --danger:         #EF4444;
 
-  --bg:             #FFFFFF; /* Pure white background */
-  --surface:        #F8F9FC; /* Soft off-white */
-  --surface-2:      #F1F3F9; /* Card background */
-  --border:         #E2E8F0;
+  --bg:             #FAFAFA; /* Very light gray for background to make white cards pop */
+  --surface:        #FFFFFF; /* Pure white for cards */
+  --surface-2:      #F4F4F5; /* Card hover or alternate sections */
+  --border:         #E4E4E7;
   --border-hover:   #C7D2FE;
   
   --text:           #0F172A; /* Heading navy */
@@ -32,8 +32,9 @@
   --radius-sm:      10px;
   
   /* Soft, diffused Stripe-like shadows */
-  --shadow:         0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
-  --shadow-hover:   0 10px 25px rgba(79,70,229,0.08);
+  --shadow-sm:      0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow:         0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-hover:   0 10px 15px -3px rgba(79, 70, 229, 0.1), 0 4px 6px -4px rgba(79, 70, 229, 0.1);
   
   --transition:     all 0.2s ease;
 }
@@ -43,13 +44,42 @@
 html { scroll-behavior: smooth; }
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background: var(--bg);
+  background-color: var(--bg);
+  /* Professional Dot Grid Pattern */
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 0 0;
   color: var(--text);
   min-height: 100vh;
   display: flex;
   overflow-x: hidden;
   -webkit-user-select: none;
   user-select: none;
+  position: relative;
+}
+
+/* Subtle Aurora ambient glows */
+body::before, body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  z-index: -1;
+  pointer-events: none;
+}
+body::before {
+  width: 400px;
+  height: 400px;
+  background: rgba(79, 70, 229, 0.05); /* Indigo glow */
+  top: -100px;
+  left: -100px;
+}
+body::after {
+  width: 600px;
+  height: 600px;
+  background: rgba(13, 148, 136, 0.03); /* Teal glow */
+  bottom: -200px;
+  right: -100px;
 }
 a { text-decoration: none; color: inherit; }
 ul { list-style: none; }
@@ -292,9 +322,8 @@ input, textarea, select {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   text-align: center; padding: 120px 20px 60px;
   position: relative;
-  background: 
-    radial-gradient(circle at 15% 40%, rgba(79, 70, 229, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 85% 60%, rgba(13, 148, 136, 0.05) 0%, transparent 50%);
+  /* Removed heavy radial gradients since we have body auroras and dots now */
+  background: transparent;
 }
 .badge-pill {
   background: var(--primary-light); border: 1px solid var(--border-hover);
@@ -483,7 +512,7 @@ input, textarea, select {
 .cta-section {
   min-height: 70vh; display: flex; align-items: center; justify-content: center;
   text-align: center; position: relative; border-top: 1px solid var(--border);
-  background: linear-gradient(180deg, var(--bg) 0%, rgba(79, 70, 229, 0.05) 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(79, 70, 229, 0.03) 100%);
 }
 .cta-content { position: relative; z-index: 10; max-width: 800px; padding: 0 20px; }
 
