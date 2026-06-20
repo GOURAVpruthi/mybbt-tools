@@ -195,6 +195,56 @@ input, textarea, select {
 .table td { padding: 16px 20px; font-size: 13px; font-family: 'JetBrains Mono', monospace; border-bottom: 1px solid var(--border); color: var(--white); }
 .table tr:hover td { background: rgba(255,255,255,0.03); }
 
+/* ── Internal App UI Components ─────────────────────────── */
+.page-header { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.page-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; margin-bottom: 8px; color: var(--text); }
+.page-header p { color: var(--text-muted); font-size: 15px; max-width: 800px; line-height: 1.5; }
+
+.card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: var(--shadow); margin-bottom: 24px; overflow: hidden; }
+.card-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface-2); }
+.card-header h2 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; color: var(--text); }
+.card-body { padding: 24px; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: var(--transition); border: 1px solid transparent; }
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 10px var(--primary-light); }
+.btn-primary:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); }
+.btn-primary:disabled { background: var(--text-muted); cursor: not-allowed; opacity: 0.6; box-shadow: none; }
+.btn-lg { padding: 14px 28px; font-size: 16px; }
+
+.badge { display: inline-flex; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; align-items: center; justify-content: center; }
+.badge-primary { background: var(--primary-light); color: var(--primary); border: 1px solid rgba(79, 70, 229, 0.2); }
+.badge-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+.badge-warning { background: rgba(217, 119, 6, 0.1); color: var(--amber); border: 1px solid rgba(217, 119, 6, 0.2); }
+.badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+
+.tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; overflow-x: auto; gap: 4px; }
+.tab-btn { padding: 12px 20px; background: none; border: none; font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: var(--transition); white-space: nowrap; }
+.tab-btn:hover { color: var(--text); background: var(--surface-2); border-radius: 6px 6px 0 0; }
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+.form-group { margin-bottom: 20px; }
+.form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+
+.upload-box { 
+  border: 2px dashed var(--border); background: var(--surface-2); 
+  border-radius: var(--radius-sm); padding: 40px 20px; 
+  text-align: center; transition: var(--transition); 
+}
+.upload-box:hover, .upload-box.dragover { border-color: var(--primary); background: var(--primary-light); }
+.upload-icon { font-size: 32px; margin-bottom: 12px; }
+.upload-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.upload-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+.upload-btn-fake { display: inline-block; padding: 8px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-weight: 600; color: var(--text); box-shadow: var(--shadow); }
+
+.progress-bar { height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; margin-top: 10px; }
+.progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+
+.result-box { margin-top: 16px; }
+.info-box { background: var(--surface-2); border-left: 3px solid var(--primary); padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 20px; font-size: 13px; }
+
 /* ── Index Page Specific ─────────────────── */
 .landing-wrapper { width: 100%; position: relative; z-index: 10; }
 
