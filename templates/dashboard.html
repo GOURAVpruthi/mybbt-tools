@@ -47,7 +47,12 @@
       <h1 class="welcome-title">Welcome, <span>{{ user.name.split(' ')[0] }}</span></h1>
       <p class="user-email">{{ user.email }}</p>
     </div>
-    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <div style="display:flex;gap:12px;align-items:center;">
+      {% if user.role == 'admin' %}
+        <a href="/admin" class="btn-primary" style="padding:10px 20px; text-decoration:none;"><i class="fas fa-shield-alt"></i> Admin Panel</a>
+      {% endif %}
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
   </div>
 
   <div class="dash-grid">
