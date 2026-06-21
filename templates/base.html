@@ -14,6 +14,16 @@
   
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.1">
   {% block extra_css %}{% endblock %}
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5N1FBGEKRT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-5N1FBGEKRT');
+  </script>
 </head>
 <body data-page="{% block page_id %}{% endblock %}">
 
