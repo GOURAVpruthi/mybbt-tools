@@ -595,13 +595,22 @@ async function handleFormSubmit(){
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
   
   try {
-    const res = await fetch('/api/contact', {
+    const res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fname, lname, email, whatsapp, service, desc, source: 'advisory_page' })
+      body: JSON.stringify({ 
+        access_key: 'e1d14f82-66a8-4247-b9ae-419b256fd9e0',
+        subject: 'New Call Back Request from YA Advisory',
+        from_name: 'YA Advisory Website',
+        Name: fname + ' ' + lname,
+        Email: email,
+        WhatsApp: whatsapp,
+        Service: service,
+        Description: desc
+      })
     });
     const data = await res.json();
-    if(data.success) {
+    if(res.status === 200) {
       btn.innerHTML = '<i class="fas fa-check"></i> Request Sent';
       btn.style.background = '#10b981';
       showToast('✅ Call back request sent! We will WhatsApp you shortly.');
@@ -616,7 +625,7 @@ async function handleFormSubmit(){
         document.getElementById('contact-desc').value = '';
       }, 4000);
     } else {
-      showToast('Error: ' + data.error);
+      showToast('Error: ' + data.message);
       btn.innerHTML = '<i class="fas fa-paper-plane"></i> Request Call Back';
       btn.disabled = false;
     }
