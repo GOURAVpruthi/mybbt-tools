@@ -1312,10 +1312,51 @@ def ping():
 def not_found(e):
     return render_template('index.html'), 404
 
-
 @app.errorhandler(413)
 def file_too_large(e):
     return jsonify({'success': False, 'error': 'File too large. Maximum size is 100MB'}), 413
+
+
+@app.route('/api/contact', methods=['POST'])
+def contact_submit():
+    """Handle contact form submissions from the frontend."""
+    try:
+        data = request.json
+        fname = data.get('fname', '').strip()
+        lname = data.get('lname', '').strip()
+        email = data.get('email', '').strip()
+        whatsapp = data.get('whatsapp', '').strip()
+        service = data.get('service', '').strip()
+        desc = data.get('desc', '').strip()
+        source = data.get('source', 'unknown')
+
+        if not fname or not email or not whatsapp:
+            return jsonify({'success': False, 'error': 'Name, Email, and WhatsApp number are required.'})
+
+        # Save to CSV
+        csv_file = os.path.join(BASE_DIR, 'leads.csv')
+        file_exists = os.path.isfile(csv_file)
+        
+        import csv
+        with open(csv_file, 'a', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            if not file_exists:
+                writer.writerow(['Timestamp', 'Source', 'First Name', 'Last Name', 'Email', 'WhatsApp', 'Service', 'Description'])
+            
+            writer.writerow([
+                datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                source,
+                fname,
+                lname,
+                email,
+                whatsapp,
+                service,
+                desc
+            ])
+            
+        return jsonify({'success': True, 'message': 'Request saved successfully.'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 
 if __name__ == '__main__':

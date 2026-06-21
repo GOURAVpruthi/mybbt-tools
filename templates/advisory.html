@@ -22,6 +22,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:20px 6%;display:fle
 nav.scrolled{background:rgba(4,13,31,.92);backdrop-filter:blur(20px);padding:14px 6%;border-bottom:1px solid var(--glass-border)}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
 .logo-img{width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.logo-icon{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--navy);width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:18px;flex-shrink:0}
 .logo-text{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--white)}
 .logo-text span{color:var(--accent)}
 .nav-links{display:flex;gap:36px;list-style:none}
@@ -258,7 +259,7 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
 <!-- NAVBAR -->
 <nav id="navbar">
   <a href="/advisory" class="logo">
-    <img src="/static/ya-logo.png" alt="YA Advisory" class="logo-img">
+    <div class="logo-icon">YA</div>
     <span class="logo-text">Your<span>Advisor</span></span>
   </a>
   <ul class="nav-links" id="nav-links">
@@ -488,15 +489,18 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
         <h4 style="font-family:'Syne',sans-serif;font-size:18px;color:var(--white);margin-bottom:6px;font-weight:700">Send Us a Message</h4>
         <p style="font-size:13px;color:var(--muted);margin-bottom:24px">We respond to all enquiries within 4 business hours.</p>
         <div class="form-row">
-          <div class="form-group"><label>First Name</label><input type="text" placeholder="Your name"></div>
-          <div class="form-group"><label>Last Name</label><input type="text" placeholder="Last name"></div>
+          <div class="form-group"><label>First Name</label><input type="text" id="contact-fname" placeholder="Your name"></div>
+          <div class="form-group"><label>Last Name</label><input type="text" id="contact-lname" placeholder="Last name"></div>
         </div>
-        <div class="form-group"><label>Email Address</label><input type="email" placeholder="your@email.com"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Email Address</label><input type="email" id="contact-email" placeholder="your@email.com"></div>
+          <div class="form-group"><label>WhatsApp No.</label><input type="tel" id="contact-whatsapp" placeholder="10-digit number"></div>
+        </div>
         <div class="form-group"><label>Service Required</label>
-          <select><option>Select a Service</option><option>GST Compliance &amp; Filing</option><option>GST Notice / Litigation</option><option>Income Tax Return</option><option>MSME Registration</option><option>Business Consulting</option><option>Virtual CFO</option><option>MYBBT Tools Help</option><option>Other</option></select>
+          <select id="contact-service"><option>Select a Service</option><option>GST Compliance &amp; Filing</option><option>GST Notice / Litigation</option><option>Income Tax Return</option><option>MSME Registration</option><option>Business Consulting</option><option>Virtual CFO</option><option>MYBBT Tools Help</option><option>Other</option></select>
         </div>
-        <div class="form-group"><label>Tell Us About Your Business</label><textarea placeholder="Brief description of your business and what you need help with..."></textarea></div>
-        <button class="btn-primary" style="width:100%;justify-content:center" onclick="handleFormSubmit()"><i class="fas fa-paper-plane"></i> Send Message</button>
+        <div class="form-group"><label>Tell Us About Your Business</label><textarea id="contact-desc" placeholder="Brief description of your business and what you need help with..."></textarea></div>
+        <button class="btn-primary" id="contact-submit" style="width:100%;justify-content:center" onclick="handleFormSubmit()"><i class="fas fa-paper-plane"></i> Request Call Back</button>
       </div>
     </div>
   </div>
@@ -573,7 +577,55 @@ function toggleFaq(el){el.classList.toggle('open');}
 // TOAST
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 // FORM SUBMIT
-function handleFormSubmit(){const email=document.querySelector('input[type="email"]').value;if(!email){showToast('Please enter your email address.');return;}window.location.href='mailto:youradvisor.ca@gmail.com?subject=Consultation Request&body=Email: '+email;}
+async function handleFormSubmit(){
+  const fname = document.getElementById('contact-fname').value;
+  const lname = document.getElementById('contact-lname').value;
+  const email = document.getElementById('contact-email').value;
+  const whatsapp = document.getElementById('contact-whatsapp').value;
+  const service = document.getElementById('contact-service').value;
+  const desc = document.getElementById('contact-desc').value;
+  
+  if(!fname || !whatsapp || !email){
+    showToast('Please provide your Name, Email, and WhatsApp number.');
+    return;
+  }
+  
+  const btn = document.getElementById('contact-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+  
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fname, lname, email, whatsapp, service, desc, source: 'advisory_page' })
+    });
+    const data = await res.json();
+    if(data.success) {
+      btn.innerHTML = '<i class="fas fa-check"></i> Request Sent';
+      btn.style.background = '#10b981';
+      showToast('✅ Call back request sent! We will WhatsApp you shortly.');
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Request Call Back';
+        btn.disabled = false;
+        btn.style.background = '';
+        document.getElementById('contact-fname').value = '';
+        document.getElementById('contact-lname').value = '';
+        document.getElementById('contact-email').value = '';
+        document.getElementById('contact-whatsapp').value = '';
+        document.getElementById('contact-desc').value = '';
+      }, 4000);
+    } else {
+      showToast('Error: ' + data.error);
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Request Call Back';
+      btn.disabled = false;
+    }
+  } catch (err) {
+    showToast('Failed to send request. Please try again.');
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Request Call Back';
+    btn.disabled = false;
+  }
+}
 // LOADER
 window.addEventListener('load',()=>{setTimeout(()=>{const l=document.getElementById('loader');l.classList.add('done');setTimeout(()=>l.remove(),700);initAnims();initCanvas();},1600);});
 // CANVAS
