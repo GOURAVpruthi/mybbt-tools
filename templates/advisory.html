@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="YA Advisory — Financial and Business Advisory. Backed by the same team building MYBBT."/>
+<title>YA Advisory — Smart Advisory. Sharp Execution.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5N1FBGEKRT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5N1FBGEKRT');
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#4F46E5;--primary-light:rgba(79,70,229,0.08);--teal:#0D9488;
+  --bg:#FAFAFA;--surface:#FFFFFF;--surface-2:#F4F4F5;--border:#E4E4E7;
+  --text:#0F172A;--text-muted:#64748B;--text-light:#94A3B8;
+  --shadow:0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -2px rgba(0,0,0,0.05);
+  --shadow-lg:0 20px 40px rgba(79,70,229,0.12);
+  --radius:16px;--transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif;background-color:var(--bg);
+  background-image:radial-gradient(var(--border) 1px,transparent 1px);
+  background-size:24px 24px;color:var(--text);min-height:100vh;
+  position:relative;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;width:600px;height:600px;
+  background:rgba(79,70,229,0.04);border-radius:50%;
+  filter:blur(120px);top:-200px;right:-200px;z-index:-1;pointer-events:none;
+}
+body::after{
+  content:'';position:fixed;width:500px;height:500px;
+  background:rgba(13,148,136,0.04);border-radius:50%;
+  filter:blur(100px);bottom:-200px;left:-100px;z-index:-1;pointer-events:none;
+}
+.global-banner{
+  background:linear-gradient(90deg,var(--primary),var(--teal));color:#fff;
+  text-align:center;padding:10px 20px;font-size:13px;font-weight:500;
+}
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(250,250,250,0.88);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);padding:0 5vw;
+}
+.nav-inner{max-width:1200px;margin:0 auto;height:72px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{display:flex;align-items:center;gap:20px}
+.brand-ya{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--primary);text-decoration:none}
+.brand-divider{width:1px;height:24px;background:var(--border)}
+.brand-mybbt{
+  display:flex;align-items:center;gap:8px;
+  font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;
+  color:var(--text-muted);text-decoration:none;transition:var(--transition);
+}
+.brand-mybbt:hover{color:var(--primary)}
+.brand-mybbt .pill{font-size:10px;background:var(--primary-light);color:var(--primary);padding:2px 7px;border-radius:20px;font-weight:600}
+.nav-links{display:flex;align-items:center;gap:8px}
+.nav-link{padding:8px 16px;border-radius:8px;font-size:14px;font-weight:500;color:var(--text-muted);text-decoration:none;transition:var(--transition)}
+.nav-link:hover{background:var(--surface-2);color:var(--text)}
+.nav-cta{padding:9px 20px;border-radius:8px;background:var(--primary);color:#fff;font-size:14px;font-weight:600;text-decoration:none;transition:var(--transition)}
+.nav-cta:hover{background:#4338CA;transform:translateY(-1px);box-shadow:0 4px 12px rgba(79,70,229,0.3)}
+/* HERO */
+.hero{max-width:1200px;margin:0 auto;padding:80px 5vw;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.hero-label{display:inline-flex;align-items:center;gap:8px;background:var(--primary-light);border:1px solid rgba(79,70,229,0.2);border-radius:30px;padding:6px 16px;margin-bottom:24px;font-size:12px;font-weight:600;color:var(--primary);letter-spacing:0.06em;text-transform:uppercase}
+.hero-label .dot{width:6px;height:6px;border-radius:50%;background:var(--primary);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}
+.hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(36px,5vw,58px);font-weight:900;line-height:1.1;color:var(--text);margin-bottom:20px}
+.hero h1 span{color:var(--primary)}
+.hero .sub{font-size:18px;color:var(--text-muted);line-height:1.7;margin-bottom:36px;max-width:480px}
+.hero-ctas{display:flex;gap:16px;flex-wrap:wrap}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--primary);color:#fff;border-radius:10px;font-weight:600;font-size:15px;text-decoration:none;transition:var(--transition)}
+.btn-primary:hover{background:#4338CA;transform:translateY(-2px);box-shadow:0 8px 24px rgba(79,70,229,0.3)}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:10px;font-weight:600;font-size:15px;text-decoration:none;transition:var(--transition)}
+.btn-secondary:hover{border-color:var(--primary);color:var(--primary);transform:translateY(-2px)}
+/* HERO VISUAL */
+.hero-visual{position:relative}
+.card-main{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;box-shadow:var(--shadow);position:relative;z-index:2}
+.card-header{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.ya-logo-big{width:48px;height:48px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--teal));display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:900;color:#fff}
+.card-header h3{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700}
+.card-header p{font-size:13px;color:var(--text-muted);margin-top:2px}
+.svc-list{display:flex;flex-direction:column;gap:10px}
+.svc-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;background:var(--surface-2);font-size:14px;font-weight:500;color:var(--text)}
+.svc-item .ic{font-size:18px;width:24px;flex-shrink:0}
+.card-float{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 18px;box-shadow:0 8px 30px rgba(0,0,0,0.08);position:absolute;display:flex;align-items:center;gap:12px}
+.card-float-1{top:-20px;right:-24px;z-index:3;animation:float 3s ease-in-out infinite}
+.card-float-2{bottom:20px;left:-24px;z-index:3;animation:float 3s ease-in-out 1.5s infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.fi{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.fi.g{background:rgba(16,185,129,0.1)}
+.fi.b{background:var(--primary-light)}
+.ft strong{display:block;font-size:13px;font-weight:600;color:var(--text)}
+.ft span{font-size:11px;color:var(--text-muted)}
+/* SECTION */
+.section{padding:80px 5vw;max-width:1200px;margin:0 auto}
+.s-label{display:inline-block;background:var(--primary-light);color:var(--primary);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:16px}
+.s-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,4vw,42px);font-weight:800;line-height:1.2;color:var(--text);margin-bottom:16px}
+.s-title span{color:var(--primary)}
+.s-sub{font-size:17px;color:var(--text-muted);line-height:1.6;max-width:580px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px}
+.c{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px;transition:var(--transition)}
+.c:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:rgba(79,70,229,0.2)}
+.c .em{font-size:32px;margin-bottom:20px}
+.c h3{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;margin-bottom:10px}
+.c p{font-size:14px;color:var(--text-muted);line-height:1.6}
+/* BRIDGE */
+.bridge-outer{padding:0 5vw;margin-bottom:80px}
+.bridge{
+  background:var(--surface);border:1px solid var(--border);border-radius:24px;
+  padding:60px;display:grid;grid-template-columns:1fr auto 1fr;gap:40px;align-items:center;
+}
+.bb{text-align:center}
+.bl{width:72px;height:72px;border-radius:18px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:900;color:#fff}
+.bl.ya{background:linear-gradient(135deg,var(--primary),var(--teal))}
+.bl.mb{background:linear-gradient(135deg,#6366F1,#8B5CF6)}
+.bb h3{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px}
+.bb p{font-size:14px;color:var(--text-muted);max-width:220px;margin:0 auto}
+.bc{display:flex;flex-direction:column;align-items:center;gap:8px}
+.bline{width:1px;height:40px;background:linear-gradient(180deg,var(--border),var(--primary),var(--border))}
+.bdot{width:44px;height:44px;border-radius:50%;background:var(--primary-light);border:2px solid rgba(79,70,229,0.3);display:flex;align-items:center;justify-content:center;font-size:20px}
+/* CONTACT */
+.contact-outer{padding:0 5vw;margin-bottom:80px}
+.contact{
+  background:var(--surface);border:1px solid var(--border);border-radius:24px;
+  padding:60px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;
+}
+.ci h2{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:800;margin-bottom:12px}
+.ci p{font-size:16px;color:var(--text-muted);line-height:1.7;margin-bottom:36px}
+.c-items{display:flex;flex-direction:column;gap:16px}
+.c-item{display:flex;align-items:center;gap:16px;padding:16px 20px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;transition:var(--transition);text-decoration:none;color:var(--text)}
+.c-item:hover{border-color:var(--primary);background:var(--primary-light)}
+.c-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ce{background:rgba(79,70,229,0.1)}
+.cl{background:rgba(10,102,194,0.1)}
+.cig{background:rgba(225,48,108,0.08)}
+.c-txt strong{display:block;font-size:14px;font-weight:600;margin-bottom:2px}
+.c-txt span{font-size:13px;color:var(--text-muted)}
+.embed-box{background:var(--surface-2);border:1px solid var(--border);border-radius:16px;padding:20px}
+.embed-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-light);margin-bottom:14px;display:block}
+/* FOOTER */
+.footer{border-top:1px solid var(--border);padding:32px 5vw;max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer p{font-size:13px;color:var(--text-muted)}
+.flinks{display:flex;gap:24px}
+.flinks a{font-size:13px;color:var(--text-muted);text-decoration:none;transition:var(--transition)}
+.flinks a:hover{color:var(--primary)}
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;gap:48px;padding:48px 5vw}
+  .hero-visual{display:none}
+  .grid-3{grid-template-columns:1fr}
+  .bridge{grid-template-columns:1fr;text-align:center;padding:40px}
+  .bc{flex-direction:row}
+  .bline{width:40px;height:1px}
+  .contact{grid-template-columns:1fr;padding:40px}
+}
+</style>
+</head>
+<body>
+
+<div class="global-banner">
+  🚀 <strong>MYBBT is in Early Beta.</strong> Advanced features launching soon — stay tuned!
+</div>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <a href="/advisory" class="brand-ya">YA Advisory</a>
+      <div class="brand-divider"></div>
+      <a href="/" class="brand-mybbt">
+        MYBBT Business Bluetooth
+        <span class="pill">TOOLS</span>
+      </a>
+    </div>
+    <div class="nav-links">
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#contact" class="nav-link">Contact</a>
+      <a href="/" class="nav-link">MYBBT Platform</a>
+      <a href="https://www.instagram.com/ya_advisory" target="_blank" class="nav-cta">Follow Us</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div>
+    <div class="hero-label"><div class="dot"></div>Business Advisory</div>
+    <h1>Smart Advisory.<br/><span>Sharp Execution.</span></h1>
+    <p class="sub">Financial planning, business structuring, and tax advisory — by the same team building MYBBT, India's smart business toolkit.</p>
+    <div class="hero-ctas">
+      <a href="#contact" class="btn-primary">Get in Touch <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
+      <a href="/" class="btn-secondary">Explore MYBBT <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="card-float card-float-1">
+      <div class="fi g">✅</div>
+      <div class="ft"><strong>Business Structuring</strong><span>Strategic &amp; Precise</span></div>
+    </div>
+    <div class="card-main">
+      <div class="card-header">
+        <div class="ya-logo-big">YA</div>
+        <div><h3>YA Advisory</h3><p>Financial &amp; Business Advisory</p></div>
+      </div>
+      <div class="svc-list">
+        <div class="svc-item"><span class="ic">📊</span>Financial Planning &amp; Analysis</div>
+        <div class="svc-item"><span class="ic">🏢</span>Business Structuring</div>
+        <div class="svc-item"><span class="ic">📋</span>GST &amp; Tax Compliance</div>
+        <div class="svc-item"><span class="ic">🤝</span>Investment Advisory</div>
+      </div>
+    </div>
+    <div class="card-float card-float-2">
+      <div class="fi b">🔗</div>
+      <div class="ft"><strong>Powered by MYBBT</strong><span>Smart Tools. Zero Friction.</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="services">
+  <div class="s-label">Our Services</div>
+  <h2 class="s-title">Advisory built for the<br/><span>modern business.</span></h2>
+  <p class="s-sub">Sharp financial expertise combined with smart technology — helping businesses move faster, with more clarity.</p>
+  <div class="grid-3">
+    <div class="c"><div class="em">📊</div><h3>Financial Planning</h3><p>Comprehensive financial analysis, cash flow planning, and business strategy aligned with your growth goals.</p></div>
+    <div class="c"><div class="em">🏢</div><h3>Business Structuring</h3><p>Smart organizational and legal structures — private limited, LLP, or sole proprietorship — matched to your vision.</p></div>
+    <div class="c"><div class="em">📋</div><h3>GST &amp; Tax Advisory</h3><p>End-to-end GST compliance, return filing strategy, and tax optimization for businesses of all sizes.</p></div>
+    <div class="c"><div class="em">🤝</div><h3>Investment Guidance</h3><p>Helping businesses and individuals make informed investment decisions with disciplined, data-driven advice.</p></div>
+    <div class="c"><div class="em">🔍</div><h3>Business Audits</h3><p>Internal audits, compliance reviews, and process assessments to identify gaps before they become problems.</p></div>
+    <div class="c"><div class="em">🚀</div><h3>Startup Advisory</h3><p>From day zero to first revenue — registration, MSME, licenses, and compliance handholding.</p></div>
+  </div>
+</div>
+
+<div class="bridge-outer">
+  <div class="bridge">
+    <div class="bb">
+      <div class="bl ya">YA</div>
+      <h3>YA Advisory</h3>
+      <p>Sharp advisory and financial expertise for real businesses.</p>
+    </div>
+    <div class="bc">
+      <div class="bline"></div>
+      <div class="bdot">🔗</div>
+      <div class="bline"></div>
+    </div>
+    <div class="bb">
+      <div class="bl mb">M</div>
+      <h3>MYBBT</h3>
+      <p>Intelligent business tools — GST, PDF, Excel, and more.</p>
+    </div>
+  </div>
+</div>
+
+<div class="contact-outer" id="contact">
+  <div class="contact">
+    <div class="ci">
+      <h2>Let's connect.</h2>
+      <p>Have a business question or need advisory support? Reach out — we respond quickly.</p>
+      <div class="c-items">
+        <a href="mailto:youradvisor.ca@gmail.com" class="c-item">
+          <div class="c-icon ce"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <div class="c-txt"><strong>youradvisor.ca@gmail.com</strong><span>Email us anytime</span></div>
+        </a>
+        <a href="https://www.linkedin.com/feed/update/urn:li:activity:7474473550788272129" target="_blank" class="c-item">
+          <div class="c-icon cl"><svg width="20" height="20" viewBox="0 0 24 24" fill="#0A66C2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></div>
+          <div class="c-txt"><strong>LinkedIn</strong><span>See our latest posts and updates</span></div>
+        </a>
+        <a href="https://www.instagram.com/ya_advisory?utm_source=qr&igsh=cnpxenZuNnlzYnFy" target="_blank" class="c-item">
+          <div class="c-icon cig"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E1306C" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+          <div class="c-txt"><strong>@ya_advisory</strong><span>Follow on Instagram</span></div>
+        </a>
+      </div>
+    </div>
+    <div class="embed-box">
+      <span class="embed-lbl">Latest from LinkedIn</span>
+      <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:activity:7474473550788272129"
+        height="380" width="100%" frameborder="0" allowfullscreen=""
+        title="YA Advisory LinkedIn Post" style="border-radius:10px;display:block;">
+      </iframe>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>© 2026 YA Advisory · Powered by <a href="/" style="color:var(--primary);text-decoration:none;font-weight:600;">MYBBT</a></p>
+  <div class="flinks">
+    <a href="/">MYBBT Platform</a>
+    <a href="https://www.instagram.com/ya_advisory" target="_blank">Instagram</a>
+    <a href="mailto:youradvisor.ca@gmail.com">Email</a>
+  </div>
+</div>
+
+</body>
+</html>

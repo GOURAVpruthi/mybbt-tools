@@ -132,6 +132,11 @@ def login_page():
     return render_template('login.html')
 
 
+@app.route('/advisory')
+def advisory_page():
+    return render_template('advisory.html')
+
+
 @app.route('/dashboard')
 def dashboard_page():
     return render_template('dashboard.html')
