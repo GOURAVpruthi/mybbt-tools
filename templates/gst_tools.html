@@ -470,6 +470,40 @@ document.addEventListener('DOMContentLoaded', () => {
   setupGSTTool({ zone:'cash-zone', input:'cash-input', btn:'cash-btn', sel:'cash-selected',
     res:'cash-result', prog:'cash-progress', api:'/api/gst/cash-ledger', accept:['csv'],
     btnLabel:'💵 Process Cash Ledger' });
+
+  // --- MAINTENANCE MODAL ---
+  const modalHTML = `
+    <div id="maintenanceModal" style="position:fixed;inset:0;background:rgba(4,13,31,0.85);backdrop-filter:blur(10px);z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.5s;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:40px;max-width:500px;text-align:center;box-shadow:0 30px 60px rgba(0,0,0,0.5),0 0 40px rgba(201,168,76,0.1);transform:translateY(20px);transition:transform 0.5s;margin:20px;">
+        <div style="font-size:48px;color:#c9a84c;margin-bottom:20px;"><i class="fas fa-server"></i></div>
+        <h2 style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:800;color:var(--text);margin-bottom:12px;">Server <span style="color:#c9a84c;">Upgrade</span></h2>
+        <p style="color:var(--text-muted);font-size:15px;line-height:1.6;margin-bottom:30px;">
+          Due to overwhelming demand, we are currently migrating our GST processing engine to high-performance servers. This suite is temporarily down for maintenance. We will be live soon!
+        </p>
+        <button onclick="document.getElementById('maintenanceModal').style.opacity='0';setTimeout(()=>document.getElementById('maintenanceModal').remove(),500)" style="background:linear-gradient(135deg,#c9a84c,#e8c96a);color:#040d1f;border:none;padding:12px 30px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;transition:transform 0.2s;">Got it, Stay Tuned</button>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  setTimeout(() => {
+    const m = document.getElementById('maintenanceModal');
+    m.style.opacity = '1';
+    m.firstElementChild.style.transform = 'translateY(0)';
+  }, 500);
+
+  // Block processing buttons
+  document.querySelectorAll('button[id$="-btn"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+      setTimeout(() => {
+        const m = document.getElementById('maintenanceModal');
+        m.style.opacity = '1';
+        m.firstElementChild.style.transform = 'translateY(0)';
+      }, 50);
+    }, true);
+  });
 });
 </script>
 {% endblock %}
