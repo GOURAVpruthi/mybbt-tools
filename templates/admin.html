@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel — MYBBT{% endblock %}
+
+{% block content %}
+<style>
+  .admin-container { max-width: 1300px; margin: 120px auto 60px; padding: 0 6%; }
+  .admin-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
+  .welcome-title { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--white); }
+  .welcome-title span { color: var(--accent); }
+  
+  .data-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; padding: 30px; overflow-x: auto; }
+  
+  table { width: 100%; border-collapse: collapse; min-width: 800px; }
+  th { text-align: left; padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+  td { padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text); font-size: 14px; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .user-name { font-weight: 600; color: var(--white); }
+  .user-email { font-size: 12px; color: var(--muted); }
+  
+  select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: var(--white); padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none; cursor: pointer; }
+  select:focus { border-color: var(--accent); }
+  
+  .status-btn { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; }
+  .status-active { background: rgba(16,185,129,0.15); color: #10b981; }
+  .status-blocked { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+  .logout-btn { color: #ef4444; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+  .logout-btn:hover { background: rgba(239,68,68,0.2); }
+</style>
+
+<div class="admin-container">
+  <div class="admin-header">
+    <div>
+      <h1 class="welcome-title">Admin <span>Control Panel</span></h1>
+      <p class="user-email">Manage users, subscriptions, and access.</p>
+    </div>
+    <div style="display:flex;gap:12px">
+      <a href="/dashboard" class="btn-outline" style="padding:10px 20px"><i class="fas fa-home"></i> Dashboard</a>
+      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </div>
+
+  <div class="data-card">
+    <table id="users-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>User Info</th>
+          <th>Plan</th>
+          <th>Role</th>
+          <th>Joined Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="6" style="text-align:center">Loading users...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+async function loadUsers() {
+  const res = await fetch('/api/admin/users');
+  const data = await res.json();
+  if(!data.success) return alert('Failed to load users');
+  
+  const tbody = document.querySelector('#users-table tbody');
+  tbody.innerHTML = '';
+  
+  data.users.forEach(u => {
+    const isAct = u.is_active === 1;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>#${u.id}</td>
+      <td>
+        <div class="user-name">${u.name}</div>
+        <div class="user-email">${u.email}</div>
+      </td>
+      <td>
+        <select onchange="updatePlan(${u.id}, this.value)">
+          <option value="Free" ${u.plan==='Free'?'selected':''}>Free</option>
+          <option value="Starter" ${u.plan==='Starter'?'selected':''}>Starter</option>
+          <option value="Professional" ${u.plan==='Professional'?'selected':''}>Professional</option>
+          <option value="CA Firm" ${u.plan==='CA Firm'?'selected':''}>CA Firm</option>
+        </select>
+      </td>
+      <td><span style="font-size:12px;padding:4px 8px;background:rgba(255,255,255,0.05);border-radius:4px">${u.role}</span></td>
+      <td style="font-size:12px">${u.created_at.split(' ')[0]}</td>
+      <td>
+        <button class="status-btn ${isAct ? 'status-active' : 'status-blocked'}" onclick="toggleStatus(${u.id}, ${isAct})">
+          ${isAct ? 'Active (Block)' : 'Blocked (Allow)'}
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function updatePlan(id, plan){
+  try{
+    const res = await fetch(`/api/admin/users/${id}/plan`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({plan})
+    });
+    if(res.ok) alert('Plan updated successfully');
+  }catch(e){ alert('Error updating plan'); }
+}
+
+async function toggleStatus(id, currentlyActive){
+  const newStatus = currentlyActive ? 'blocked' : 'active';
+  if(!confirm(`Are you sure you want to make this user ${newStatus}?`)) return;
+  try{
+    const res = await fetch(`/api/admin/users/${id}/status`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({status: newStatus})
+    });
+    if(res.ok) loadUsers();
+  }catch(e){ alert('Error updating status'); }
+}
+
+async function logout(){
+  if(!confirm('Are you sure you want to log out?')) return;
+  const res = await fetch('/api/auth/logout', {method:'POST'});
+  if(res.ok) window.location.href = '/login';
+}
+
+window.onload = loadUsers;
+</script>
+{% endblock %}

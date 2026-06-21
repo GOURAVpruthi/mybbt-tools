@@ -186,8 +186,13 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
     <li><a href="#tools">Platform</a></li>
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="/advisory" class="advisory-link"><img src="/static/ya-logo.png" style="width:14px;border-radius:2px;"> YA Advisory</a></li>
-    <li><a href="/login" class="nav-links">Login</a></li>
-    <li><a href="/login" class="nav-cta">Start Free Trial</a></li>
+    {% if session.get('user_id') %}
+      <li><a href="/dashboard" class="nav-links">Dashboard</a></li>
+      <li><a href="/dashboard" class="nav-cta">My Profile</a></li>
+    {% else %}
+      <li><a href="/login" class="nav-links">Login</a></li>
+      <li><a href="/login" class="nav-cta">Start Free Trial</a></li>
+    {% endif %}
   </ul>
   <div class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
 </nav>

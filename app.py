@@ -17,7 +17,34 @@ import sys
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash, session, send_from_directory, abort
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
+import sqlite3
+import functools
+
+def get_db():
+    db_path = os.path.join(BASE_DIR, 'users.db')
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_db():
+    conn = get_db()
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            plan TEXT DEFAULT 'Free',
+            is_active INTEGER DEFAULT 1,
+            role TEXT DEFAULT 'user',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
 # Import tool modules
 from tools.file_manager import FileManager
@@ -48,6 +75,26 @@ ALLOWED_EXTENSIONS = {
 # Ensure folders exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+
+# Initialize DB
+init_db()
+
+# --- Decorators ---
+def login_required(f):
+    @functools.wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login_page'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def admin_required(f):
+    @functools.wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('role') != 'admin':
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Global dictionary to track background tasks
 TASKS = {}
@@ -129,6 +176,8 @@ def reco_page():
 
 @app.route('/login')
 def login_page():
+    if 'user_id' in session:
+        return redirect(url_for('dashboard_page'))
     return render_template('login.html')
 
 
@@ -138,8 +187,123 @@ def advisory_page():
 
 
 @app.route('/dashboard')
+@login_required
 def dashboard_page():
-    return render_template('dashboard.html')
+    # Fetch latest user info
+    conn = get_db()
+    user = conn.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
+    conn.close()
+    if not user:
+        session.clear()
+        return redirect(url_for('login_page'))
+    return render_template('dashboard.html', user=dict(user))
+
+@app.route('/admin')
+@admin_required
+def admin_page():
+    return render_template('admin.html')
+
+# ─────────────────────────────────────────
+# AUTHENTICATION & ADMIN APIs
+# ─────────────────────────────────────────
+@app.route('/api/auth/register', methods=['POST'])
+def api_register():
+    data = request.json
+    name = data.get('name', '').strip()
+    email = data.get('email', '').strip()
+    password = data.get('password', '')
+
+    if not name or not email or not password:
+        return jsonify({'success': False, 'error': 'All fields are required'})
+
+    try:
+        conn = get_db()
+        c = conn.cursor()
+        
+        # Check if first user -> make them admin
+        count = c.execute('SELECT COUNT(*) FROM users').fetchone()[0]
+        role = 'admin' if count == 0 or email.lower() == 'youradvisor.ca@gmail.com' else 'user'
+        
+        pw_hash = generate_password_hash(password)
+        c.execute('INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
+                  (name, email, pw_hash, role))
+        conn.commit()
+        
+        user_id = c.lastrowid
+        session['user_id'] = user_id
+        session['name'] = name
+        session['role'] = role
+        session['plan'] = 'Free'
+        
+        return jsonify({'success': True})
+    except sqlite3.IntegrityError:
+        return jsonify({'success': False, 'error': 'Email already registered'})
+    finally:
+        conn.close()
+
+
+@app.route('/api/auth/login', methods=['POST'])
+def api_login():
+    data = request.json
+    email = data.get('email', '').strip()
+    password = data.get('password', '')
+
+    if not email or not password:
+        return jsonify({'success': False, 'error': 'Email and password required'})
+
+    conn = get_db()
+    user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+    conn.close()
+
+    if user and check_password_hash(user['password_hash'], password):
+        if user['is_active'] == 0:
+            return jsonify({'success': False, 'error': 'Account is blocked. Contact support.'})
+            
+        session['user_id'] = user['id']
+        session['name'] = user['name']
+        session['role'] = user['role']
+        session['plan'] = user['plan']
+        return jsonify({'success': True, 'role': user['role']})
+    
+    return jsonify({'success': False, 'error': 'Invalid credentials'})
+
+
+@app.route('/api/auth/logout', methods=['POST'])
+def api_logout():
+    session.clear()
+    return jsonify({'success': True})
+
+
+@app.route('/api/admin/users', methods=['GET'])
+@admin_required
+def api_admin_users():
+    conn = get_db()
+    users = conn.execute('SELECT id, name, email, plan, is_active, role, created_at FROM users ORDER BY id DESC').fetchall()
+    conn.close()
+    return jsonify({'success': True, 'users': [dict(u) for u in users]})
+
+
+@app.route('/api/admin/users/<int:user_id>/plan', methods=['POST'])
+@admin_required
+def api_admin_update_plan(user_id):
+    plan = request.json.get('plan')
+    conn = get_db()
+    conn.execute('UPDATE users SET plan = ? WHERE id = ?', (plan, user_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+
+@app.route('/api/admin/users/<int:user_id>/status', methods=['POST'])
+@admin_required
+def api_admin_update_status(user_id):
+    status = request.json.get('status')
+    val = 1 if status == 'active' else 0
+    conn = get_db()
+    conn.execute('UPDATE users SET is_active = ? WHERE id = ?', (val, user_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
 
 
 @app.route('/robots.txt')
@@ -156,6 +320,7 @@ def sitemap():
 # FILE MANAGER
 # ─────────────────────────────────────────
 @app.route('/file-manager')
+@login_required
 def file_manager_page():
     return render_template('file_manager.html')
 
@@ -468,6 +633,7 @@ def download_single_file(filename):
 # PDF TOOLS
 # ─────────────────────────────────────────
 @app.route('/pdf-tools')
+@login_required
 def pdf_tools_page():
     return render_template('pdf_tools.html')
 
@@ -721,6 +887,7 @@ def download_file(filename):
 # EXCEL TOOLS
 # ─────────────────────────────────────────
 @app.route('/excel-tools')
+@login_required
 def excel_tools_page():
     return render_template('excel_tools.html')
 
@@ -754,6 +921,7 @@ def download_excel(filename):
 # GST TOOLS
 # ─────────────────────────────────────────
 @app.route('/gst-tools')
+@login_required
 def gst_tools_page():
     return render_template('gst_tools.html')
 
