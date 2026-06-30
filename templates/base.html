@@ -5,114 +5,372 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="MYBBT Business Bluetooth — Professional Tools. Zero Friction.">
   <title>{% block title %}MYBBT Business Bluetooth{% endblock %}</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
   
-  <!-- Fonts: Space Grotesk (Hero), Inter (Body), JetBrains Mono (Data) -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet"/>
-  
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.1">
-  {% block extra_css %}{% endblock %}
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- Google tag (gtag.js) -->
+  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-5N1FBGEKRT"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-5N1FBGEKRT');
   </script>
+
+<style>
+/* ═══════════════════════════════════════════════
+   MYBBT APP SHELL — Navy + Gold Theme
+═══════════════════════════════════════════════ */
+:root {
+  --navy:        #040d1f;
+  --navy2:       #071329;
+  --navy3:       #0b1e3d;
+  --navy4:       #0f2748;
+  --blue:        #1a3a6b;
+  --accent:      #c9a84c;
+  --accent2:     #e8c96a;
+  --gold-light:  rgba(201,168,76,0.12);
+  --gold-border: rgba(201,168,76,0.20);
+  --white:       #ffffff;
+  --text:        #d4e0f5;
+  --text-muted:  #8899bb;
+  --border:      rgba(255,255,255,0.07);
+  --surface:     rgba(11,30,61,0.8);
+  --surface2:    rgba(7,19,41,0.9);
+  --radius:      14px;
+  --radius-sm:   9px;
+  --sidebar-w:   250px;
+  --topbar-h:    60px;
+
+  /* Keep compat vars for pdf_tools etc */
+  --background:  var(--navy2);
+  --primary:     var(--accent);
+  --shadow-sm:   0 2px 8px rgba(0,0,0,0.4);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--navy);
+  background-image:
+    radial-gradient(ellipse 60% 40% at 10% -10%, rgba(201,168,76,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 90%, rgba(26,58,107,0.25) 0%, transparent 60%);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+img { max-width: 100%; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+input, textarea, select { font-family: inherit; }
+
+/* ── APP LAYOUT ─────────────────────────────── */
+#app-wrapper { display: flex; width: 100%; min-height: 100vh; }
+
+/* ── SIDEBAR ────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--navy2);
+  border-right: 1px solid var(--gold-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  z-index: 300;
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  overflow-y: auto;
+}
+
+/* Logo */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--gold-border);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.sidebar-logo .logo-icon {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800;
+  color: var(--navy); flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(201,168,76,0.3);
+}
+.sidebar-logo .logo-text {
+  font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800;
+  color: var(--white); letter-spacing: 0.5px; line-height: 1.1;
+}
+.sidebar-logo .logo-text span {
+  display: block; font-family: 'Inter', sans-serif;
+  font-size: 10px; font-weight: 500; color: var(--text-muted);
+  letter-spacing: 0.3px; text-transform: uppercase; margin-top: 1px;
+}
+
+/* Home link */
+.sidebar-home-link {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 18px;
+  background: var(--gold-light);
+  border-bottom: 1px solid var(--gold-border);
+  font-size: 12px; font-weight: 600; color: var(--accent);
+  letter-spacing: 0.3px;
+  transition: background .2s;
+}
+.sidebar-home-link:hover { background: rgba(201,168,76,0.18); }
+.sidebar-home-link i { font-size: 11px; }
+
+/* Nav */
+.sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+.nav-section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: rgba(201,168,76,0.5);
+  padding: 10px 10px 5px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: var(--radius-sm);
+  color: var(--text-muted); font-size: 13.5px; font-weight: 500;
+  transition: all .2s; margin-bottom: 2px;
+  border: 1px solid transparent;
+}
+.nav-item:hover {
+  background: rgba(201,168,76,0.08);
+  border-color: rgba(201,168,76,0.15);
+  color: var(--white);
+}
+.nav-item.active {
+  background: rgba(201,168,76,0.12);
+  border-color: rgba(201,168,76,0.25);
+  color: var(--accent);
+  font-weight: 600;
+}
+.nav-item .nav-icon { width: 20px; height: 20px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.nav-item svg { width: 16px; height: 16px; }
+.badge { display: inline-flex; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+.badge-primary { background: var(--gold-light); color: var(--accent); border: 1px solid var(--gold-border); }
+
+/* Sidebar user footer */
+.sidebar-footer {
+  padding: 14px 16px;
+  border-top: 1px solid var(--gold-border);
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+.sidebar-footer .user-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800;
+  color: var(--navy); flex-shrink: 0;
+}
+.sidebar-footer .user-info { flex: 1; min-width: 0; }
+.sidebar-footer .user-name { font-size: 13px; font-weight: 600; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-footer .user-plan { font-size: 10px; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.sidebar-footer .logout-icon { color: var(--text-muted); cursor: pointer; transition: color .2s; font-size: 14px; padding: 4px; }
+.sidebar-footer .logout-icon:hover { color: #ef4444; }
+
+/* Sidebar overlay */
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(4,13,31,.7); backdrop-filter: blur(4px);
+  z-index: 299;
+}
+
+/* ── MAIN CONTENT ───────────────────────────── */
+.main-content {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: transparent;
+}
+
+/* ── TOPBAR ─────────────────────────────────── */
+.topbar {
+  height: var(--topbar-h);
+  background: rgba(4,13,31,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--gold-border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+  position: sticky; top: 0; z-index: 200;
+}
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+.topbar-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--white); }
+.topbar-breadcrumb { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+.menu-toggle {
+  display: none; width: 36px; height: 36px;
+  background: rgba(201,168,76,0.1); border: 1px solid var(--gold-border);
+  border-radius: 8px; align-items: center; justify-content: center;
+  color: var(--accent); flex-shrink: 0;
+}
+
+/* ── PAGE BODY ──────────────────────────────── */
+.page-body { padding: 28px 28px; flex: 1; }
+
+/* Upload boxes */
+.upload-box {
+  border: 2px dashed var(--gold-border);
+  background: rgba(201,168,76,0.03);
+  border-radius: var(--radius-sm); padding: 40px 20px;
+  text-align: center; transition: all .25s; cursor: pointer; position: relative;
+}
+.upload-box input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-box:hover { border-color: var(--accent); background: rgba(201,168,76,0.07); }
+.upload-icon { font-size: 32px; margin-bottom: 12px; }
+.upload-title { font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+.upload-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+.upload-btn-fake { display: inline-block; padding: 8px 20px; background: var(--gold-light); border: 1px solid var(--gold-border); border-radius: 6px; font-size: 13px; font-weight: 600; color: var(--accent); }
+
+/* Toast */
+#toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 12px 18px; border-radius: 10px; font-size: 14px; font-weight: 500; color: var(--white); animation: slideUp .3s ease; border: 1px solid; }
+.toast-success { background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.3); }
+.toast-error { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); }
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── RESPONSIVE ─────────────────────────────── */
+@media(max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay.active { display: block; }
+  .main-content { margin-left: 0; }
+  .menu-toggle { display: flex; }
+  .page-body { padding: 20px 16px; }
+  .topbar { padding: 0 16px; }
+}
+</style>
+  {% block extra_css %}{% endblock %}
 </head>
 <body data-page="{% block page_id %}{% endblock %}">
-
-
-<!-- Inner pages use app-wrapper, index.html will override this entirely -->
 
 {% block content_wrapper %}
 <div id="app-wrapper">
   <!-- Sidebar Overlay (Mobile) -->
-  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 
-  <!-- ── SIDEBAR ──────────────────────────────────────────── -->
+  <!-- ── SIDEBAR ────────────────────────── -->
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
+    <!-- Logo → links to main site -->
+    <a href="/" class="sidebar-logo">
       <div class="logo-icon">M</div>
       <div class="logo-text">
         MYBBT
         <span>Business Bluetooth</span>
       </div>
-    </div>
+    </a>
+
+    <!-- Back to main site -->
+    <a href="/" class="sidebar-home-link">
+      <i class="fas fa-globe"></i> mybbt.co.in — Main Site
+    </a>
 
     <nav class="sidebar-nav">
-      <div class="nav-section-label">Main</div>
-      <a href="/dashboard" class="nav-item">
+      <div class="nav-section-label">My Account</div>
+      <a href="/dashboard" class="nav-item {% if request.path == '/dashboard' %}active{% endif %}">
         <span class="nav-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
         </span>
-        Dashboard
+        My Dashboard
       </a>
 
-      <div class="nav-section-label" style="margin-top:12px">File Tools</div>
-      <a href="/file-manager" class="nav-item">
+      <div class="nav-section-label" style="margin-top:8px">Document Tools</div>
+      <a href="/pdf-tools" class="nav-item {% if request.path == '/pdf-tools' %}active{% endif %}">
         <span class="nav-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+        </span>
+        PDF Tools
+      </a>
+      <a href="/excel-tools" class="nav-item {% if request.path == '/excel-tools' %}active{% endif %}">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+        </span>
+        Excel Consolidator
+      </a>
+      <a href="/file-manager" class="nav-item {% if request.path == '/file-manager' %}active{% endif %}">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
         </span>
         File Manager
       </a>
 
-      <div class="nav-section-label" style="margin-top:12px">Document Tools</div>
-      <a href="/pdf-tools" class="nav-item">
+      <div class="nav-section-label" style="margin-top:8px">GST Suite</div>
+      <a href="/gst-tools" class="nav-item {% if request.path == '/gst-tools' %}active{% endif %}">
         <span class="nav-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/>
-          </svg>
-        </span>
-        PDF Tools
-      </a>
-      <a href="/excel-tools" class="nav-item">
-        <span class="nav-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/>
-          </svg>
-        </span>
-        Excel Consolidator
-      </a>
-
-      <div class="nav-section-label" style="margin-top:12px">GST Tools</div>
-      <a href="/gst-tools" class="nav-item">
-        <span class="nav-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 2.5 2 2.5-2 3.5 2z"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 2.5 2 2.5-2 3.5 2z"/></svg>
         </span>
         GST Tools
-        <span class="badge badge-primary" style="margin-left:auto;font-size:10px">7</span>
+        <span class="badge badge-primary" style="margin-left:auto">7</span>
       </a>
+      <a href="/reco" class="nav-item {% if request.path == '/reco' %}active{% endif %}">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+        </span>
+        GST Reconciliation
+      </a>
+
+      <div class="nav-section-label" style="margin-top:8px">Advisory</div>
+      <a href="/advisory" class="nav-item {% if request.path == '/advisory' %}active{% endif %}">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </span>
+        YA Advisory
+      </a>
+
+      {% if session.get('role') == 'admin' %}
+      <div class="nav-section-label" style="margin-top:8px">Admin</div>
+      <a href="/admin" class="nav-item {% if request.path == '/admin' %}active{% endif %}" style="color:var(--accent)">
+        <span class="nav-icon"><i class="fas fa-shield-alt" style="font-size:14px"></i></span>
+        Admin Panel
+      </a>
+      {% endif %}
     </nav>
+
+    <!-- User Footer -->
+    {% if session.get('user_id') %}
+    <div class="sidebar-footer">
+      <div class="user-avatar">{{ session.get('name', 'U')[0].upper() }}</div>
+      <div class="user-info">
+        <div class="user-name">{{ session.get('name', 'User') }}</div>
+        <div class="user-plan">{{ session.get('plan', 'Free') }} Plan</div>
+      </div>
+      <span class="logout-icon" onclick="quickLogout()" title="Logout"><i class="fas fa-sign-out-alt"></i></span>
+    </div>
+    {% endif %}
   </aside>
 
-  <!-- ── MAIN CONTENT ──────────────────────────────────────── -->
+  <!-- ── MAIN CONTENT ──────────────────── -->
   <div class="main-content">
     <header class="topbar">
-      <div class="topbar-left" style="display:flex;align-items:center;">
-        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menu-toggle" onclick="toggleSidebar()" aria-label="Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
         <div>
-          <div class="topbar-title">{% block topbar_title %}Business Bluetooth{% endblock %}</div>
+          <div class="topbar-title">{% block topbar_title %}MYBBT{% endblock %}</div>
           <div class="topbar-breadcrumb">{% block topbar_breadcrumb %}{% endblock %}</div>
         </div>
       </div>
-      <div class="topbar-right" style="margin-left:auto; display:flex; align-items:center;">
-        <!-- Theme toggle removed for clean Light Theme spec -->
+      <div style="display:flex;align-items:center;gap:12px;">
+        {% if session.get('user_id') %}
+        <a href="/dashboard" style="font-size:12px;color:var(--accent);font-weight:600;display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--gold-light);border:1px solid var(--gold-border);border-radius:8px;">
+          <i class="fas fa-user-circle"></i> {{ session.get('name', '').split(' ')[0] }}
+        </a>
+        {% endif %}
       </div>
     </header>
 
@@ -126,9 +384,34 @@
 <!-- Toast Container -->
 <div id="toast-container"></div>
 
-<!-- Libraries -->
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<!-- Theme script removed -->
+<script>
+// Sidebar toggle
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('active');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('active');
+}
+
+// Quick logout from sidebar footer
+async function quickLogout() {
+  if (!confirm('Logout karna chahte hain?')) return;
+  await fetch('/api/auth/logout', { method: 'POST' });
+  window.location.href = '/login';
+}
+
+// Toast
+function showToast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.textContent = msg;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+</script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

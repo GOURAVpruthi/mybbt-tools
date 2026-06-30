@@ -1,128 +1,298 @@
 {% extends "base.html" %}
+{% block title %}My Dashboard — MYBBT{% endblock %}
+{% block page_id %}dashboard{% endblock %}
+{% block topbar_title %}My Dashboard{% endblock %}
+{% block topbar_breadcrumb %}<span>Account</span> › Profile{% endblock %}
 
-{% block title %}Dashboard — MYBBT{% endblock %}
+{% block extra_css %}
+<style>
+:root{
+  --gold:#c9a84c; --gold2:#e8c96a;
+  --navy:#040d1f; --navy2:#071329; --navy3:#0b1e3d;
+  --white:#fff; --text:#d4e0f5; --muted:#8899bb;
+  --glass:rgba(11,30,61,0.7); --glass-border:rgba(201,168,76,0.18);
+}
+.db-wrap { max-width: 1100px; margin: 0 auto; }
+
+/* ─── TOP HERO BAR ─── */
+.db-hero {
+  background: linear-gradient(135deg, rgba(201,168,76,0.10), rgba(11,30,61,0.8));
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  padding: 28px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 20px;
+  margin-bottom: 28px;
+  position: relative; overflow: hidden;
+}
+.db-hero::before {
+  content: ''; position: absolute; top: -60px; right: -60px;
+  width: 200px; height: 200px;
+  background: rgba(201,168,76,0.06); border-radius: 50%; filter: blur(40px);
+}
+.db-hero-left { display: flex; align-items: center; gap: 18px; }
+.db-avatar {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800;
+  color: var(--navy); flex-shrink: 0;
+  box-shadow: 0 0 0 4px rgba(201,168,76,0.2);
+}
+.db-user-name { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--white); }
+.db-user-email { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.db-user-since { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.db-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.btn-gold {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 9px; font-size: 13px; font-weight: 700;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--navy); border: none; cursor: pointer; transition: .25s;
+  text-decoration: none;
+}
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(201,168,76,.35); }
+.btn-red {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 9px; font-size: 13px; font-weight: 600;
+  background: rgba(239,68,68,0.12); color: #ef4444;
+  border: 1px solid rgba(239,68,68,0.25); cursor: pointer; transition: .25s;
+}
+.btn-red:hover { background: rgba(239,68,68,0.2); }
+
+/* ─── STAT CARDS ─── */
+.db-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--glass); border: 1px solid var(--glass-border);
+  border-radius: 14px; padding: 20px 22px;
+  display: flex; align-items: center; gap: 14px;
+  transition: .3s;
+}
+.stat-card:hover { border-color: rgba(201,168,76,.3); transform: translateY(-3px); }
+.stat-icon {
+  width: 44px; height: 44px; border-radius: 11px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; background: rgba(201,168,76,0.12);
+}
+.stat-val { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: var(--white); line-height: 1; }
+.stat-lbl { font-size: 11px; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: .5px; }
+
+/* ─── PLAN CARD ─── */
+.plan-section { margin-bottom: 28px; }
+.plan-card {
+  background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(11,30,61,0.6));
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 16px; padding: 24px 28px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+}
+.plan-info { display: flex; align-items: center; gap: 14px; }
+.plan-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 20px;
+  background: rgba(201,168,76,0.15); color: var(--gold);
+  border: 1px solid rgba(201,168,76,0.3);
+  font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+}
+.plan-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--white); }
+.plan-subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; margin-right: 5px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* ─── TOOLS GRID ─── */
+.section-title {
+  font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+  color: var(--white); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-title::after { content: ''; flex: 1; height: 1px; background: var(--glass-border); }
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 28px; }
+.tool-card {
+  background: var(--glass); border: 1px solid var(--glass-border);
+  border-radius: 14px; padding: 22px; transition: .3s;
+  text-decoration: none; display: block;
+}
+.tool-card:hover { border-color: rgba(201,168,76,.35); transform: translateY(-4px); background: rgba(201,168,76,0.06); box-shadow: 0 12px 32px rgba(0,0,0,.3); }
+.t-icon { font-size: 22px; color: var(--gold); margin-bottom: 14px; }
+.t-title { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+.t-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.t-arrow { font-size: 11px; color: var(--gold); margin-top: 12px; font-weight: 600; }
+
+/* ─── ACCOUNT INFO ─── */
+.info-card {
+  background: var(--glass); border: 1px solid var(--glass-border);
+  border-radius: 14px; padding: 24px;
+}
+.info-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.info-row:last-child { border-bottom: none; }
+.info-label { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; width: 130px; flex-shrink: 0; }
+.info-val { font-size: 14px; color: var(--white); font-weight: 500; }
+
+/* RESPONSIVE */
+@media(max-width: 900px) {
+  .db-stats { grid-template-columns: repeat(2, 1fr); }
+}
+@media(max-width: 600px) {
+  .db-hero { padding: 20px; }
+  .db-hero-left { flex-direction: column; align-items: flex-start; }
+  .db-stats { grid-template-columns: 1fr 1fr; }
+  .db-avatar { width: 50px; height: 50px; font-size: 20px; }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<style>
-  .dash-container { max-width: 1200px; margin: 120px auto 60px; padding: 0 6%; }
-  .dash-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
-  .welcome-title { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--white); }
-  .welcome-title span { color: var(--accent); }
-  .user-email { color: var(--muted); font-size: 14px; margin-top: 4px; }
-  
-  .dash-grid { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
-  
-  .profile-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; padding: 30px; }
-  .avatar { width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; color: var(--navy); font-weight: 800; margin-bottom: 20px; font-family: 'Syne', sans-serif; }
-  .plan-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(201,168,76,0.15); color: var(--accent); border: 1px solid rgba(201,168,76,0.3); margin-top: 15px; }
-  
-  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 30px; }
-  .stat-box { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; text-align: center; }
-  .stat-val { font-size: 24px; font-weight: 700; color: var(--white); font-family: 'Syne', sans-serif; }
-  .stat-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+<div class="db-wrap">
 
-  .tools-section { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; padding: 30px; }
-  .section-title { font-family: 'Syne', sans-serif; font-size: 20px; color: var(--white); margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; }
-  
-  .tool-list { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .tool-card { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 24px; transition: 0.3s; text-decoration: none; display: block; }
-  .tool-card:hover { border-color: var(--accent); transform: translateY(-3px); background: rgba(201,168,76,0.05); }
-  .t-icon { font-size: 24px; color: var(--accent); margin-bottom: 16px; }
-  .t-title { font-size: 16px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
-  .t-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
-
-  .logout-btn { color: #ef4444; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
-  .logout-btn:hover { background: rgba(239,68,68,0.2); }
-  
-  @media(max-width: 900px){
-    .dash-grid { grid-template-columns: 1fr; }
-    .tool-list { grid-template-columns: 1fr; }
-    .dash-header { flex-direction: column; align-items: flex-start; gap: 20px; }
-  }
-</style>
-
-<div class="dash-container">
-  <div class="dash-header">
-    <div>
-      <h1 class="welcome-title">Welcome, <span>{{ user.name.split(' ')[0] }}</span></h1>
-      <p class="user-email">{{ user.email }}</p>
+  <!-- Hero Bar -->
+  <div class="db-hero">
+    <div class="db-hero-left">
+      <div class="db-avatar">{{ user.name[0].upper() }}</div>
+      <div>
+        <div class="db-user-name">{{ user.name }}</div>
+        <div class="db-user-email">{{ user.email }}</div>
+        <div class="db-user-since">Member since {{ user.created_at.split(' ')[0] }}</div>
+      </div>
     </div>
-    <div style="display:flex;gap:12px;align-items:center;">
+    <div class="db-actions">
       {% if user.role == 'admin' %}
-        <a href="/admin" class="btn-primary" style="padding:10px 20px; text-decoration:none;"><i class="fas fa-shield-alt"></i> Admin Panel</a>
+        <a href="/admin" class="btn-gold"><i class="fas fa-shield-alt"></i> Admin Panel</a>
       {% endif %}
-      <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-    </div>
-  </div>
-
-  <div class="dash-grid">
-    <!-- Left Profile Sidebar -->
-    <div class="profile-card">
-      <div class="avatar">{{ user.name[0].upper() }}</div>
-      <h2 style="font-size:18px; color:var(--white); margin-bottom:4px;">{{ user.name }}</h2>
-      <p style="font-size:13px; color:var(--muted);">Member since {{ user.created_at.split(' ')[0] }}</p>
-      
-      <div class="plan-badge">
-        <i class="fas fa-crown" style="margin-right:6px;"></i> {{ user.plan }} Plan
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div class="stat-val">Unlimited</div>
-          <div class="stat-lbl">GSTINs</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-val">Active</div>
-          <div class="stat-lbl">Status</div>
-        </div>
-      </div>
-      
-      {% if user.plan == 'Free' %}
-      <a href="/login" class="btn-primary" style="width:100%; justify-content:center; margin-top:24px; padding:12px; font-size:13px;">
-        <i class="fas fa-rocket"></i> Upgrade to Pro
+      <a href="/" class="btn-gold" style="background:rgba(201,168,76,.12);color:var(--gold);border:1px solid rgba(201,168,76,.25);box-shadow:none;">
+        <i class="fas fa-home"></i> Main Site
       </a>
-      {% endif %}
+      <button class="btn-red" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
+  </div>
 
-    <!-- Right Tools Area -->
-    <div class="tools-section">
-      <h2 class="section-title">Your Apps & Services</h2>
-      
-      <div class="tool-list">
-        <a href="/gst-tools" class="tool-card">
-          <div class="t-icon"><i class="fas fa-sync-alt"></i></div>
-          <h3 class="t-title">GST Engine</h3>
-          <p class="t-desc">Advanced GSTR-2A/2B reconciliation with Purchase Register.</p>
-        </a>
-        <a href="/pdf-tools" class="tool-card">
-          <div class="t-icon"><i class="fas fa-file-pdf"></i></div>
-          <h3 class="t-title">PDF Toolkit</h3>
-          <p class="t-desc">Merge, split, compress, and extract data from compliance PDFs.</p>
-        </a>
-        <a href="/excel-tools" class="tool-card">
-          <div class="t-icon"><i class="fas fa-file-excel"></i></div>
-          <h3 class="t-title">Excel Consolidator</h3>
-          <p class="t-desc">Combine multiple sheets and run scale operations.</p>
-        </a>
-        <a href="/advisory" class="tool-card">
-          <div class="t-icon" style="color:var(--white);"><i class="fas fa-briefcase"></i></div>
-          <h3 class="t-title" style="color:var(--white);">YA Advisory</h3>
-          <p class="t-desc">Access premium business consulting and tax compliance services.</p>
-        </a>
+  <!-- Stats -->
+  <div class="db-stats">
+    <div class="stat-card">
+      <div class="stat-icon">👑</div>
+      <div>
+        <div class="stat-val">{{ user.plan }}</div>
+        <div class="stat-lbl">Current Plan</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(16,185,129,0.12)">✅</div>
+      <div>
+        <div class="stat-val" style="color:#10b981">{{ 'Active' if user.is_active else 'Blocked' }}</div>
+        <div class="stat-lbl">Account Status</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🗂️</div>
+      <div>
+        <div class="stat-val">7+</div>
+        <div class="stat-lbl">GST Tools</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📄</div>
+      <div>
+        <div class="stat-val">25+</div>
+        <div class="stat-lbl">PDF Tools</div>
       </div>
     </div>
   </div>
+
+  <!-- Plan Card -->
+  <div class="plan-section">
+    <div class="plan-card">
+      <div class="plan-info">
+        <div class="plan-badge"><i class="fas fa-crown"></i> {{ user.plan }} Plan</div>
+        <div>
+          <div class="plan-title"><span class="status-dot"></span>Account Active</div>
+          <div class="plan-subtitle">All tools unlocked. Full access granted.</div>
+        </div>
+      </div>
+      {% if user.plan == 'Free' %}
+      <a href="/advisory" class="btn-gold"><i class="fas fa-rocket"></i> Upgrade Plan</a>
+      {% else %}
+      <span style="font-size:12px;color:var(--muted)">✨ Premium Access</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Apps & Services -->
+  <div class="section-title">Your Apps & Services</div>
+  <div class="tools-grid">
+    <a href="/gst-tools" class="tool-card">
+      <div class="t-icon"><i class="fas fa-sync-alt"></i></div>
+      <div class="t-title">GST Engine</div>
+      <div class="t-desc">GSTR-2A/2B reconciliation with Purchase Register. 19-rule smart matching.</div>
+      <div class="t-arrow">Open Tool →</div>
+    </a>
+    <a href="/reco" class="tool-card">
+      <div class="t-icon"><i class="fas fa-exchange-alt"></i></div>
+      <div class="t-title">GST Reconciliation</div>
+      <div class="t-desc">Advanced PR vs 2B reconciliation engine with Excel output.</div>
+      <div class="t-arrow">Open Tool →</div>
+    </a>
+    <a href="/pdf-tools" class="tool-card">
+      <div class="t-icon"><i class="fas fa-file-pdf"></i></div>
+      <div class="t-title">PDF Toolkit</div>
+      <div class="t-desc">25+ tools — merge, split, compress, convert, sign, OCR & more.</div>
+      <div class="t-arrow">Open Tool →</div>
+    </a>
+    <a href="/excel-tools" class="tool-card">
+      <div class="t-icon"><i class="fas fa-table"></i></div>
+      <div class="t-title">Excel Consolidator</div>
+      <div class="t-desc">Combine multiple Excel sheets and perform bulk operations.</div>
+      <div class="t-arrow">Open Tool →</div>
+    </a>
+    <a href="/file-manager" class="tool-card">
+      <div class="t-icon"><i class="fas fa-folder-open"></i></div>
+      <div class="t-title">File Manager</div>
+      <div class="t-desc">Bulk upload, manage and download files securely.</div>
+      <div class="t-arrow">Open Tool →</div>
+    </a>
+    <a href="/advisory" class="tool-card">
+      <div class="t-icon" style="color:var(--white)"><i class="fas fa-briefcase"></i></div>
+      <div class="t-title">YA Advisory</div>
+      <div class="t-desc">Premium business consulting and tax compliance services.</div>
+      <div class="t-arrow">Explore →</div>
+    </a>
+  </div>
+
+  <!-- Account Details -->
+  <div class="section-title">Account Details</div>
+  <div class="info-card">
+    <div class="info-row">
+      <div class="info-label">Full Name</div>
+      <div class="info-val">{{ user.name }}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Email</div>
+      <div class="info-val">{{ user.email }}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Role</div>
+      <div class="info-val" style="text-transform:capitalize">{{ user.role }}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Plan</div>
+      <div class="info-val">{{ user.plan }}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Status</div>
+      <div class="info-val" style="color:{{ '#10b981' if user.is_active else '#ef4444' }}">
+        <span class="status-dot" style="background:{{ '#10b981' if user.is_active else '#ef4444' }}"></span>
+        {{ 'Active' if user.is_active else 'Blocked' }}
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">Member Since</div>
+      <div class="info-val">{{ user.created_at.split(' ')[0] }}</div>
+    </div>
+  </div>
+
 </div>
 
 <script>
 async function logout(){
-  if(!confirm('Are you sure you want to log out?')) return;
-  try {
-    const res = await fetch('/api/auth/logout', {method:'POST'});
-    if(res.ok) window.location.href = '/login';
-  } catch(e){
-    console.error(e);
-  }
+  if(!confirm('Logout karna chahte hain?')) return;
+  await fetch('/api/auth/logout', {method:'POST'});
+  window.location.href = '/login';
 }
 </script>
 {% endblock %}
