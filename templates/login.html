@@ -126,6 +126,7 @@ async function doLogin(){
         verificationEmail = data.email;
         showToast(data.message);
         document.getElementById('verify-sub').textContent = `OTP sent to ${data.email}`;
+        setTimeout(() => alert(`Demo Mode - Your OTP for ${data.email} is: ${data.mock_otp}`), 500);
         toggleForm('verify');
       } else {
         window.location.href = data.role === 'admin' ? '/admin' : '/dashboard';
@@ -159,6 +160,7 @@ async function doRegister(){
       verificationEmail = data.email;
       showToast(data.message);
       document.getElementById('verify-sub').textContent = `OTP sent to ${data.email}`;
+      setTimeout(() => alert(`Demo Mode - Your OTP for ${data.email} is: ${data.mock_otp}`), 500);
       toggleForm('verify');
     } else {
       showToast(data.error, true);

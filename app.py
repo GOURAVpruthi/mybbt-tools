@@ -264,10 +264,7 @@ def api_register():
         c.execute('INSERT INTO otps (email, otp_code, expires_at) VALUES (?, ?, datetime("now", "+15 minutes"))', (email, otp_code))
         conn.commit()
         
-        # NOTE: For now, print OTP to console since SMTP is not configured.
-        print(f"\n\n{'='*40}\nOTP FOR {email}: {otp_code}\n{'='*40}\n\n", flush=True)
-
-        return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'OTP sent to email'})
+        return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'OTP sent to email', 'mock_otp': otp_code})
     except sqlite3.IntegrityError:
         return jsonify({'success': False, 'error': 'Email already registered'})
     finally:
@@ -330,18 +327,18 @@ def api_login():
     user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
 
     if user and check_password_hash(user['password_hash'], password):
-        if user['is_active'] == 0:
+        user_dict = dict(user)
+        if user_dict['is_active'] == 0:
             conn.close()
             return jsonify({'success': False, 'error': 'Account is blocked. Contact support.'})
             
-        if user.get('is_verified') == 0:
+        if user_dict.get('is_verified', 0) == 0:
             # Generate new OTP
             otp_code = str(uuid.uuid4().int)[:6]
             conn.execute('INSERT INTO otps (email, otp_code, expires_at) VALUES (?, ?, datetime("now", "+15 minutes"))', (email, otp_code))
             conn.commit()
             conn.close()
-            print(f"\n\n{'='*40}\nOTP FOR {email}: {otp_code}\n{'='*40}\n\n", flush=True)
-            return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'Account not verified. OTP sent to email.'})
+            return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'Account not verified. OTP sent to email.', 'mock_otp': otp_code})
             
         conn.close()
         session['user_id'] = user['id']
