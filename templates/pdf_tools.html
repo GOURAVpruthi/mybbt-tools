@@ -142,37 +142,37 @@ select:focus{border-color:#c9a84c}
 #org-upload-zone{display:block}
 #org-workspace{display:none}
 .org-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;
-  padding:16px;background:#fff;border-radius:var(--radius);border:1px solid var(--gray-200)}
+  padding:16px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border)}
 .org-tool-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;
-  border:1px solid var(--gray-300);background:#fff;cursor:pointer;font-size:.82rem;font-weight:500;
-  color:var(--gray-700);transition:all .15s;font-family:inherit}
-.org-tool-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-light)}
-.org-tool-btn.danger:hover{border-color:#dc2626;color:#dc2626;background:#fef2f2}
+  border:1px solid var(--border);background:transparent;cursor:pointer;font-size:.82rem;font-weight:500;
+  color:var(--text);transition:all .15s;font-family:inherit}
+.org-tool-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.1)}
+.org-tool-btn.danger:hover{border-color:#ef4444;color:#ef4444;background:rgba(239,68,68,0.1)}
 .org-pages-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;
   padding:4px}
-.org-page-card{background:#fff;border:2px solid var(--gray-200);border-radius:10px;
+.org-page-card{background:var(--surface);border:2px solid var(--border);border-radius:10px;
   overflow:hidden;cursor:grab;transition:all .2s;position:relative;user-select:none}
 .org-page-card:active{cursor:grabbing;transform:scale(.97)}
-.org-page-card.selected{border-color:var(--red);box-shadow:0 0 0 3px rgba(226,25,44,.15)}
+.org-page-card.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.15)}
 .org-page-card.sortable-ghost{opacity:.4}
 .org-page-card.sortable-chosen{box-shadow:var(--shadow-lg);z-index:99}
 .org-page-img{width:100%;display:block;background:var(--gray-100)}
 .org-page-footer{padding:6px 8px;display:flex;align-items:center;justify-content:space-between}
-.org-page-num{font-size:.72rem;font-weight:600;color:var(--gray-500)}
+.org-page-num{font-size:.72rem;font-weight:600;color:var(--text-muted)}
 .org-page-controls{display:flex;gap:3px}
 .org-ctrl-btn{background:none;border:none;cursor:pointer;padding:3px;border-radius:4px;
-  color:var(--gray-400);font-size:.9rem;line-height:1;transition:all .15s}
-.org-ctrl-btn:hover{background:var(--gray-100);color:var(--gray-700)}
-.org-ctrl-btn.del:hover{background:#fef2f2;color:#dc2626}
+  color:var(--text-muted);font-size:.9rem;line-height:1;transition:all .15s}
+.org-ctrl-btn:hover{background:rgba(255,255,255,0.05);color:var(--text)}
+.org-ctrl-btn.del:hover{background:rgba(239,68,68,0.15);color:#ef4444}
 .org-select-overlay{position:absolute;top:6px;left:6px;width:20px;height:20px;
-  background:#fff;border:2px solid var(--gray-300);border-radius:4px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--red)}
-.org-page-card.selected .org-select-overlay{background:var(--red);border-color:var(--red);color:#fff}
-.org-apply-bar{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--gray-200);
+  background:var(--surface);border:2px solid var(--border);border-radius:4px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:.7rem;color:transparent}
+.org-page-card.selected .org-select-overlay{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+.org-apply-bar{position:sticky;bottom:0;background:var(--navy);border-top:1px solid var(--border);
   padding:16px 24px;display:flex;align-items:center;justify-content:space-between;
-  box-shadow:0 -4px 12px rgba(0,0,0,.06)}
-.org-count-info{font-size:.875rem;color:var(--gray-500)}
-.org-count-info strong{color:var(--gray-800)}
+  box-shadow:0 -10px 30px rgba(0,0,0,.4)}
+.org-count-info{font-size:.875rem;color:var(--text-muted)}
+.org-count-info strong{color:var(--white)}
 
 /* ─── LOADING SPINNER ────────────────────────────── */
 .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);

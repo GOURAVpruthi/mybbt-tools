@@ -43,6 +43,31 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+    
+    # Add new columns if they don't exist
+    try: c.execute('ALTER TABLE users ADD COLUMN profile_pic TEXT')
+    except sqlite3.OperationalError: pass
+    
+    try: c.execute('ALTER TABLE users ADD COLUMN mobile TEXT')
+    except sqlite3.OperationalError: pass
+    
+    try: c.execute('ALTER TABLE users ADD COLUMN join_community INTEGER DEFAULT 0')
+    except sqlite3.OperationalError: pass
+    
+    try: c.execute('ALTER TABLE users ADD COLUMN is_verified INTEGER DEFAULT 0')
+    except sqlite3.OperationalError: pass
+
+    # OTPs table for email verification
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS otps (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL,
+            otp_code TEXT NOT NULL,
+            expires_at TIMESTAMP NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
     conn.commit()
     conn.close()
 
@@ -175,6 +200,10 @@ def laws_page():
 def reco_page():
     return render_template('reco_tool.html')
 
+@app.route('/uploads/dps/<filename>')
+def serve_dp(filename):
+    dp_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'dps')
+    return send_from_directory(dp_dir, filename)
 
 @app.route('/login')
 def login_page():
@@ -227,21 +256,65 @@ def api_register():
         role = 'admin' if count == 0 or email.lower() == 'youradvisor.ca@gmail.com' else 'user'
         
         pw_hash = generate_password_hash(password)
-        c.execute('INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
+        c.execute('INSERT INTO users (name, email, password_hash, role, is_verified) VALUES (?, ?, ?, ?, 0)',
                   (name, email, pw_hash, role))
+        
+        # Generate OTP
+        otp_code = str(uuid.uuid4().int)[:6]
+        c.execute('INSERT INTO otps (email, otp_code, expires_at) VALUES (?, ?, datetime("now", "+15 minutes"))', (email, otp_code))
         conn.commit()
         
-        user_id = c.lastrowid
-        session['user_id'] = user_id
-        session['name'] = name
-        session['role'] = role
-        session['plan'] = 'Free'
-        
-        return jsonify({'success': True})
+        # NOTE: For now, print OTP to console since SMTP is not configured.
+        print(f"\n\n{'='*40}\nOTP FOR {email}: {otp_code}\n{'='*40}\n\n", flush=True)
+
+        return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'OTP sent to email'})
     except sqlite3.IntegrityError:
         return jsonify({'success': False, 'error': 'Email already registered'})
     finally:
         conn.close()
+
+@app.route('/api/auth/send_otp', methods=['POST'])
+def api_send_otp():
+    data = request.json
+    email = data.get('email', '').strip()
+    if not email:
+        return jsonify({'success': False, 'error': 'Email required'})
+    conn = get_db()
+    otp_code = str(uuid.uuid4().int)[:6]
+    conn.execute('INSERT INTO otps (email, otp_code, expires_at) VALUES (?, ?, datetime("now", "+15 minutes"))', (email, otp_code))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True, 'mock_otp': otp_code})
+
+@app.route('/api/auth/verify_otp', methods=['POST'])
+def api_verify_otp():
+    data = request.json
+    email = data.get('email', '').strip()
+    otp = data.get('otp', '').strip()
+
+    conn = get_db()
+    # Check OTP
+    valid = conn.execute('SELECT * FROM otps WHERE email = ? AND otp_code = ? AND expires_at > datetime("now") ORDER BY id DESC LIMIT 1', (email, otp)).fetchone()
+    
+    if not valid:
+        conn.close()
+        return jsonify({'success': False, 'error': 'Invalid or expired OTP'})
+        
+    # Mark user verified
+    conn.execute('UPDATE users SET is_verified = 1 WHERE email = ?', (email,))
+    user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+    
+    # Delete used OTP
+    conn.execute('DELETE FROM otps WHERE email = ?', (email,))
+    conn.commit()
+    conn.close()
+
+    # Login
+    session['user_id'] = user['id']
+    session['name'] = user['name']
+    session['role'] = user['role']
+    session['plan'] = user['plan']
+    return jsonify({'success': True, 'role': user['role']})
 
 
 @app.route('/api/auth/login', methods=['POST'])
@@ -255,19 +328,64 @@ def api_login():
 
     conn = get_db()
     user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
-    conn.close()
 
     if user and check_password_hash(user['password_hash'], password):
         if user['is_active'] == 0:
+            conn.close()
             return jsonify({'success': False, 'error': 'Account is blocked. Contact support.'})
             
+        if user.get('is_verified') == 0:
+            # Generate new OTP
+            otp_code = str(uuid.uuid4().int)[:6]
+            conn.execute('INSERT INTO otps (email, otp_code, expires_at) VALUES (?, ?, datetime("now", "+15 minutes"))', (email, otp_code))
+            conn.commit()
+            conn.close()
+            print(f"\n\n{'='*40}\nOTP FOR {email}: {otp_code}\n{'='*40}\n\n", flush=True)
+            return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'Account not verified. OTP sent to email.'})
+            
+        conn.close()
         session['user_id'] = user['id']
         session['name'] = user['name']
         session['role'] = user['role']
         session['plan'] = user['plan']
         return jsonify({'success': True, 'role': user['role']})
     
+    conn.close()
     return jsonify({'success': False, 'error': 'Invalid credentials'})
+
+@app.route('/api/user/update', methods=['POST'])
+@login_required
+def api_update_profile():
+    mobile = request.form.get('mobile', '').strip()
+    join_community = 1 if request.form.get('join_community') == 'on' else 0
+    
+    conn = get_db()
+    c = conn.cursor()
+    
+    # Handle Profile Picture Upload
+    if 'profile_pic' in request.files:
+        file = request.files['profile_pic']
+        if file and file.filename != '':
+            if not file.content_type.startswith('image/'):
+                return jsonify({'success': False, 'error': 'Only images are allowed for profile picture.'})
+            
+            ext = os.path.splitext(secure_filename(file.filename))[1]
+            filename = f"dp_{session['user_id']}_{int(time.time())}{ext}"
+            
+            # Save file
+            dp_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'dps')
+            os.makedirs(dp_dir, exist_ok=True)
+            filepath = os.path.join(dp_dir, filename)
+            file.save(filepath)
+            
+            # Update DB with filename
+            c.execute('UPDATE users SET profile_pic = ? WHERE id = ?', (filename, session['user_id']))
+
+    c.execute('UPDATE users SET mobile = ?, join_community = ? WHERE id = ?', (mobile, join_community, session['user_id']))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'success': True})
 
 
 @app.route('/api/auth/logout', methods=['POST'])

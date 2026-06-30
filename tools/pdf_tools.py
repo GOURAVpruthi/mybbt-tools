@@ -1293,83 +1293,57 @@ class PDFTools:
     #  OCR PDF — Extract text from image-based PDFs
     # ══════════════════════════════════════════════════════════
     def ocr_pdf(self, input_path):
-        """Run OCR on scanned PDF pages, return searchable text + PDF file."""
+        """Run OCR on scanned PDF pages to create a Searchable PDF (preserves formatting)."""
         try:
             import fitz
             doc = fitz.open(input_path)
             if doc.is_encrypted:
                 doc.authenticate('')
-            all_text = []
             ts = self._ts()
+            out_name = f'ocr_searchable_{ts}.pdf'
+            out_path = self._out(out_name)
+            out_doc = fitz.open()
 
             for i, page in enumerate(doc):
-                # Try embedded text first
+                # Try embedded text first to check if OCR is really needed
                 text = page.get_text().strip()
-                if len(text) > 20:
-                    all_text.append({'page': i + 1, 'text': text, 'method': 'embedded'})
+                if len(text) > 100:
+                    # Page already has text, just copy it directly
+                    out_doc.insert_pdf(doc, from_page=i, to_page=i)
                 else:
-                    # Render page as image and run OCR
+                    # Render page as image and run OCR to generate a searchable PDF page
                     try:
                         import pytesseract
                         from PIL import Image as PILImage
                         import io as _io
-                        pix = page.get_pixmap(dpi=300, alpha=False)  # 300dpi for better OCR
+                        # 300 DPI for high-quality OCR
+                        pix = page.get_pixmap(dpi=300, alpha=False)
                         img_bytes = pix.tobytes('png')
                         img = PILImage.open(_io.BytesIO(img_bytes))
-                        ocr_text = pytesseract.image_to_string(img, lang='eng')
-                        all_text.append({'page': i + 1, 'text': ocr_text.strip(), 'method': 'ocr'})
+                        
+                        # Generate searchable PDF bytes directly from Tesseract
+                        # This preserves the original image layout perfectly
+                        pdf_bytes = pytesseract.image_to_pdf_or_hocr(img, extension='pdf', lang='eng')
+                        
+                        page_doc = fitz.open("pdf", pdf_bytes)
+                        out_doc.insert_pdf(page_doc)
+                        page_doc.close()
                     except Exception as ocr_err:
-                        all_text.append({'page': i + 1, 'text': f'[OCR failed: {ocr_err}]', 'method': 'error'})
+                        # Fallback: copy original page if OCR fails
+                        out_doc.insert_pdf(doc, from_page=i, to_page=i)
 
             doc.close()
-
-            # Build output PDF with extracted text
-            out_doc = fitz.open()
-            for pt in all_text:
-                page = out_doc.new_page(width=595, height=842)  # A4
-                page.insert_text(
-                    (50, 40),
-                    f'OCR Result — Page {pt["page"]}  ({pt["method"]})',
-                    fontsize=9, fontname='helv', color=(0.5, 0.5, 0.5)
-                )
-                page.draw_line(
-                    fitz.Point(50, 52), fitz.Point(545, 52),
-                    color=(0.88, 0.1, 0.17), width=0.8
-                )
-                y = 68
-                for line in pt['text'].split('\n'):
-                    while line:
-                        chunk = line[:95]
-                        line = line[95:]
-                        if y > 810:
-                            page = out_doc.new_page(width=595, height=842)
-                            page.insert_text(
-                                (50, 40), f'OCR Result — Page {pt["page"]} (cont.)',
-                                fontsize=9, fontname='helv', color=(0.5, 0.5, 0.5)
-                            )
-                            y = 60
-                        page.insert_text(
-                            (50, y), chunk,
-                            fontsize=10, fontname='helv', color=(0.05, 0.05, 0.05)
-                        )
-                        y += 15
-                    y += 3
-
-            out_name = f'ocr_{ts}.pdf'
-            out_path = self._out(out_name)
             out_doc.save(out_path, garbage=4, deflate=True)
             out_doc.close()
 
-            full_text = '\n\n'.join([f"--- Page {p['page']} ---\n{p['text']}" for p in all_text])
             return {
                 'success': True, 'filename': out_name,
-                'pages': len(all_text),
-                'preview': full_text[:500],
-                'char_count': len(full_text),
-                'message': f'OCR complete! Extracted text from {len(all_text)} pages. Downloading as PDF.'
+                'pages': len(out_doc),
+                'message': 'OCR complete! Generated a Searchable PDF preserving original layout.'
             }
         except Exception as e:
             return {'success': False, 'error': str(e)}
+
 
 
     # ══════════════════════════════════════════════════════════

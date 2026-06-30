@@ -78,9 +78,22 @@ body{background:var(--navy);color:var(--text);font-family:'Inter',sans-serif;min
     <button class="btn" id="btn-reg" onclick="doRegister()"><i class="fas fa-user-plus"></i> Create Account</button>
     <div class="switch-text">Already have an account? <a href="#" onclick="toggleForm('login')">Sign in</a></div>
   </div>
+  <!-- VERIFY FORM -->
+  <div id="verify-form" style="display: none;">
+    <h1 class="form-title">Verify Email</h1>
+    <p class="form-sub" id="verify-sub">Check your inbox for the 6-digit code.</p>
+    <div class="form-group">
+      <label>Enter OTP Code</label>
+      <input type="text" id="verify-otp" class="form-control" placeholder="123456" maxlength="6" style="text-align: center; letter-spacing: 4px; font-size: 20px; font-weight: bold;">
+    </div>
+    <button class="btn" id="btn-verify" onclick="doVerify()"><i class="fas fa-check-circle"></i> Verify & Login</button>
+    <div class="switch-text"><a href="#" onclick="toggleForm('login')">Back to Sign In</a></div>
+  </div>
 </div>
 
 <script>
+let verificationEmail = '';
+
 function showToast(msg, isError=false){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -91,6 +104,7 @@ function showToast(msg, isError=false){
 function toggleForm(type){
   document.getElementById('login-form').style.display = type === 'login' ? 'block' : 'none';
   document.getElementById('register-form').style.display = type === 'register' ? 'block' : 'none';
+  document.getElementById('verify-form').style.display = type === 'verify' ? 'block' : 'none';
 }
 
 async function doLogin(){
@@ -108,7 +122,14 @@ async function doLogin(){
     });
     const data = await res.json();
     if(data.success){
-      window.location.href = data.role === 'admin' ? '/admin' : '/dashboard';
+      if(data.requires_otp) {
+        verificationEmail = data.email;
+        showToast(data.message);
+        document.getElementById('verify-sub').textContent = `OTP sent to ${data.email}`;
+        toggleForm('verify');
+      } else {
+        window.location.href = data.role === 'admin' ? '/admin' : '/dashboard';
+      }
     } else {
       showToast(data.error, true);
       btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
@@ -135,7 +156,10 @@ async function doRegister(){
     });
     const data = await res.json();
     if(data.success){
-      window.location.href = '/dashboard';
+      verificationEmail = data.email;
+      showToast(data.message);
+      document.getElementById('verify-sub').textContent = `OTP sent to ${data.email}`;
+      toggleForm('verify');
     } else {
       showToast(data.error, true);
       btn.disabled = false; btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
@@ -143,6 +167,31 @@ async function doRegister(){
   } catch(e) {
     showToast('Network error', true);
     btn.disabled = false; btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+  }
+}
+
+async function doVerify(){
+  const otp = document.getElementById('verify-otp').value.trim();
+  if(!otp) return showToast('Please enter the OTP', true);
+  
+  const btn = document.getElementById('btn-verify');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+  
+  try {
+    const res = await fetch('/api/auth/verify_otp', {
+      method: 'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email: verificationEmail, otp})
+    });
+    const data = await res.json();
+    if(data.success){
+      window.location.href = data.role === 'admin' ? '/admin' : '/dashboard';
+    } else {
+      showToast(data.error, true);
+      btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
+    }
+  } catch(e) {
+    showToast('Network error', true);
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Login';
   }
 }
 

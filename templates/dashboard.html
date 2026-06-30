@@ -97,7 +97,72 @@
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; margin-right: 5px; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-/* ─── TOOLS GRID ─── */
+/* ─── PRICING MODAL ─── */
+.modal-overlay {
+  display:none; position:fixed; inset:0; z-index:1000;
+  background:rgba(4,13,31,0.85); backdrop-filter:blur(8px);
+  align-items:center; justify-content:center; padding:20px;
+}
+.modal-overlay.open { display:flex; animation:fadeIn .25s ease; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.pricing-modal {
+  background:#071329; border:1px solid rgba(201,168,76,0.25);
+  border-radius:22px; width:100%; max-width:860px;
+  max-height:90vh; overflow-y:auto;
+  padding:36px 32px;
+  box-shadow:0 24px 80px rgba(0,0,0,0.7);
+  position:relative;
+}
+.modal-close {
+  position:absolute; top:18px; right:20px;
+  width:34px; height:34px; border-radius:50%;
+  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+  color:#8899bb; font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:.2s;
+}
+.modal-close:hover { background:rgba(239,68,68,0.15); color:#ef4444; }
+.modal-title { font-family:'Syne',sans-serif; font-size:24px; font-weight:800; color:#fff; margin-bottom:6px; }
+.modal-sub { font-size:13px; color:#8899bb; margin-bottom:28px; }
+.plans-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.price-card {
+  background:rgba(11,30,61,0.7); border:1px solid rgba(255,255,255,0.07);
+  border-radius:16px; padding:24px 20px; position:relative; transition:.3s;
+}
+.price-card:hover { transform:translateY(-4px); box-shadow:0 16px 40px rgba(0,0,0,0.4); }
+.price-card.featured {
+  background:linear-gradient(145deg,rgba(201,168,76,0.10),rgba(11,30,61,0.8));
+  border-color:rgba(201,168,76,0.35);
+}
+.popular-badge {
+  position:absolute; top:-11px; left:50%; transform:translateX(-50%);
+  background:linear-gradient(135deg,#c9a84c,#e8c96a);
+  color:#040d1f; font-size:10px; font-weight:800; letter-spacing:.5px;
+  padding:4px 14px; border-radius:20px; text-transform:uppercase; white-space:nowrap;
+}
+.plan-name { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:#8899bb; margin-bottom:10px; }
+.plan-price { font-family:'Syne',sans-serif; font-size:32px; font-weight:800; color:#fff; line-height:1; }
+.plan-price span { font-size:14px; font-weight:500; color:#8899bb; }
+.plan-desc { font-size:12px; color:#8899bb; margin:10px 0 18px; line-height:1.5; }
+.plan-features { list-style:none; padding:0; margin-bottom:22px; display:flex; flex-direction:column; gap:8px; }
+.plan-features li { font-size:13px; color:#d4e0f5; display:flex; align-items:flex-start; gap:8px; }
+.plan-features li::before { content:'✓'; color:#c9a84c; font-weight:700; flex-shrink:0; }
+.plan-btn {
+  display:block; width:100%; padding:11px; border-radius:9px;
+  font-size:13px; font-weight:700; text-align:center; cursor:pointer;
+  border:none; transition:.25s; font-family:'Inter',sans-serif;
+}
+.plan-btn-outline {
+  background:transparent; color:#c9a84c;
+  border:1px solid rgba(201,168,76,0.3);
+}
+.plan-btn-outline:hover { background:rgba(201,168,76,0.1); }
+.plan-btn-gold {
+  background:linear-gradient(135deg,#c9a84c,#e8c96a); color:#040d1f;
+}
+.plan-btn-gold:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(201,168,76,0.35); }
+.plan-contact-note { text-align:center; font-size:12px; color:#8899bb; margin-top:20px; }
+.plan-contact-note a { color:#c9a84c; font-weight:600; }
+@media(max-width:680px) { .plans-grid { grid-template-columns:1fr; } .pricing-modal { padding:24px 18px; } }
 .section-title {
   font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
   color: var(--white); margin-bottom: 16px;
@@ -145,14 +210,29 @@
   <!-- Hero Bar -->
   <div class="db-hero">
     <div class="db-hero-left">
+      {% if user.profile_pic %}
+      <div class="db-avatar" style="background: url('/uploads/dps/{{ user.profile_pic }}') center/cover; box-shadow: 0 0 0 4px rgba(201,168,76,0.2);"></div>
+      {% else %}
       <div class="db-avatar">{{ user.name[0].upper() }}</div>
+      {% endif %}
       <div>
         <div class="db-user-name">{{ user.name }}</div>
-        <div class="db-user-email">{{ user.email }}</div>
+        <div class="db-user-email" style="display:flex;align-items:center;gap:8px;">
+          {{ user.email }}
+          {% if user.is_verified %}
+            <span style="color:#10b981;font-size:11px;font-weight:600;"><i class="fas fa-check-circle"></i> Verified</span>
+          {% else %}
+            <span style="color:#ef4444;font-size:11px;font-weight:600;"><i class="fas fa-exclamation-circle"></i> Unverified</span>
+            <button onclick="requestOTP('{{ user.email }}')" style="background:var(--gold-light);color:var(--gold);border:1px solid var(--gold-border);border-radius:4px;padding:2px 6px;font-size:10px;font-weight:600;cursor:pointer;">Verify Now</button>
+          {% endif %}
+        </div>
         <div class="db-user-since">Member since {{ user.created_at.split(' ')[0] }}</div>
       </div>
     </div>
     <div class="db-actions">
+      <button class="btn-gold" style="background:transparent; border:1px solid var(--gold-border); color:var(--text);" onclick="openEditProfile()">
+        <i class="fas fa-edit"></i> Edit Profile
+      </button>
       {% if user.role == 'admin' %}
         <a href="/admin" class="btn-gold"><i class="fas fa-shield-alt"></i> Admin Panel</a>
       {% endif %}
@@ -206,7 +286,7 @@
         </div>
       </div>
       {% if user.plan == 'Free' %}
-      <a href="/advisory" class="btn-gold"><i class="fas fa-rocket"></i> Upgrade Plan</a>
+      <button class="btn-gold" onclick="openPricing()"><i class="fas fa-rocket"></i> Upgrade Plan</button>
       {% else %}
       <span style="font-size:12px;color:var(--muted)">✨ Premium Access</span>
       {% endif %}
@@ -288,11 +368,189 @@
 
 </div>
 
+<!-- ══ PRICING MODAL ════════════════════════════════════════ -->
+<div class="modal-overlay" id="pricing-modal" onclick="closePricingOutside(event)">
+  <div class="pricing-modal">
+    <button class="modal-close" onclick="closePricing()">✕</button>
+    <div class="modal-title">🚀 Choose Your Plan</div>
+    <div class="modal-sub">Trusted by top GST and PDF professionals — empower your workflow with MYBBT.</div>
+
+    <div class="plans-grid">
+
+      <!-- FREE -->
+      <div class="price-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">₹0 <span>/ month</span></div>
+        <div class="plan-desc">Basic access. Perfect for trying out the platform.</div>
+        <ul class="plan-features">
+          <li>PDF Tools (limited)</li>
+          <li>1 GSTIN Reconciliation</li>
+          <li>Basic Excel Tools</li>
+          <li>File Manager</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline" disabled style="opacity:.5;cursor:not-allowed">Current Plan</button>
+      </div>
+
+      <!-- PROFESSIONAL ⭐ -->
+      <div class="price-card featured">
+        <div class="popular-badge">⭐ Most Popular</div>
+        <div class="plan-name">Professional</div>
+        <div class="plan-price">₹499 <span>/ month</span></div>
+        <div class="plan-desc">Designed for individual CAs and business professionals.</div>
+        <ul class="plan-features">
+          <li>Unlimited PDF Tools</li>
+          <li>Unlimited GSTIN Reconciliation</li>
+          <li>Advanced Excel Consolidator</li>
+          <li>File Manager (100 MB)</li>
+          <li>Priority Support</li>
+          <li>YA Advisory Access</li>
+        </ul>
+        <button class="plan-btn plan-btn-gold" onclick="contactForUpgrade('Professional - ₹499/month')">
+          <i class="fas fa-rocket"></i> Get Professional
+        </button>
+      </div>
+
+      <!-- CA FIRM -->
+      <div class="price-card">
+        <div class="plan-name">CA Firm</div>
+        <div class="plan-price">₹999 <span>/ month</span></div>
+        <div class="plan-desc">For CA firms and multi-client setups.</div>
+        <ul class="plan-features">
+          <li>Everything in Professional</li>
+          <li>Unlimited GSTINs</li>
+          <li>Bulk Processing</li>
+          <li>File Manager (1 GB)</li>
+          <li>Dedicated Support</li>
+          <li>Custom Integrations</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline" onclick="contactForUpgrade('CA Firm - ₹999/month')">
+          <i class="fas fa-building"></i> Get CA Firm
+        </button>
+      </div>
+
+    </div>
+
+    <div class="plan-contact-note">
+      📲 To upgrade, reach out to us via WhatsApp or Email —
+      <a href="https://wa.me/917000000000?text=Hello,%20I%20would%20like%20to%20upgrade%20my%20MYBBT%20plan." target="_blank">WhatsApp</a>
+      or
+      <a href="mailto:support@mybbt.co.in">support@mybbt.co.in</a>
+      <br><small style="margin-top:6px;display:block;opacity:.7">Instant activation after verification by the Admin.</small>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EDIT PROFILE MODAL ════════════════════════════════════════ -->
+<div class="modal-overlay" id="profile-modal" onclick="closeProfileOutside(event)">
+  <div class="pricing-modal" style="max-width: 500px; padding: 28px;">
+    <button class="modal-close" onclick="closeEditProfile()">✕</button>
+    <div class="modal-title" style="font-size: 20px;">👤 Edit Profile</div>
+    <div class="modal-sub" style="margin-bottom: 20px;">Update your personal details below.</div>
+    
+    <form id="profile-form" onsubmit="submitProfile(event)">
+      <div class="info-row" style="border:none; padding-bottom: 0;">
+        <label class="info-label">Profile Picture</label>
+      </div>
+      <input type="file" id="profile_pic" name="profile_pic" accept="image/*" style="margin-bottom: 16px; color: var(--muted); font-size: 13px;">
+      
+      <div class="info-row" style="border:none; padding-bottom: 0;">
+        <label class="info-label">Mobile Number (Optional)</label>
+      </div>
+      <input type="text" id="mobile" name="mobile" value="{{ user.mobile or '' }}" placeholder="+91 XXXXX XXXXX" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--navy2); color: white; margin-bottom: 16px;">
+      
+      <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text); cursor: pointer; margin-bottom: 24px;">
+        <input type="checkbox" id="join_community" name="join_community" {% if user.join_community %}checked{% endif %}>
+        Join WhatsApp Community Group
+      </label>
+      
+      <button type="submit" class="plan-btn plan-btn-gold" id="btn-save-profile">Save Changes</button>
+    </form>
+  </div>
+</div>
+
 <script>
+async function requestOTP(email) {
+  try {
+    const res = await fetch('/api/auth/send_otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    if(data.success) {
+      const code = prompt(`OTP sent to ${email}!\n(Demo Mode - Your OTP is: ${data.mock_otp})\nEnter OTP to verify:`);
+      if(code) {
+        verifyOTP(email, code);
+      }
+    } else {
+      alert(data.error || 'Failed to send OTP');
+    }
+  } catch(e) { alert('Network error'); }
+}
+
+async function verifyOTP(email, otp_code) {
+  try {
+    const res = await fetch('/api/auth/verify_otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, otp: otp_code })
+    });
+    const data = await res.json();
+    if(data.success) {
+      alert('Verification successful!');
+      location.reload();
+    } else {
+      alert(data.error || 'Invalid OTP');
+    }
+  } catch(e) { alert('Network error'); }
+}
+
 async function logout(){
-  if(!confirm('Logout karna chahte hain?')) return;
+  if(!confirm('Are you sure you want to log out?')) return;
   await fetch('/api/auth/logout', {method:'POST'});
   window.location.href = '/login';
 }
+
+function openPricing() {
+  document.getElementById('pricing-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePricing() {
+  document.getElementById('pricing-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closePricingOutside(e) {
+  if (e.target === document.getElementById('pricing-modal')) closePricing();
+}
+function contactForUpgrade(plan) {
+  const msg = encodeURIComponent(`Hello! I would like to upgrade to the MYBBT ${plan} plan. My account email: {{ user.email }}`);
+  window.open(`https://wa.me/917000000000?text=${msg}`, '_blank');
+}
+// Profile Edit Modals
+function openEditProfile() { document.getElementById('profile-modal').classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeEditProfile() { document.getElementById('profile-modal').classList.remove('open'); document.body.style.overflow = ''; }
+function closeProfileOutside(e) { if (e.target === document.getElementById('profile-modal')) closeEditProfile(); }
+
+async function submitProfile(e) {
+  e.preventDefault();
+  const form = document.getElementById('profile-form');
+  const btn = document.getElementById('btn-save-profile');
+  const fd = new FormData(form);
+  
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+  try {
+    const res = await fetch('/api/user/update', { method: 'POST', body: fd });
+    const data = await res.json();
+    if(data.success) location.reload();
+    else { alert(data.error || 'Failed to update'); btn.disabled=false; btn.innerHTML='Save Changes'; }
+  } catch(err) {
+    alert('Network error'); btn.disabled=false; btn.innerHTML='Save Changes';
+  }
+}
+
+// Close on Escape
+document.addEventListener('keydown', e => { 
+  if(e.key==='Escape') { closePricing(); closeEditProfile(); }
+});
 </script>
 {% endblock %}
