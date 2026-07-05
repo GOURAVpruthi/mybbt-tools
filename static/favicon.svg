@@ -8,28 +8,26 @@
       <stop offset="100%" stop-color="#664D00" />
     </linearGradient>
 
-    <!-- Metallic Silver / White Gradient -->
+    <!-- Metallic White/Silver Gradient - Keeps the whiteness but adds enough silver shadow to pop on light backgrounds -->
     <linearGradient id="silver" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FFFFFF" />
-      <stop offset="50%" stop-color="#E0E5EC" />
-      <stop offset="100%" stop-color="#9BA6B5" />
+      <stop offset="40%" stop-color="#F4F6F9" />
+      <stop offset="80%" stop-color="#C5CDDA" />
+      <stop offset="100%" stop-color="#9CA8B8" />
     </linearGradient>
     
-    <!-- Mask for the Right Diamond -->
+    <!-- Mask for the Right Diamond (creates the gap under the Left Diamond) -->
     <mask id="maskRight">
       <rect x="-500" y="-500" width="1000" height="1000" fill="white" />
       <path d="M 30 -40 L 30 120" fill="none" stroke="black" stroke-width="125" stroke-linecap="round" />
     </mask>
 
-    <!-- Mask for the Left Diamond -->
+    <!-- Mask for the Left Diamond (creates the gap under the Right Diamond) -->
     <mask id="maskLeft">
       <rect x="-500" y="-500" width="1000" height="1000" fill="white" />
       <path d="M -30 40 L -30 -120" fill="none" stroke="black" stroke-width="125" stroke-linecap="round" />
     </mask>
   </defs>
-  
-  <!-- Navy Background to ensure the silver/gold pops on BOTH light and dark browser tabs -->
-  <rect width="512" height="512" rx="112" fill="#040d1f" />
   
   <g transform="translate(256, 256) scale(1.1) rotate(45)">
     <!-- Right Diamond (GOLD) -->
