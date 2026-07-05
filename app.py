@@ -244,9 +244,13 @@ def send_otp_email(to_email, otp_code):
         # Load env manually
         env_vars = {}
         env_path = os.path.join(BASE_DIR, '.env')
+        debug_info = f"Path: {env_path}, Exists: {os.path.exists(env_path)}. "
+        
         if os.path.exists(env_path):
             with open(env_path, 'r', encoding='utf-8-sig') as f:
-                for line in f:
+                lines = f.readlines()
+                debug_info += f"Read {len(lines)} lines. "
+                for line in lines:
                     line = line.strip()
                     if line and not line.startswith('#') and '=' in line:
                         k, v = line.split('=', 1)
@@ -259,7 +263,8 @@ def send_otp_email(to_email, otp_code):
         
         if not sender or not password:
             print("Missing MAIL_USERNAME or MAIL_PASSWORD in .env")
-            return False, "Missing credentials in .env file"
+            parsed_keys = list(env_vars.keys())
+            return False, f"Missing credentials. {debug_info} Found keys: {parsed_keys}."
             
         msg = MIMEText(f"Your MYBBT Verification Code is: {otp_code}\n\nThis code will expire in 15 minutes.")
         msg['Subject'] = 'MYBBT Verification Code'
