@@ -1,22 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#F5E0A0" />
-      <stop offset="30%" stop-color="#D4AF37" />
-      <stop offset="70%" stop-color="#AA8015" />
-      <stop offset="100%" stop-color="#6A4E00" />
+    <!-- Extremely bright and premium metallic gold gradient -->
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF2B2" />
+      <stop offset="35%" stop-color="#E5B730" />
+      <stop offset="70%" stop-color="#B88A00" />
+      <stop offset="100%" stop-color="#664D00" />
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.6"/>
-    </filter>
+    
+    <!-- Mask for the Right Diamond (creates the gap under the Left Diamond) -->
+    <mask id="maskRight">
+      <rect x="-500" y="-500" width="1000" height="1000" fill="white" />
+      <!-- Cutout using the Right arm of Left Diamond -->
+      <path d="M 30 -40 L 30 120" fill="none" stroke="black" stroke-width="125" stroke-linecap="round" />
+    </mask>
+
+    <!-- Mask for the Left Diamond (creates the gap under the Right Diamond) -->
+    <mask id="maskLeft">
+      <rect x="-500" y="-500" width="1000" height="1000" fill="white" />
+      <!-- Cutout using the Left arm of Right Diamond -->
+      <path d="M -30 40 L -30 -120" fill="none" stroke="black" stroke-width="125" stroke-linecap="round" />
+    </mask>
   </defs>
   
-  <rect width="512" height="512" rx="112" fill="#040d1f" />
+  <!-- Transparent background so it blends perfectly into the browser tab like ChatGPT -->
   
-  <g transform="translate(256, 256) scale(1.4) rotate(45)" filter="url(#shadow)">
-    <path d="M 0 -80 L 60 -80 A 20 20 0 0 1 80 -60 L 80 0 A 20 20 0 0 1 60 20 L 0 20 A 20 20 0 0 1 -20 0 L -20 -60 A 20 20 0 0 1 0 -80 Z" fill="none" stroke="url(#goldGrad)" stroke-width="32" stroke-linejoin="round" />
-    <path d="M 0 80 L -60 80 A 20 20 0 0 1 -80 60 L -80 0 A 20 20 0 0 1 -60 -20 L 0 -20 A 20 20 0 0 1 20 0 L 20 60 A 20 20 0 0 1 0 80 Z" fill="none" stroke="url(#goldGrad)" stroke-width="32" stroke-linejoin="round" />
-    <path d="M 20 0 L 20 60 A 20 20 0 0 1 0 80" fill="none" stroke="url(#goldGrad)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" />
-    <path d="M -20 0 L -20 -60 A 20 20 0 0 1 0 -80" fill="none" stroke="url(#goldGrad)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" />
+  <g transform="translate(256, 256) rotate(45)">
+    <!-- Right Diamond -->
+    <rect x="-30" y="-180" width="210" height="210" rx="70" fill="none" stroke="url(#gold)" stroke-width="85" mask="url(#maskRight)" />
+    
+    <!-- Left Diamond -->
+    <rect x="-180" y="-30" width="210" height="210" rx="70" fill="none" stroke="url(#gold)" stroke-width="85" mask="url(#maskLeft)" />
   </g>
 </svg>
