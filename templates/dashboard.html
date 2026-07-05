@@ -478,7 +478,7 @@ async function requestOTP(email) {
     });
     const data = await res.json();
     if(data.success) {
-      const code = prompt(`OTP sent to ${email}!\n(Demo Mode - Your OTP is: ${data.mock_otp})\nEnter OTP to verify:`);
+      const code = prompt(`OTP sent to ${email}!\nEnter the 6-digit OTP to verify:`);
       if(code) {
         verifyOTP(email, code);
       }

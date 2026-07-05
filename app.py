@@ -14,6 +14,8 @@ import shutil
 import threading
 import traceback
 import sys
+import smtplib
+from email.mime.text import MIMEText
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash, session, send_from_directory, abort
 from werkzeug.utils import secure_filename
@@ -235,6 +237,44 @@ def admin_page():
     return render_template('admin.html')
 
 # ─────────────────────────────────────────
+# EMAIL HELPER
+# ─────────────────────────────────────────
+def send_otp_email(to_email, otp_code):
+    try:
+        # Load env manually
+        env_vars = {}
+        env_path = os.path.join(BASE_DIR, '.env')
+        if os.path.exists(env_path):
+            with open(env_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        k, v = line.split('=', 1)
+                        env_vars[k.strip()] = v.strip().strip('"\'')
+        
+        sender = env_vars.get('MAIL_USERNAME')
+        password = env_vars.get('MAIL_PASSWORD')
+        
+        if not sender or not password:
+            print("Missing MAIL_USERNAME or MAIL_PASSWORD in .env")
+            return False
+            
+        msg = MIMEText(f"Your MYBBT Verification Code is: {otp_code}\n\nThis code will expire in 15 minutes.")
+        msg['Subject'] = 'MYBBT Verification Code'
+        msg['From'] = f"MYBBT Support <{sender}>"
+        msg['To'] = to_email
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(sender, password)
+        server.send_message(msg)
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False
+
+# ─────────────────────────────────────────
 # AUTHENTICATION & ADMIN APIs
 # ─────────────────────────────────────────
 @app.route('/api/auth/register', methods=['POST'])
@@ -264,7 +304,10 @@ def api_register():
         c.execute('INSERT INTO otps (email, otp_code, expires_at) VALUES (?, ?, datetime("now", "+15 minutes"))', (email, otp_code))
         conn.commit()
         
-        return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'OTP sent to email', 'mock_otp': otp_code})
+        if send_otp_email(email, otp_code):
+            return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'OTP sent to email'})
+        else:
+            return jsonify({'success': False, 'error': 'Failed to send OTP email. Please try again later.'})
     except sqlite3.IntegrityError:
         return jsonify({'success': False, 'error': 'Email already registered'})
     finally:
@@ -281,7 +324,11 @@ def api_send_otp():
     conn.execute('INSERT INTO otps (email, otp_code, expires_at) VALUES (?, ?, datetime("now", "+15 minutes"))', (email, otp_code))
     conn.commit()
     conn.close()
-    return jsonify({'success': True, 'mock_otp': otp_code})
+    
+    if send_otp_email(email, otp_code):
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False, 'error': 'Failed to send OTP email'})
 
 @app.route('/api/auth/verify_otp', methods=['POST'])
 def api_verify_otp():
@@ -338,7 +385,11 @@ def api_login():
             conn.execute('INSERT INTO otps (email, otp_code, expires_at) VALUES (?, ?, datetime("now", "+15 minutes"))', (email, otp_code))
             conn.commit()
             conn.close()
-            return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'Account not verified. OTP sent to email.', 'mock_otp': otp_code})
+            
+            if send_otp_email(email, otp_code):
+                return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'Account not verified. OTP sent to email.'})
+            else:
+                return jsonify({'success': False, 'error': 'Failed to send OTP email. Please try again later.'})
             
         conn.close()
         session['user_id'] = user['id']
