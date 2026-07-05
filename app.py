@@ -245,7 +245,7 @@ def send_otp_email(to_email, otp_code):
         env_vars = {}
         env_path = os.path.join(BASE_DIR, '.env')
         if os.path.exists(env_path):
-            with open(env_path, 'r', encoding='utf-8') as f:
+            with open(env_path, 'r', encoding='utf-8-sig') as f:
                 for line in f:
                     line = line.strip()
                     if line and not line.startswith('#') and '=' in line:
@@ -254,6 +254,8 @@ def send_otp_email(to_email, otp_code):
         
         sender = env_vars.get('MAIL_USERNAME')
         password = env_vars.get('MAIL_PASSWORD')
+        if password:
+            password = password.replace(" ", "")
         
         if not sender or not password:
             print("Missing MAIL_USERNAME or MAIL_PASSWORD in .env")
