@@ -342,12 +342,10 @@ def profile_page():
         if 'profile_pic' in request.files:
             file = request.files['profile_pic']
             if file and file.filename != '':
-                filename = secure_filename(f"user_{session['user_id']}_{file.filename}")
-                pic_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'profiles')
-                os.makedirs(pic_dir, exist_ok=True)
-                filepath = os.path.join(pic_dir, filename)
-                file.save(filepath)
-                profile_pic_path = f"/static/uploads/profiles/{filename}"
+                file_data = file.read()
+                b64_encoded = base64.b64encode(file_data).decode('utf-8')
+                mime_type = file.content_type
+                profile_pic_path = f"data:{mime_type};base64,{b64_encoded}"
         
         conn.execute('''
             UPDATE users 
@@ -360,6 +358,9 @@ def profile_page():
 
     user = conn.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
     conn.close()
+    if not user:
+        session.clear()
+        return redirect(url_for('login_page'))
     return render_template('profile.html', user=dict(user))
 
 @app.route('/static/uploads/profiles/<filename>')
