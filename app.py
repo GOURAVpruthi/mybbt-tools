@@ -257,7 +257,7 @@ def send_otp_email(to_email, otp_code):
         
         if not sender or not password:
             print("Missing MAIL_USERNAME or MAIL_PASSWORD in .env")
-            return False
+            return False, "Missing credentials in .env file"
             
         msg = MIMEText(f"Your MYBBT Verification Code is: {otp_code}\n\nThis code will expire in 15 minutes.")
         msg['Subject'] = 'MYBBT Verification Code'
@@ -269,10 +269,10 @@ def send_otp_email(to_email, otp_code):
         server.login(sender, password)
         server.send_message(msg)
         server.quit()
-        return True
+        return True, None
     except Exception as e:
         print(f"Error sending email: {e}")
-        return False
+        return False, str(e)
 
 # ─────────────────────────────────────────
 # AUTHENTICATION & ADMIN APIs
@@ -304,10 +304,11 @@ def api_register():
         c.execute('INSERT INTO otps (email, otp_code, expires_at) VALUES (?, ?, datetime("now", "+15 minutes"))', (email, otp_code))
         conn.commit()
         
-        if send_otp_email(email, otp_code):
+        success, error_msg = send_otp_email(email, otp_code)
+        if success:
             return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'OTP sent to email'})
         else:
-            return jsonify({'success': False, 'error': 'Failed to send OTP email. Please try again later.'})
+            return jsonify({'success': False, 'error': f'Failed to send OTP email: {error_msg}'})
     except sqlite3.IntegrityError:
         return jsonify({'success': False, 'error': 'Email already registered'})
     finally:
@@ -325,10 +326,11 @@ def api_send_otp():
     conn.commit()
     conn.close()
     
-    if send_otp_email(email, otp_code):
+    success, error_msg = send_otp_email(email, otp_code)
+    if success:
         return jsonify({'success': True})
     else:
-        return jsonify({'success': False, 'error': 'Failed to send OTP email'})
+        return jsonify({'success': False, 'error': f'Failed to send OTP email: {error_msg}'})
 
 @app.route('/api/auth/verify_otp', methods=['POST'])
 def api_verify_otp():
@@ -386,10 +388,11 @@ def api_login():
             conn.commit()
             conn.close()
             
-            if send_otp_email(email, otp_code):
+            success, error_msg = send_otp_email(email, otp_code)
+            if success:
                 return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'Account not verified. OTP sent to email.'})
             else:
-                return jsonify({'success': False, 'error': 'Failed to send OTP email. Please try again later.'})
+                return jsonify({'success': False, 'error': f'Failed to send OTP email: {error_msg}'})
             
         conn.close()
         session['user_id'] = user['id']
