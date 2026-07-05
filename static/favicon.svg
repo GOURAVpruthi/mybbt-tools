@@ -12,18 +12,36 @@
   </defs>
   
   <!-- Navy Background -->
-  <rect width="512" height="512" rx="112" fill="#040d1f" />
+  <rect width="512" height="512" rx="80" fill="#040d1f" />
   
-  <!-- Interlocking Abstract Tech Symbol (Bottom-Center Style) -->
-  <g transform="translate(256, 256) rotate(45)" filter="url(#shadow)">
+  <!-- Decorative Dots -->
+  <circle cx="110" cy="170" r="10" fill="url(#goldGrad)" />
+  <circle cx="402" cy="170" r="10" fill="url(#goldGrad)" />
+  
+  <!-- The Symbol (Scaled and Moved Up) -->
+  <g transform="translate(256, 170) scale(0.7) rotate(45)" filter="url(#shadow)">
     <!-- Top-Right Diamond -->
     <path d="M 0 -80 L 60 -80 A 20 20 0 0 1 80 -60 L 80 0 A 20 20 0 0 1 60 20 L 0 20 A 20 20 0 0 1 -20 0 L -20 -60 A 20 20 0 0 1 0 -80 Z" fill="none" stroke="url(#goldGrad)" stroke-width="36" stroke-linejoin="round" />
-    
     <!-- Bottom-Left Diamond -->
     <path d="M 0 80 L -60 80 A 20 20 0 0 1 -80 60 L -80 0 A 20 20 0 0 1 -60 -20 L 0 -20 A 20 20 0 0 1 20 0 L 20 60 A 20 20 0 0 1 0 80 Z" fill="none" stroke="url(#goldGrad)" stroke-width="36" stroke-linejoin="round" />
-    
-    <!-- Overlay to create the interlock illusion (bringing one segment forward) -->
+    <!-- Overlays -->
     <path d="M 20 0 L 20 60 A 20 20 0 0 1 0 80" fill="none" stroke="url(#goldGrad)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" />
     <path d="M -20 0 L -20 -60 A 20 20 0 0 1 0 -80" fill="none" stroke="url(#goldGrad)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" />
   </g>
+  
+  <!-- MY BBT Text -->
+  <text x="256" y="340" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="76" text-anchor="middle" dominant-baseline="central" letter-spacing="4">
+    <tspan fill="#ffffff">MY </tspan>
+    <tspan fill="url(#goldGrad)">BBT</tspan>
+  </text>
+  
+  <!-- Subtitle 1 -->
+  <text x="256" y="415" font-family="'Inter', Arial, sans-serif" font-weight="600" font-size="18" fill="#a0aabf" text-anchor="middle" dominant-baseline="central" letter-spacing="5">
+    &#x2014; MY BUSINESS BLUETOOTH &#x2014;
+  </text>
+  
+  <!-- Subtitle 2 -->
+  <text x="256" y="455" font-family="'Inter', Arial, sans-serif" font-weight="500" font-size="15" fill="#D4AF37" text-anchor="middle" dominant-baseline="central" letter-spacing="3">
+    &#x2014; ONE PLATFORM. ALL SOLUTIONS. &#x2014;
+  </text>
 </svg>
