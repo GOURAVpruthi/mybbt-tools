@@ -211,7 +211,7 @@
   <div class="db-hero">
     <div class="db-hero-left">
       {% if user.profile_pic %}
-      <div class="db-avatar" style="background: url('/uploads/dps/{{ user.profile_pic }}') center/cover; box-shadow: 0 0 0 4px rgba(201,168,76,0.2);"></div>
+      <div class="db-avatar" style="background: url('{{ user.profile_pic }}') center/cover; box-shadow: 0 0 0 4px rgba(201,168,76,0.2);"></div>
       {% else %}
       <div class="db-avatar">{{ user.name[0].upper() }}</div>
       {% endif %}

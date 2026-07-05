@@ -196,9 +196,18 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
     <li><a href="#tools">Platform</a></li>
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="/advisory" class="advisory-link"><img src="/static/ya-logo.png" style="width:14px;border-radius:2px;"> YA Advisory</a></li>
-    {% if session.get('user_id') %}
+    {% if current_user %}
       <li><a href="/dashboard" class="nav-links">Dashboard</a></li>
-      <li><a href="/dashboard" class="nav-cta">My Profile</a></li>
+      <li>
+        <a href="/dashboard" class="nav-cta" style="display: flex; align-items: center; gap: 8px;">
+          {% if current_user.profile_pic %}
+            <img src="{{ current_user.profile_pic }}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid var(--navy);">
+          {% else %}
+            <i class="fas fa-user-circle"></i>
+          {% endif %}
+          {{ current_user.name.split(' ')[0] }}
+        </a>
+      </li>
     {% else %}
       <li><a href="/login" class="nav-links">Login</a></li>
       <li><a href="/login" class="nav-cta">Start Free Trial</a></li>
