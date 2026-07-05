@@ -7,6 +7,13 @@
       <stop offset="70%" stop-color="#B88A00" />
       <stop offset="100%" stop-color="#664D00" />
     </linearGradient>
+
+    <!-- Metallic Silver / White Gradient -->
+    <linearGradient id="silver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="50%" stop-color="#E0E5EC" />
+      <stop offset="100%" stop-color="#9BA6B5" />
+    </linearGradient>
     
     <!-- Mask for the Right Diamond (creates the gap under the Left Diamond) -->
     <mask id="maskRight">
@@ -23,13 +30,11 @@
     </mask>
   </defs>
   
-  <!-- Transparent background so it blends perfectly into the browser tab like ChatGPT -->
-  
   <g transform="translate(256, 256) rotate(45)">
-    <!-- Right Diamond -->
+    <!-- Right Diamond (GOLD) -->
     <rect x="-30" y="-180" width="210" height="210" rx="70" fill="none" stroke="url(#gold)" stroke-width="85" mask="url(#maskRight)" />
     
-    <!-- Left Diamond -->
-    <rect x="-180" y="-30" width="210" height="210" rx="70" fill="none" stroke="url(#gold)" stroke-width="85" mask="url(#maskLeft)" />
+    <!-- Left Diamond (SILVER/WHITE) -->
+    <rect x="-180" y="-30" width="210" height="210" rx="70" fill="none" stroke="url(#silver)" stroke-width="85" mask="url(#maskLeft)" />
   </g>
 </svg>
