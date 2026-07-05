@@ -48,6 +48,7 @@ class CursorWrapper:
             query = query.replace('?', '%s')
             query = query.replace('INTEGER PRIMARY KEY AUTOINCREMENT', 'SERIAL PRIMARY KEY')
             query = query.replace('datetime("now", "+15 minutes")', "NOW() + INTERVAL '15 minutes'")
+            query = query.replace('datetime("now")', "NOW()")
             self.cursor.execute(query, params)
         else:
             self.cursor.execute(query, params)
