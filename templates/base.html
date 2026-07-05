@@ -275,10 +275,19 @@ input, textarea, select { font-family: inherit; }
       </div>
     </a>
 
-    <!-- Back to main site -->
-    <a href="https://mybbt.co.in/" class="sidebar-home-link">
-      <i class="fas fa-globe"></i> mybbt.co.in — Main Site
+    {% if current_user %}
+    <a href="/profile" class="sidebar-user-profile" style="display: flex; align-items: center; gap: 12px; padding: 16px 18px; background: rgba(201,168,76,0.05); border-bottom: 1px solid var(--gold-border); text-decoration: none; transition: 0.2s;">
+      {% if current_user.profile_pic %}
+        <img src="{{ current_user.profile_pic }}" alt="Profile" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent);">
+      {% else %}
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--navy3); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; border: 2px solid var(--accent);">{{ current_user.name[0] | upper }}</div>
+      {% endif %}
+      <div style="display: flex; flex-direction: column;">
+        <span style="font-size: 14px; font-weight: 600; color: var(--white);">{{ current_user.name }}</span>
+        <span style="font-size: 11px; color: var(--accent);">View Profile</span>
+      </div>
     </a>
+    {% endif %}
 
     <nav class="sidebar-nav">
       <div class="nav-section-label">My Account</div>

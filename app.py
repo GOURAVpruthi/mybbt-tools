@@ -58,6 +58,21 @@ def init_db():
     
     try: c.execute('ALTER TABLE users ADD COLUMN is_verified INTEGER DEFAULT 0')
     except sqlite3.OperationalError: pass
+    
+    try: c.execute('ALTER TABLE users ADD COLUMN username TEXT')
+    except sqlite3.OperationalError: pass
+    
+    try: c.execute('ALTER TABLE users ADD COLUMN dob TEXT')
+    except sqlite3.OperationalError: pass
+    
+    try: c.execute('ALTER TABLE users ADD COLUMN address TEXT')
+    except sqlite3.OperationalError: pass
+    
+    try: c.execute('ALTER TABLE users ADD COLUMN bio TEXT')
+    except sqlite3.OperationalError: pass
+    
+    try: c.execute('ALTER TABLE users ADD COLUMN services_taken TEXT')
+    except sqlite3.OperationalError: pass
 
     # OTPs table for email verification
     c.execute('''
@@ -230,6 +245,59 @@ def dashboard_page():
         session.clear()
         return redirect(url_for('login_page'))
     return render_template('dashboard.html', user=dict(user))
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile_page():
+    conn = get_db()
+    
+    if request.method == 'POST':
+        # Handle profile info update
+        name = request.form.get('name')
+        username = request.form.get('username')
+        dob = request.form.get('dob')
+        address = request.form.get('address')
+        bio = request.form.get('bio')
+        
+        # Handle profile picture upload
+        profile_pic_path = request.form.get('current_pic', '')
+        if 'profile_pic' in request.files:
+            file = request.files['profile_pic']
+            if file and file.filename != '':
+                filename = secure_filename(f"user_{session['user_id']}_{file.filename}")
+                pic_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'profiles')
+                os.makedirs(pic_dir, exist_ok=True)
+                filepath = os.path.join(pic_dir, filename)
+                file.save(filepath)
+                profile_pic_path = f"/static/uploads/profiles/{filename}"
+        
+        conn.execute('''
+            UPDATE users 
+            SET name=?, username=?, dob=?, address=?, bio=?, profile_pic=?
+            WHERE id=?
+        ''', (name, username, dob, address, bio, profile_pic_path, session['user_id']))
+        conn.commit()
+        flash("Profile updated successfully!", "success")
+        return redirect(url_for('profile_page'))
+
+    user = conn.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
+    conn.close()
+    return render_template('profile.html', user=dict(user))
+
+@app.route('/static/uploads/profiles/<filename>')
+def serve_profile_pic(filename):
+    pic_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'profiles')
+    return send_from_directory(pic_dir, filename)
+
+@app.context_processor
+def inject_user():
+    if 'user_id' in session:
+        conn = get_db()
+        user = conn.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
+        conn.close()
+        if user:
+            return dict(current_user=dict(user))
+    return dict(current_user=None)
 
 @app.route('/admin')
 @admin_required
