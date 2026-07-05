@@ -15,22 +15,23 @@
       <stop offset="100%" stop-color="#9BA6B5" />
     </linearGradient>
     
-    <!-- Mask for the Right Diamond (creates the gap under the Left Diamond) -->
+    <!-- Mask for the Right Diamond -->
     <mask id="maskRight">
       <rect x="-500" y="-500" width="1000" height="1000" fill="white" />
-      <!-- Cutout using the Right arm of Left Diamond -->
       <path d="M 30 -40 L 30 120" fill="none" stroke="black" stroke-width="125" stroke-linecap="round" />
     </mask>
 
-    <!-- Mask for the Left Diamond (creates the gap under the Right Diamond) -->
+    <!-- Mask for the Left Diamond -->
     <mask id="maskLeft">
       <rect x="-500" y="-500" width="1000" height="1000" fill="white" />
-      <!-- Cutout using the Left arm of Right Diamond -->
       <path d="M -30 40 L -30 -120" fill="none" stroke="black" stroke-width="125" stroke-linecap="round" />
     </mask>
   </defs>
   
-  <g transform="translate(256, 256) rotate(45)">
+  <!-- Navy Background to ensure the silver/gold pops on BOTH light and dark browser tabs -->
+  <rect width="512" height="512" rx="112" fill="#040d1f" />
+  
+  <g transform="translate(256, 256) scale(1.1) rotate(45)">
     <!-- Right Diamond (GOLD) -->
     <rect x="-30" y="-180" width="210" height="210" rx="70" fill="none" stroke="url(#gold)" stroke-width="85" mask="url(#maskRight)" />
     
