@@ -25,7 +25,9 @@ import sqlite3
 import functools
 
 def get_db():
-    db_path = os.path.join(BASE_DIR, 'users.db')
+    # Use DATA_DIR for database so it survives cloud deployments
+    data_dir = os.environ.get('DATA_DIR', BASE_DIR)
+    db_path = os.path.join(data_dir, 'users.db')
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
@@ -73,6 +75,9 @@ def init_db():
     
     try: c.execute('ALTER TABLE users ADD COLUMN services_taken TEXT')
     except sqlite3.OperationalError: pass
+    
+    # Fix case-sensitivity for existing emails
+    c.execute('UPDATE users SET email = LOWER(email)')
 
     # OTPs table for email verification
     c.execute('''
@@ -100,8 +105,11 @@ CORS(app)
 
 # Configuration
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
-OUTPUT_FOLDER = os.path.join(BASE_DIR, 'outputs')
+# Support for persistent disks on cloud hosts (like Render)
+DATA_DIR = os.environ.get('DATA_DIR', BASE_DIR)
+
+UPLOAD_FOLDER = os.path.join(DATA_DIR, 'uploads')
+OUTPUT_FOLDER = os.path.join(DATA_DIR, 'outputs')
 MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100MB
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -368,7 +376,7 @@ def send_otp_email(to_email, otp_code):
 def api_register():
     data = request.json
     name = data.get('name', '').strip()
-    email = data.get('email', '').strip()
+    email = data.get('email', '').strip().lower()
     password = data.get('password', '')
 
     if not name or not email or not password:
@@ -404,7 +412,7 @@ def api_register():
 @app.route('/api/auth/send_otp', methods=['POST'])
 def api_send_otp():
     data = request.json
-    email = data.get('email', '').strip()
+    email = data.get('email', '').strip().lower()
     if not email:
         return jsonify({'success': False, 'error': 'Email required'})
     conn = get_db()
@@ -422,7 +430,7 @@ def api_send_otp():
 @app.route('/api/auth/verify_otp', methods=['POST'])
 def api_verify_otp():
     data = request.json
-    email = data.get('email', '').strip()
+    email = data.get('email', '').strip().lower()
     otp = data.get('otp', '').strip()
 
     conn = get_db()
@@ -453,7 +461,7 @@ def api_verify_otp():
 @app.route('/api/auth/login', methods=['POST'])
 def api_login():
     data = request.json
-    email = data.get('email', '').strip()
+    email = data.get('email', '').strip().lower()
     password = data.get('password', '')
 
     if not email or not password:
