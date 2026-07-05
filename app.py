@@ -256,8 +256,8 @@ def send_otp_email(to_email, otp_code):
                         k, v = line.split('=', 1)
                         env_vars[k.strip()] = v.strip().strip('"\'')
         
-        sender = env_vars.get('MAIL_USERNAME')
-        password = env_vars.get('MAIL_PASSWORD')
+        sender = env_vars.get('MAIL_USERNAME') or os.environ.get('MAIL_USERNAME')
+        password = env_vars.get('MAIL_PASSWORD') or os.environ.get('MAIL_PASSWORD')
         if password:
             password = password.replace(" ", "")
         
