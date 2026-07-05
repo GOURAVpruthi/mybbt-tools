@@ -241,41 +241,54 @@ def admin_page():
 # ─────────────────────────────────────────
 def send_otp_email(to_email, otp_code):
     try:
+        import requests
+        
         # Load env manually
         env_vars = {}
         env_path = os.path.join(BASE_DIR, '.env')
-        debug_info = f"Path: {env_path}, Exists: {os.path.exists(env_path)}. "
-        
         if os.path.exists(env_path):
             with open(env_path, 'r', encoding='utf-8-sig') as f:
-                lines = f.readlines()
-                debug_info += f"Read {len(lines)} lines. "
-                for line in lines:
+                for line in f.readlines():
                     line = line.strip()
                     if line and not line.startswith('#') and '=' in line:
                         k, v = line.split('=', 1)
                         env_vars[k.strip()] = v.strip().strip('"\'')
         
-        sender = env_vars.get('MAIL_USERNAME') or os.environ.get('MAIL_USERNAME')
-        password = env_vars.get('MAIL_PASSWORD') or os.environ.get('MAIL_PASSWORD')
-        if password:
-            password = password.replace(" ", "")
+        brevo_api_key = env_vars.get('BREVO_API_KEY') or os.environ.get('BREVO_API_KEY')
+        sender = env_vars.get('MAIL_USERNAME') or os.environ.get('MAIL_USERNAME') or "youradvisor.ca@gmail.com"
         
-        if not sender or not password:
-            print("Missing MAIL_USERNAME or MAIL_PASSWORD in .env")
-            parsed_keys = list(env_vars.keys())
-            return False, f"Missing credentials. {debug_info} Found keys: {parsed_keys}."
+        if not brevo_api_key:
+            return False, "Missing BREVO_API_KEY in environment or .env file"
             
-        msg = MIMEText(f"Your MYBBT Verification Code is: {otp_code}\n\nThis code will expire in 15 minutes.")
-        msg['Subject'] = 'MYBBT Verification Code'
-        msg['From'] = f"MYBBT Support <{sender}>"
-        msg['To'] = to_email
-
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=10)
-        server.login(sender, password)
-        server.send_message(msg)
-        server.quit()
-        return True, None
+        url = "https://api.brevo.com/v3/smtp/email"
+        
+        headers = {
+            "accept": "application/json",
+            "api-key": brevo_api_key,
+            "content-type": "application/json"
+        }
+        
+        payload = {
+            "sender": {
+                "name": "MYBBT Support",
+                "email": sender
+            },
+            "to": [
+                {
+                    "email": to_email
+                }
+            ],
+            "subject": "MYBBT Verification Code",
+            "htmlContent": f"<html><body><p>Your MYBBT Verification Code is: <strong>{otp_code}</strong></p><p>This code will expire in 15 minutes.</p></body></html>"
+        }
+        
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
+        
+        if response.status_code in (200, 201, 202):
+            return True, None
+        else:
+            return False, f"Brevo API Error: {response.status_code} - {response.text}"
+            
     except Exception as e:
         print(f"Error sending email: {e}")
         return False, str(e)
