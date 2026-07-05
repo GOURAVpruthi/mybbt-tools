@@ -54,11 +54,23 @@ class CursorWrapper:
             self.cursor.execute(query, params)
         return self
 
+    def _convert_row(self, row):
+        if not row: return row
+        if not self.is_postgres: return row
+        import datetime
+        d = dict(row)
+        for k, v in d.items():
+            if isinstance(v, datetime.datetime):
+                d[k] = str(v)
+        return d
+
     def fetchone(self):
-        return self.cursor.fetchone()
+        return self._convert_row(self.cursor.fetchone())
 
     def fetchall(self):
-        return self.cursor.fetchall()
+        rows = self.cursor.fetchall()
+        if not rows: return rows
+        return [self._convert_row(r) for r in rows]
 
 class DBWrapper:
     def __init__(self, is_postgres, conn):
