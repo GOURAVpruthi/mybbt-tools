@@ -271,8 +271,7 @@ def send_otp_email(to_email, otp_code):
         msg['From'] = f"MYBBT Support <{sender}>"
         msg['To'] = to_email
 
-        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=10)
-        server.starttls()
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=10)
         server.login(sender, password)
         server.send_message(msg)
         server.quit()
