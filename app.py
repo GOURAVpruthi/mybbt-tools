@@ -23,14 +23,74 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 import sqlite3
 import functools
+import re
+
+try:
+    import psycopg2
+    import psycopg2.extras
+    import psycopg2.errors
+    POSTGRES_OK = True
+    DBIntegrityError = (sqlite3.IntegrityError, psycopg2.errors.UniqueViolation)
+    DBOperationalError = (sqlite3.OperationalError, psycopg2.errors.DuplicateColumn, psycopg2.errors.UndefinedColumn, psycopg2.errors.InFailedSqlTransaction)
+except ImportError:
+    POSTGRES_OK = False
+    DBIntegrityError = (sqlite3.IntegrityError,)
+    DBOperationalError = (sqlite3.OperationalError,)
+
+class CursorWrapper:
+    def __init__(self, is_postgres, cursor, conn=None):
+        self.is_postgres = is_postgres
+        self.cursor = cursor
+        self.conn = conn
+        
+    def execute(self, query, params=()):
+        if self.is_postgres:
+            query = query.replace('?', '%s')
+            query = query.replace('INTEGER PRIMARY KEY AUTOINCREMENT', 'SERIAL PRIMARY KEY')
+            query = query.replace('datetime("now", "+15 minutes")', "NOW() + INTERVAL '15 minutes'")
+            self.cursor.execute(query, params)
+        else:
+            self.cursor.execute(query, params)
+        return self
+
+    def fetchone(self):
+        return self.cursor.fetchone()
+
+    def fetchall(self):
+        return self.cursor.fetchall()
+
+class DBWrapper:
+    def __init__(self, is_postgres, conn):
+        self.is_postgres = is_postgres
+        self.conn = conn
+
+    def cursor(self):
+        if self.is_postgres:
+            return CursorWrapper(self.is_postgres, self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor), self.conn)
+        else:
+            return CursorWrapper(self.is_postgres, self.conn.cursor(), self.conn)
+
+    def execute(self, query, params=()):
+        c = self.cursor()
+        return c.execute(query, params)
+
+    def commit(self):
+        self.conn.commit()
+
+    def close(self):
+        self.conn.close()
 
 def get_db():
-    # Use DATA_DIR for database so it survives cloud deployments
-    data_dir = os.environ.get('DATA_DIR', BASE_DIR)
-    db_path = os.path.join(data_dir, 'users.db')
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    return conn
+    db_url = os.environ.get('DATABASE_URL')
+    if db_url and POSTGRES_OK:
+        conn = psycopg2.connect(db_url)
+        return DBWrapper(True, conn)
+    else:
+        data_dir = os.environ.get('DATA_DIR', BASE_DIR)
+        db_path = os.path.join(data_dir, 'users.db')
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        return DBWrapper(False, conn)
 
 def init_db():
     conn = get_db()
@@ -50,31 +110,40 @@ def init_db():
     
     # Add new columns if they don't exist
     try: c.execute('ALTER TABLE users ADD COLUMN profile_pic TEXT')
-    except sqlite3.OperationalError: pass
+    except DBOperationalError:
+        if c.is_postgres: c.conn.rollback()
     
     try: c.execute('ALTER TABLE users ADD COLUMN mobile TEXT')
-    except sqlite3.OperationalError: pass
+    except DBOperationalError:
+        if c.is_postgres: c.conn.rollback()
     
     try: c.execute('ALTER TABLE users ADD COLUMN join_community INTEGER DEFAULT 0')
-    except sqlite3.OperationalError: pass
+    except DBOperationalError:
+        if c.is_postgres: c.conn.rollback()
     
     try: c.execute('ALTER TABLE users ADD COLUMN is_verified INTEGER DEFAULT 0')
-    except sqlite3.OperationalError: pass
+    except DBOperationalError:
+        if c.is_postgres: c.conn.rollback()
     
     try: c.execute('ALTER TABLE users ADD COLUMN username TEXT')
-    except sqlite3.OperationalError: pass
+    except DBOperationalError:
+        if c.is_postgres: c.conn.rollback()
     
     try: c.execute('ALTER TABLE users ADD COLUMN dob TEXT')
-    except sqlite3.OperationalError: pass
+    except DBOperationalError:
+        if c.is_postgres: c.conn.rollback()
     
     try: c.execute('ALTER TABLE users ADD COLUMN address TEXT')
-    except sqlite3.OperationalError: pass
+    except DBOperationalError:
+        if c.is_postgres: c.conn.rollback()
     
     try: c.execute('ALTER TABLE users ADD COLUMN bio TEXT')
-    except sqlite3.OperationalError: pass
+    except DBOperationalError:
+        if c.is_postgres: c.conn.rollback()
     
     try: c.execute('ALTER TABLE users ADD COLUMN services_taken TEXT')
-    except sqlite3.OperationalError: pass
+    except DBOperationalError:
+        if c.is_postgres: c.conn.rollback()
     
     # Fix case-sensitivity for existing emails
     c.execute('UPDATE users SET email = LOWER(email)')
@@ -404,7 +473,8 @@ def api_register():
             return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'OTP sent to email'})
         else:
             return jsonify({'success': False, 'error': f'Failed to send OTP email: {error_msg}'})
-    except sqlite3.IntegrityError:
+    except DBIntegrityError:
+        if conn.is_postgres: conn.conn.rollback()
         return jsonify({'success': False, 'error': 'Email already registered'})
     finally:
         conn.close()
@@ -518,14 +588,14 @@ def api_update_profile():
             ext = os.path.splitext(secure_filename(file.filename))[1]
             filename = f"dp_{session['user_id']}_{int(time.time())}{ext}"
             
-            # Save file
-            dp_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'dps')
-            os.makedirs(dp_dir, exist_ok=True)
-            filepath = os.path.join(dp_dir, filename)
-            file.save(filepath)
+            # Save as Base64 to bypass ephemeral storage issues
+            file_data = file.read()
+            b64_encoded = base64.b64encode(file_data).decode('utf-8')
+            mime_type = file.content_type
+            data_uri = f"data:{mime_type};base64,{b64_encoded}"
             
-            # Update DB with filename
-            c.execute('UPDATE users SET profile_pic = ? WHERE id = ?', (filename, session['user_id']))
+            # Update DB with base64 string
+            c.execute('UPDATE users SET profile_pic = ? WHERE id = ?', (data_uri, session['user_id']))
 
     c.execute('UPDATE users SET mobile = ?, join_community = ? WHERE id = ?', (mobile, join_community, session['user_id']))
     conn.commit()

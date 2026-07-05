@@ -33,4 +33,4 @@ requests==2.34.2
 cryptography==49.0.0
 lxml==6.1.1
 qrcode==8.1
-
+psycopg2-binary==2.9.10
