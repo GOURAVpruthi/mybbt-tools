@@ -235,21 +235,44 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
     <div class="hero-visual">
       <div class="orb orb1"></div>
       <div class="orb orb2"></div>
-      <div class="float-tag t1">✨ 19-Rule Match</div>
-      <div class="float-tag t2">📊 Excel Ready</div>
       <div class="dashboard-3d" style="background: none; padding: 0; box-shadow: none; border: none; min-height: auto;">
         <div style="position: relative;">
-          <img src="/static/hero_banner.png" alt="MYBBT Professional" style="width: 100%; max-width: 420px; border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+          <!-- Main Hero Image (Dark Theme) -->
+          <img src="/static/hero_banner_dark.png" alt="MYBBT Professional" style="width: 100%; max-width: 460px; border-radius: 20px;">
           
-          <div style="position: absolute; bottom: 40px; left: -50px; background: var(--navy2); padding: 16px; border-radius: 12px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 12px; animation: floatTag 6s infinite ease-in-out;">
-            <div style="width: 40px; height: 40px; background: rgba(16,185,129,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 18px;">
+          <!-- Floating Card 1: GST Reco (Bottom Left) -->
+          <div style="position: absolute; bottom: 30px; left: -40px; background: rgba(7, 19, 41, 0.85); backdrop-filter: blur(12px); padding: 14px 18px; border-radius: 12px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 12px; animation: float3d 5s infinite ease-in-out;">
+            <div style="width: 36px; height: 36px; background: rgba(16,185,129,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 16px;">
               <i class="fas fa-check"></i>
             </div>
             <div>
-              <div style="font-size: 12px; color: var(--muted); font-weight: 500;">GST 2B vs Purchase</div>
-              <div style="font-size: 15px; font-weight: 700; color: var(--white);">100% Reconciled</div>
+              <div style="font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase;">GST 2B vs Purchase</div>
+              <div style="font-size: 14px; font-weight: 700; color: var(--white);">100% Reconciled</div>
             </div>
           </div>
+
+          <!-- Floating Card 2: PDF OCR (Top Left) -->
+          <div style="position: absolute; top: 60px; left: -20px; background: rgba(7, 19, 41, 0.85); backdrop-filter: blur(12px); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; animation: floatTag 7s infinite ease-in-out reverse;">
+            <div style="width: 32px; height: 32px; background: rgba(201,168,76,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 14px;">
+              <i class="fas fa-file-invoice"></i>
+            </div>
+            <div>
+              <div style="font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase;">PDF Extraction</div>
+              <div style="font-size: 13px; font-weight: 700; color: var(--white);">Data Extracted</div>
+            </div>
+          </div>
+
+          <!-- Floating Card 3: Bulk Tools (Top Right) -->
+          <div style="position: absolute; top: 180px; right: -30px; background: rgba(7, 19, 41, 0.85); backdrop-filter: blur(12px); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; animation: floatTag 6s infinite ease-in-out;">
+            <div style="width: 32px; height: 32px; background: rgba(59,130,246,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #3b82f6; font-size: 14px;">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <div>
+              <div style="font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase;">Bulk Processing</div>
+              <div style="font-size: 13px; font-weight: 700; color: var(--white);">Live Engine</div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
