@@ -161,8 +161,8 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
 @keyframes spinLogo{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .anim{opacity:0;transform:translateY(30px);transition:opacity .6s,transform .6s}
 .anim.visible{opacity:1;transform:translateY(0)}
-.beta-banner{background:linear-gradient(90deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border-bottom:1px solid var(--glass-border);padding:12px 6%;text-align:center;font-size:13px;color:var(--white);position:relative;z-index:999;font-weight:500}
-.beta-banner span{color:var(--accent);font-weight:700}
+.logo img{transition:transform 0.5s ease-in-out}
+.logo:hover img{transform:rotate(360deg)}
 @media(max-width:900px){.hero-grid{grid-template-columns:1fr}.features-grid,.tools-grid{grid-template-columns:1fr 1fr}.pricing-grid{grid-template-columns:1fr}.pricing-card.popular{transform:scale(1)}.pricing-card.popular:hover{transform:translateY(-6px)}.footer-grid{grid-template-columns:1fr 1fr}.hero-visual{display:none}nav.open .nav-links{display:flex;flex-direction:column;position:fixed;inset:0;background:var(--navy2);align-items:center;justify-content:center;gap:30px;z-index:999}.hamburger{display:flex}.nav-links{display:none}}
 @media(max-width:600px){.features-grid,.tools-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr}}
 </style>
@@ -179,11 +179,6 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
 <canvas id="bg-canvas"></canvas>
-
-<div class="beta-banner">
-  <img src="/static/favicon.svg?v=8" alt="Logo" style="width:16px; height:16px; vertical-align:text-bottom; margin-right:4px;">
-  <span>MYBBT is in Early Beta.</span> GST Reco &amp; PDF Tools are live! AI features launching soon.
-</div>
 
 <!-- NAVBAR -->
 <nav id="navbar">
