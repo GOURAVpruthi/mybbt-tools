@@ -236,17 +236,22 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
     <div class="hero-visual">
       <div class="orb orb1"></div>
       <div class="orb orb2"></div>
-      <div class="dashboard-3d" style="background: none; padding: 0; box-shadow: none; border: none; min-height: auto;">
-        <div style="position: relative;">
-          <!-- Main Hero Image (Dark Theme) -->
-          <img src="/static/hero_girl_phone.png" alt="MYBBT Professional" style="width: 100%; max-width: 420px; border-radius: 20px;">
-          
-          <!-- Large Dynamic UI Card (ClearTax Style) -->
-          <div style="position: absolute; top: 15%; left: -80px; background: rgba(7, 19, 41, 0.85); backdrop-filter: blur(20px); border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: 0 20px 40px rgba(0,0,0,0.6); width: 260px; height: 280px; overflow: hidden; animation: float3d 8s infinite ease-in-out;">
+      <div class="dashboard-3d" style="background: none; padding: 0; box-shadow: none; border: none; min-height: 480px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; position: relative;">
+        
+        <!-- The Spinning Logo (UFO) -->
+        <div style="position: relative; z-index: 10; animation: float3d 6s infinite ease-in-out;">
+          <img src="/static/favicon.svg" alt="MYBBT Logo" style="width: 100px; height: 100px; animation: spinLogo 15s linear infinite; filter: drop-shadow(0 0 30px rgba(201, 168, 76, 0.8));">
+        </div>
+
+        <!-- The Light Beam -->
+        <div style="position: absolute; top: 70px; left: 50%; transform: translateX(-50%); width: 340px; height: 420px; background: linear-gradient(to bottom, rgba(201,168,76,0.3) 0%, rgba(201,168,76,0.05) 60%, transparent 100%); clip-path: polygon(42% 0, 58% 0, 100% 100%, 0% 100%); animation: pulse 4s infinite ease-in-out; z-index: 1;"></div>
+
+        <!-- The Changing UI Cards (inside the beam) -->
+        <div style="position: absolute; top: 130px; left: 50%; transform: translateX(-50%); width: 280px; height: 280px; z-index: 5;">
             
             <!-- Slide 1 -->
-            <div style="position: absolute; inset: 0; padding: 24px; animation: slideFader 12s infinite; animation-delay: 0s;">
-              <div style="font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 20px; line-height: 1.4;">Auto-reconciling your data with 100% accuracy</div>
+            <div style="position: absolute; inset: 0; padding: 24px; background: rgba(7, 19, 41, 0.95); backdrop-filter: blur(12px); border-radius: 16px; border: 1px solid rgba(201,168,76,0.4); box-shadow: 0 20px 50px rgba(201,168,76,0.15); animation: slideFader 12s infinite; animation-delay: 0s;">
+              <div style="font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 20px; line-height: 1.4; text-align: center;">Auto-reconciling your data</div>
               <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <span style="font-size: 11px; color: var(--muted);">Purchase Register</span>
@@ -261,14 +266,11 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
                 </div>
                 <div style="font-size: 14px; color: #ef4444; font-weight: 700; margin-top: 4px;">Missing ₹ 12,400</div>
               </div>
-              <div style="margin-top: 20px; font-size: 12px; font-weight: 600; color: #10b981; text-align: center;">
-                MYBBT saves you <br><span style="font-size: 16px;">14 hours/month</span>
-              </div>
             </div>
 
             <!-- Slide 2 -->
-            <div style="position: absolute; inset: 0; padding: 24px; animation: slideFader 12s infinite; animation-delay: 4s;">
-              <div style="font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 20px; line-height: 1.4;">Extracting data from your PDF invoices instantly</div>
+            <div style="position: absolute; inset: 0; padding: 24px; background: rgba(7, 19, 41, 0.95); backdrop-filter: blur(12px); border-radius: 16px; border: 1px solid rgba(201,168,76,0.4); box-shadow: 0 20px 50px rgba(201,168,76,0.15); animation: slideFader 12s infinite; animation-delay: 4s;">
+              <div style="font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 20px; line-height: 1.4; text-align: center;">Extracting data instantly</div>
               <div style="display: flex; flex-direction: column; gap: 12px;">
                 <div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid rgba(201,168,76,0.2);">
                   <i class="fas fa-file-pdf" style="color: var(--accent); font-size: 20px;"></i>
@@ -288,22 +290,19 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
                   </div>
                 </div>
               </div>
-              <div style="margin-top: 20px; font-size: 12px; font-weight: 600; color: var(--accent); text-align: center;">
-                AI precision <br><span style="font-size: 16px;">Zero manual entry</span>
-              </div>
             </div>
 
             <!-- Slide 3 -->
-            <div style="position: absolute; inset: 0; padding: 24px; animation: slideFader 12s infinite; animation-delay: 8s;">
-              <div style="font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 20px; line-height: 1.4;">Bulk process hundreds of files securely</div>
-              <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="position: absolute; inset: 0; padding: 24px; background: rgba(7, 19, 41, 0.95); backdrop-filter: blur(12px); border-radius: 16px; border: 1px solid rgba(201,168,76,0.4); box-shadow: 0 20px 50px rgba(201,168,76,0.15); animation: slideFader 12s infinite; animation-delay: 8s;">
+              <div style="font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 20px; line-height: 1.4; text-align: center;">Bulk process securely</div>
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 30px;">
                 <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;"><div style="height: 100%; width: 100%; background: #3b82f6;"></div></div>
-                <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-bottom: 20px;">
                   <span>Uploading 450 files</span>
                   <span>100%</span>
                 </div>
                 
-                <div style="display: flex; align-items: center; gap: 12px; background: rgba(59,130,246,0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(59,130,246,0.3);">
+                <div style="display: flex; align-items: center; gap: 12px; background: rgba(59,130,246,0.1); padding: 16px; border-radius: 8px; border: 1px solid rgba(59,130,246,0.3);">
                   <i class="fas fa-server" style="color: #3b82f6; font-size: 24px;"></i>
                   <div>
                     <div style="font-size: 12px; font-weight: 600; color: var(--white);">Cloud Engine</div>
@@ -311,11 +310,7 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
                   </div>
                 </div>
               </div>
-              <div style="margin-top: 24px; font-size: 12px; font-weight: 600; color: #3b82f6; text-align: center;">
-                Enterprise speed <br><span style="font-size: 16px;">Lightning fast</span>
-              </div>
             </div>
-          </div>
         </div>
       </div>
     </div>
