@@ -3,13 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MYBBT – Professional Tools. Zero Friction.</title>
-<meta name="description" content="MYBBT - Professional Tools & YA Advisory. GST Reconciliation, PDF Tools, and Business Solutions.">
+<title>MYBBT – Where Business Connects.</title>
+<meta name="description" content="MYBBT - Where Business Connects. GST Reconciliation, PDF Tools, and Business Solutions.">
 <meta name="keywords" content="MYBBT, YA Advisory, GST Reconciliation, PDF OCR, Professional Business Tools">
 <meta property="og:title" content="MYBBT - Professional Tools">
 <meta property="og:description" content="Empower your workflow with MYBBT. Trusted by top GST and PDF professionals.">
-<meta property="og:image" content="/static/logo.png?v=2">
-<link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v=8">
+<meta property="og:image" content="/static/logo.png">
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="icon" type="image/png" href="/static/logo.png">
+<link rel="apple-touch-icon" href="/static/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -156,6 +158,7 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
 @keyframes floatTag{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes load{0%{width:0}100%{width:100%}}
+@keyframes spinLogo{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .anim{opacity:0;transform:translateY(30px);transition:opacity .6s,transform .6s}
 .anim.visible{opacity:1;transform:translateY(0)}
 .beta-banner{background:linear-gradient(90deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border-bottom:1px solid var(--glass-border);padding:12px 6%;text-align:center;font-size:13px;color:var(--white);position:relative;z-index:999;font-weight:500}
@@ -167,10 +170,10 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
 <body>
 <div id="loader">
   <div class="loader-logo" style="display: flex; align-items: center; justify-content: center; gap: 14px;">
-    <img src="/static/favicon.svg?v=8" alt="MYBBT" style="width: 48px; height: 48px;">
+    <img src="/static/favicon.svg" alt="MYBBT" style="width: 48px; height: 48px; animation: spinLogo 2s linear infinite;">
     <div>MY<span>BBT</span></div>
   </div>
-  <div class="loader-tag">Professional Tools. Zero Friction.</div>
+  <div class="loader-tag">Where Business Connects.</div>
   <div class="loader-bar"><div class="loader-fill"></div></div>
 </div>
 <div class="cursor" id="cursor"></div>
@@ -185,7 +188,7 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
 <!-- NAVBAR -->
 <nav id="navbar">
   <a href="/" class="logo">
-    <img src="/static/favicon.svg?v=8" alt="MYBBT" style="width: 42px; height: 42px; flex-shrink: 0;">
+    <img src="/static/favicon.svg" alt="MYBBT" style="width: 42px; height: 42px; flex-shrink: 0;">
     <div>
       <div class="logo-text">MY<span>BBT</span></div>
       <div class="logo-sub">Business Bluetooth</div>
@@ -221,7 +224,7 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
   <div class="hero-grid">
     <div>
       <div class="hero-badge"><span></span>Built for Tax &amp; Finance Professionals</div>
-      <h1 class="hero-title">Professional Tools.<br><span class="gold">Zero Friction.</span></h1>
+      <h1 class="hero-title">Where Business <br><span class="gold">Connects.</span></h1>
       <p class="hero-sub">GST reconciliation, PDF workflows, and bulk tools.</p>
       <p class="hero-desc">Everything your tax practice needs, connected in one intelligent platform. Automate hours of manual work with absolute precision.</p>
       <div class="btn-row">
