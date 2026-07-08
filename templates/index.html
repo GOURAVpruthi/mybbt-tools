@@ -683,8 +683,8 @@ async function updateMarketData() {
   let html = '';
   for(let t of userTickers) {
     try {
-      const url = \`https://query1.finance.yahoo.com/v8/finance/chart/\${t.symbol}?range=1d&interval=1d\`;
-      const proxyUrl = \`https://api.allorigins.win/get?url=\${encodeURIComponent(url)}\`;
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${t.symbol}?range=1d&interval=1d`;
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
       const res = await fetch(proxyUrl);
       const data = await res.json();
       const parsed = JSON.parse(data.contents);
@@ -698,18 +698,18 @@ async function updateMarketData() {
       const color = isUp ? '#10b981' : '#ef4444';
       const icon = isUp ? 'fa-caret-up' : 'fa-caret-down';
       
-      html += \`
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; background: rgba(255,255,255,0.03); padding: 8px 10px; border-radius: 4px; border-left: 3px solid \${color};">
+      html += `
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; background: rgba(255,255,255,0.03); padding: 8px 10px; border-radius: 4px; border-left: 3px solid ${color};">
           <div>
-            <div style="color: var(--white); font-weight: 600;">\${t.name}</div>
-            <div style="font-size: 10px; color: var(--muted);">\${t.type}</div>
+            <div style="color: var(--white); font-weight: 600;">${t.name}</div>
+            <div style="font-size: 10px; color: var(--muted);">${t.type}</div>
           </div>
           <div style="text-align: right;">
-            <div style="color: var(--white); font-weight: 700;">\${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</div>
-            <div style="font-size: 10px; color: \${color};"><i class="fas \${icon}"></i> \${diff>0?'+':''}\${diff.toFixed(2)} (\${Math.abs(pct).toFixed(2)}%)</div>
+            <div style="color: var(--white); font-weight: 700;">${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</div>
+            <div style="font-size: 10px; color: ${color};"><i class="fas ${icon}"></i> ${diff>0?'+':''}${diff.toFixed(2)} (${Math.abs(pct).toFixed(2)}%)</div>
           </div>
         </div>
-      \`;
+      `;
     } catch(e) {
       // Fallback if API blocked
       const randBase = t.symbol.includes('NSEI') ? 24315.20 : t.symbol.includes('BSESN') ? 79924.50 : 18352.76;
@@ -719,18 +719,18 @@ async function updateMarketData() {
       const curPrice = randBase + diff;
       const pct = (diff / randBase) * 100;
       
-      html += \`
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; background: rgba(255,255,255,0.03); padding: 8px 10px; border-radius: 4px; border-left: 3px solid \${color};">
+      html += `
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; background: rgba(255,255,255,0.03); padding: 8px 10px; border-radius: 4px; border-left: 3px solid ${color};">
           <div>
-            <div style="color: var(--white); font-weight: 600;">\${t.name}</div>
-            <div style="font-size: 10px; color: var(--muted);">\${t.type} (Live Approx)</div>
+            <div style="color: var(--white); font-weight: 600;">${t.name}</div>
+            <div style="font-size: 10px; color: var(--muted);">${t.type} (Live Approx)</div>
           </div>
           <div style="text-align: right;">
-            <div style="color: var(--white); font-weight: 700;">\${curPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</div>
-            <div style="font-size: 10px; color: \${color};"><i class="fas \${isUp?'fa-caret-up':'fa-caret-down'}"></i> \${diff>0?'+':''}\${diff.toFixed(2)} (\${Math.abs(pct).toFixed(2)}%)</div>
+            <div style="color: var(--white); font-weight: 700;">${curPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</div>
+            <div style="font-size: 10px; color: ${color};"><i class="fas ${isUp?'fa-caret-up':'fa-caret-down'}"></i> ${diff>0?'+':''}${diff.toFixed(2)} (${Math.abs(pct).toFixed(2)}%)</div>
           </div>
         </div>
-      \`;
+      `;
     }
   }
   container.innerHTML = html;
