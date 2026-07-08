@@ -159,7 +159,7 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes load{0%{width:0}100%{width:100%}}
 @keyframes spinLogo{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes scrollUpdates{0%,15%{transform:translateY(0)}25%,48%{transform:translateY(-30px)}58%,81%{transform:translateY(-60px)}91%,100%{transform:translateY(-90px)}}
+@keyframes scrollUpdates{0%,15%{transform:translateY(0)}25%,48%{transform:translateY(-24px)}58%,81%{transform:translateY(-48px)}91%,100%{transform:translateY(-72px)}}
 @keyframes slideFader{0%,25%{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}33%,95%{opacity:0;transform:translateY(10px) scale(0.98);pointer-events:none}100%{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}}
 .anim{opacity:0;transform:translateY(30px);transition:opacity .6s,transform .6s}
 .anim.visible{opacity:1;transform:translateY(0)}
@@ -221,37 +221,72 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
   <div class="hero-grid">
     <div>
       <div class="hero-badge"><span></span>Designed for Modern CAs & Tax Pros</div>
-      <h1 class="hero-title" style="font-size: 2.2rem; line-height: 1.2; margin-bottom: 24px; text-transform: capitalize; letter-spacing: -0.5px;">"Connecting Business to <span class="gold">Possibilities.</span>"</h1>
+      <h1 class="hero-title" style="font-size: 1.8rem; line-height: 1.2; margin-bottom: 24px; text-transform: capitalize; letter-spacing: -0.5px; white-space: nowrap;">"Connecting Business to <span class="gold">Possibilities.</span>"</h1>
       
-      <!-- Upcoming Due Dates -->
-      <div style="background: rgba(7, 19, 41, 0.6); border: 1px solid var(--glass-border); border-radius: 12px; padding: 16px; margin: 0 0 24px 0; max-width: 480px; box-shadow: inset 0 0 20px rgba(0,0,0,0.2);">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
-          <div style="font-size: 13px; font-weight: 600; color: var(--gold-light); display: flex; align-items: center; gap: 8px;">
-            <i class="far fa-calendar-alt" style="color: #f59e0b;"></i> Upcoming Due Dates
+      <div style="display: flex; gap: 16px; margin: 0 0 24px 0; max-width: 580px; flex-wrap: wrap;">
+        <!-- GST Hub -->
+        <div style="flex: 1; min-width: 260px; background: rgba(7, 19, 41, 0.6); border: 1px solid var(--glass-border); border-radius: 12px; padding: 16px; box-shadow: inset 0 0 20px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 12px;">
+          <!-- Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
+            <div style="font-size: 13px; font-weight: 700; color: #3b82f6; display: flex; align-items: center; gap: 8px;">
+              <i class="fas fa-file-invoice-dollar"></i> GST Hub
+            </div>
+            <div style="font-size: 9px; font-weight: 700; background: rgba(16,185,129,0.15); color: #10b981; padding: 3px 6px; border-radius: 12px; text-transform: uppercase;">Live</div>
           </div>
-          <div style="font-size: 10px; font-weight: 700; background: rgba(239,68,68,0.15); color: #ef4444; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px;">Alerts</div>
+          <!-- Due Dates -->
+          <div style="font-size: 11px; font-weight: 600; color: var(--gold-light); margin-bottom: -4px;"><i class="far fa-calendar-alt"></i> Upcoming Due Dates</div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; background: rgba(255,255,255,0.03); padding: 6px 10px; border-radius: 4px;">
+              <span style="color: var(--white);">GSTR-1</span>
+              <span style="font-weight: 700; color: #f59e0b;">11th Aug</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; background: rgba(255,255,255,0.03); padding: 6px 10px; border-radius: 4px;">
+              <span style="color: var(--white);">GSTR-3B</span>
+              <span style="font-weight: 700; color: #f59e0b;">20th Aug</span>
+            </div>
+          </div>
+          <!-- Ticker -->
+          <div style="font-size: 11px; font-weight: 600; color: var(--gold-light); margin-top: 4px; margin-bottom: -4px;"><i class="fas fa-satellite-dish" style="color: #f59e0b; animation: pulse 2s infinite;"></i> Portal Updates</div>
+          <div style="height: 24px; overflow: hidden; position: relative; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 0 8px;">
+            <div style="animation: scrollUpdates 10s linear infinite; display: flex; flex-direction: column;">
+              <div style="height: 24px; display: flex; align-items: center; font-size: 10px; color: var(--muted);"><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">GSTR-1A facility is now live.</span></div>
+              <div style="height: 24px; display: flex; align-items: center; font-size: 10px; color: var(--muted);"><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Advisory on Error Code 136.</span></div>
+              <div style="height: 24px; display: flex; align-items: center; font-size: 10px; color: var(--muted);"><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">New validation for HSN codes.</span></div>
+              <div style="height: 24px; display: flex; align-items: center; font-size: 10px; color: var(--muted);"><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">GSTR-1A facility is now live.</span></div>
+            </div>
+          </div>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--white); background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <span style="color: #3b82f6; font-weight: 700; font-size: 11px; background: rgba(59,130,246,0.1); padding: 2px 6px; border-radius: 4px;">GST</span> 
-              <span>GSTR-1 (Monthly)</span>
+
+        <!-- Income Tax Hub -->
+        <div style="flex: 1; min-width: 260px; background: rgba(7, 19, 41, 0.6); border: 1px solid var(--glass-border); border-radius: 12px; padding: 16px; box-shadow: inset 0 0 20px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 12px;">
+          <!-- Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
+            <div style="font-size: 13px; font-weight: 700; color: #ef4444; display: flex; align-items: center; gap: 8px;">
+              <i class="fas fa-landmark"></i> Income Tax Hub
             </div>
-            <span style="font-weight: 600; color: #f59e0b;">11th of Next Month</span>
+            <div style="font-size: 9px; font-weight: 700; background: rgba(16,185,129,0.15); color: #10b981; padding: 3px 6px; border-radius: 12px; text-transform: uppercase;">Live</div>
           </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--white); background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <span style="color: #3b82f6; font-weight: 700; font-size: 11px; background: rgba(59,130,246,0.1); padding: 2px 6px; border-radius: 4px;">GST</span> 
-              <span>GSTR-3B (Monthly)</span>
+          <!-- Due Dates -->
+          <div style="font-size: 11px; font-weight: 600; color: var(--gold-light); margin-bottom: -4px;"><i class="far fa-calendar-alt"></i> Upcoming Due Dates</div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; background: rgba(255,255,255,0.03); padding: 6px 10px; border-radius: 4px;">
+              <span style="color: var(--white);">ITR (Non-Audit)</span>
+              <span style="font-weight: 700; color: #f59e0b;">31st Jul</span>
             </div>
-            <span style="font-weight: 600; color: #f59e0b;">20th of Next Month</span>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; background: rgba(255,255,255,0.03); padding: 6px 10px; border-radius: 4px;">
+              <span style="color: var(--white);">ITR (Audit)</span>
+              <span style="font-weight: 700; color: #f59e0b;">31st Oct</span>
+            </div>
           </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--white); background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <span style="color: #ef4444; font-weight: 700; font-size: 11px; background: rgba(239,68,68,0.1); padding: 2px 6px; border-radius: 4px;">IT</span> 
-              <span>Income Tax Return (Audit)</span>
+          <!-- Ticker -->
+          <div style="font-size: 11px; font-weight: 600; color: var(--gold-light); margin-top: 4px; margin-bottom: -4px;"><i class="fas fa-satellite-dish" style="color: #f59e0b; animation: pulse 2s infinite;"></i> Portal Updates</div>
+          <div style="height: 24px; overflow: hidden; position: relative; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 0 8px;">
+            <div style="animation: scrollUpdates 10s linear infinite; display: flex; flex-direction: column;">
+              <div style="height: 24px; display: flex; align-items: center; font-size: 10px; color: var(--muted);"><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">ITR-2 & 3 utilities updated for AY 24-25.</span></div>
+              <div style="height: 24px; display: flex; align-items: center; font-size: 10px; color: var(--muted);"><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">AIS portal scheduled maintenance.</span></div>
+              <div style="height: 24px; display: flex; align-items: center; font-size: 10px; color: var(--muted);"><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">New JSON schema for ITR-5 released.</span></div>
+              <div style="height: 24px; display: flex; align-items: center; font-size: 10px; color: var(--muted);"><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">ITR-2 & 3 utilities updated for AY 24-25.</span></div>
             </div>
-            <span style="font-weight: 600; color: #f59e0b;">31st Oct</span>
           </div>
         </div>
       </div>
