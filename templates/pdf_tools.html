@@ -1132,37 +1132,51 @@ let mergeSortable = null;
 
 function addMergeFiles(input) {
   Array.from(input.files).forEach(f => mergeFiles.push(f));
+  if (mergeFiles.length > 0) {
+    document.getElementById('merge-drop').style.display = 'none';
+    document.getElementById('merge-grid').style.display = 'grid';
+    document.getElementById('merge-add-btn').style.display = 'flex';
+  }
   renderMergeList();
-  document.getElementById('merge-btn').style.display = mergeFiles.length >= 2 ? 'inline-flex' : 'none';
+  const btn = document.getElementById('merge-btn');
+  if (btn) btn.disabled = mergeFiles.length < 2;
 }
 
 function renderMergeList() {
-  const list = document.getElementById('merge-list');
-  if (!list) return;
-  list.innerHTML = mergeFiles.map((f,i) => `
-    <div class="file-item" data-idx="${i}">
-      <span class="file-drag-handle">⠿</span>
-      <span class="file-item-name">📄 ${f.name}</span>
-      <span class="file-item-size">${fmtSize(f.size)}</span>
-      <button class="file-item-remove" onclick="removeMergeFile(${i})">✕</button>
+  const grid = document.getElementById('merge-grid');
+  if (!grid) return;
+  grid.innerHTML = mergeFiles.map((f,i) => `
+    <div class="org-page-card" data-idx="${i}" style="height:200px; display:flex; flex-direction:column;">
+      <div class="file-drag-handle" style="flex:1; background:#1e293b; display:flex; align-items:center; justify-content:center; font-size:3rem; border-bottom:1px solid #334155;">📄</div>
+      <div class="org-page-footer" style="background:var(--surface);">
+        <span class="org-page-num" style="max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${f.name}">${f.name}</span>
+        <div class="org-page-controls">
+          <button class="org-ctrl-btn del" onclick="removeMergeFile(${i})">✕</button>
+        </div>
+      </div>
     </div>`).join('');
   initMergeSortable();
 }
 
 function removeMergeFile(i) {
   mergeFiles.splice(i, 1);
+  if (mergeFiles.length === 0) {
+    document.getElementById('merge-drop').style.display = 'block';
+    document.getElementById('merge-grid').style.display = 'none';
+    document.getElementById('merge-add-btn').style.display = 'none';
+  }
   renderMergeList();
   const btn = document.getElementById('merge-btn');
-  if (btn) btn.style.display = mergeFiles.length >= 2 ? 'inline-flex' : 'none';
+  if (btn) btn.disabled = mergeFiles.length < 2;
 }
 
 function initMergeSortable() {
-  const list = document.getElementById('merge-list');
-  if (!list) return;
+  const grid = document.getElementById('merge-grid');
+  if (!grid) return;
   if (mergeSortable) mergeSortable.destroy();
-  mergeSortable = Sortable.create(list, {
+  mergeSortable = Sortable.create(grid, {
     animation: 150,
-    handle: '.file-drag-handle',
+    handle: '.org-page-card',
     ghostClass: 'sortable-ghost',
     onEnd: (evt) => {
       const moved = mergeFiles.splice(evt.oldIndex, 1)[0];
@@ -1173,11 +1187,18 @@ function initMergeSortable() {
 
 async function doMerge() {
   if (mergeFiles.length < 2) return alert('Please add at least 2 PDF files');
+  
+  const mode = document.querySelector('input[name="merge-engine"]:checked')?.value || 'free';
+  if (mode === 'pro') {
+    const payConfirm = confirm("Advanced Mode selected.\n\nAmount: ₹1.00\nPayment Gateway: Razorpay (Simulated)\n\nClick 'OK' to simulate successful payment and proceed with iLovePDF Engine.");
+    if (!payConfirm) return;
+  }
+  
   const fd = new FormData();
-  const order = mergeFiles.map(f => f.name);
-  mergeFiles.forEach(f => fd.append('files[]', f));
-  fd.append('order', JSON.stringify(order));
-  await callAPI('/api/pdf/merge-ordered', fd, 'merge-result', 'Merging PDFs…');
+  mergeFiles.forEach(f => fd.append('files', f));
+  fd.append('mode', mode);
+
+  await callAPI('/api/pdf/merge', fd, 'merge-result', mode === 'pro' ? 'Paid Processing (iLovePDF)…' : 'Merging PDFs (Local)…');
 }
 
 // ─── SPLIT ────────────────────────────────────────
