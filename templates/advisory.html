@@ -105,18 +105,27 @@ section{position:relative;z-index:1}
 #services{padding:100px 0}
 .services-header{text-align:center;margin-bottom:60px}
 .services-header .section-sub{margin:0 auto}
-.services-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
-.service-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);padding:28px;position:relative;overflow:hidden;transition:.4s;cursor:default}
-.service-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,.06),transparent);opacity:0;transition:.4s}
-.service-card:hover{transform:translateY(-6px);border-color:rgba(201,168,76,.4);box-shadow:0 20px 50px rgba(0,0,0,.3),0 0 30px rgba(201,168,76,.08)}
-.service-card:hover::before{opacity:1}
+.category-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; color: var(--gold-light); margin-bottom: 30px; text-align: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; }
+.services-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:60px}
+
+/* Flip Cards */
+.service-card-wrapper { perspective: 1000px; height: 260px; }
+.service-flip-card { width: 100%; height: 100%; position: relative; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; cursor: pointer; }
+.service-card-wrapper:hover .service-flip-card { transform: rotateY(180deg); }
+.service-card-front, .service-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 28px; overflow: hidden; display: flex; flex-direction: column; }
+
+/* Front */
+.service-card-front::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,.06),transparent);opacity:1;transition:.4s}
 .service-icon{width:52px;height:52px;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border:1px solid rgba(201,168,76,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--accent);margin-bottom:18px;transition:.3s}
-.service-card:hover .service-icon{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--navy);transform:scale(1.1)}
-.service-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--white);margin-bottom:10px}
-.service-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px}
-.service-link{font-size:12px;color:var(--accent);font-weight:600;letter-spacing:.3px;display:flex;align-items:center;gap:6px;text-decoration:none;transition:.3s}
-.service-link:hover{gap:10px}
+.service-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--white);margin-bottom:10px;line-height:1.4;}
 .service-num{position:absolute;top:20px;right:20px;font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:rgba(201,168,76,.06);line-height:1}
+
+/* Back */
+.service-card-back { transform: rotateY(180deg); background: linear-gradient(145deg, var(--navy3), var(--navy2)); border-color: rgba(201,168,76,.4); justify-content: space-between; }
+.service-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px;flex-grow:1;}
+.service-price-box { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px dashed rgba(201,168,76,.3); text-align: center; }
+.service-price-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.service-price-val { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--accent2); }
 #why{padding:100px 0;background:linear-gradient(180deg,transparent,rgba(26,58,107,.08),transparent)}
 .why-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
 .why-visual{position:relative}
@@ -238,9 +247,6 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
 @keyframes load{0%{width:0}100%{width:100%}}
 .anim{opacity:0;transform:translateY(30px);transition:opacity .6s,transform .6s}
 .anim.visible{opacity:1;transform:translateY(0)}
-.mybbt-banner{background:linear-gradient(90deg,rgba(201,168,76,.12),rgba(201,168,76,.06));border-bottom:1px solid var(--glass-border);padding:10px 6%;text-align:center;font-size:13px;color:var(--accent);position:relative;z-index:999}
-.mybbt-banner a{color:var(--accent2);font-weight:700;text-decoration:none;border-bottom:1px solid rgba(232,201,106,.4);transition:.3s}
-.mybbt-banner a:hover{color:var(--white)}
 @media(max-width:900px){.hero-grid,.why-grid,.contact-grid{grid-template-columns:1fr}.services-grid,.tools-grid{grid-template-columns:1fr 1fr}.footer-grid{grid-template-columns:1fr 1fr}.hero-visual{display:none}.process-timeline{flex-direction:column;gap:30px}.process-timeline::before{display:none}.testi-grid{grid-template-columns:1fr}nav.open .nav-links{display:flex;flex-direction:column;position:fixed;inset:0;background:var(--navy2);align-items:center;justify-content:center;gap:30px;z-index:999}.hamburger{display:flex}.nav-links{display:none}}
 @media(max-width:600px){.services-grid,.tools-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr}.why-cards-sm{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}}
 </style>
@@ -254,11 +260,6 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
 <canvas id="bg-canvas"></canvas>
-<!-- MYBBT Tools Banner -->
-<div class="mybbt-banner">
-  🚀 Powered by <a href="/">MYBBT Business Bluetooth</a> — Smart GST &amp; Business Tools now live!
-  &nbsp;·&nbsp; <a href="/gst-tools">Try GST Tools →</a>
-</div>
 <a href="mailto:youradvisor.ca@gmail.com" class="email-float" title="Email Us"><i class="fas fa-envelope"></i></a>
 <div class="toast" id="toast"></div>
 <!-- NAVBAR -->
@@ -326,18 +327,34 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
     <div class="services-header anim">
       <div class="section-label">What We Offer</div>
       <h2 class="section-title">Comprehensive <span class="gold">Tax &amp; Compliance</span> Services</h2>
-      <p class="section-sub">From GST registration to litigation support — we provide end-to-end tax solutions tailored for your business needs.</p>
     </div>
+    
+    {% for category, services in services_grouped.items() %}
+    <div class="category-title anim">{{ category }}</div>
     <div class="services-grid">
-      <div class="service-card anim"><div class="service-num">01</div><div class="service-icon"><i class="fas fa-file-invoice"></i></div><div class="service-name">GST Compliance &amp; Filing</div><p class="service-desc">Complete GSTR-1, GSTR-3B, GSTR-9 filing with reconciliation and timely submissions to avoid notices.</p><a href="#contact" class="service-link">Get Started <i class="fas fa-arrow-right"></i></a></div>
-      <div class="service-card anim"><div class="service-num">02</div><div class="service-icon"><i class="fas fa-gavel"></i></div><div class="service-name">GST Litigation &amp; Notices</div><p class="service-desc">Expert handling of GST notices, summons, appeals, and litigation proceedings before GST authorities.</p><a href="#contact" class="service-link">Get Started <i class="fas fa-arrow-right"></i></a></div>
-      <div class="service-card anim"><div class="service-num">03</div><div class="service-icon"><i class="fas fa-receipt"></i></div><div class="service-name">Income Tax Return Filing</div><p class="service-desc">Accurate ITR filing for individuals, businesses, startups, and corporates with maximum deductions.</p><a href="#contact" class="service-link">Get Started <i class="fas fa-arrow-right"></i></a></div>
-      <div class="service-card anim"><div class="service-num">04</div><div class="service-icon"><i class="fas fa-briefcase"></i></div><div class="service-name">Business Consulting</div><p class="service-desc">Strategic business advisory for startups and SMEs — entity structure, registrations, and growth planning.</p><a href="#contact" class="service-link">Get Started <i class="fas fa-arrow-right"></i></a></div>
-      <div class="service-card anim"><div class="service-num">05</div><div class="service-icon"><i class="fas fa-industry"></i></div><div class="service-name">MSME Registration &amp; Advisory</div><p class="service-desc">Udyam registration and advisory on MSME benefits, government schemes, and priority lending.</p><a href="#contact" class="service-link">Get Started <i class="fas fa-arrow-right"></i></a></div>
-      <div class="service-card anim"><div class="service-num">06</div><div class="service-icon"><i class="fas fa-chart-pie"></i></div><div class="service-name">Tax Planning &amp; Advisory</div><p class="service-desc">Year-round tax planning strategies to minimize liability and optimize savings for individuals and businesses.</p><a href="#contact" class="service-link">Get Started <i class="fas fa-arrow-right"></i></a></div>
-      <div class="service-card anim"><div class="service-num">07</div><div class="service-icon"><i class="fas fa-shield-alt"></i></div><div class="service-name">Compliance Management</div><p class="service-desc">End-to-end compliance including ROC filings, TDS returns, and all regulatory requirements.</p><a href="#contact" class="service-link">Get Started <i class="fas fa-arrow-right"></i></a></div>
-      <div class="service-card anim"><div class="service-num">08</div><div class="service-icon"><i class="fas fa-user-tie"></i></div><div class="service-name">Virtual CFO</div><p class="service-desc">On-demand CFO services for growing businesses — financial reporting, MIS, and strategic decision support.</p><a href="#contact" class="service-link">Get Started <i class="fas fa-arrow-right"></i></a></div>
+      {% for s in services %}
+      <div class="service-card-wrapper anim">
+        <div class="service-flip-card" onclick="this.classList.toggle('flipped')">
+          <!-- Front -->
+          <div class="service-card-front">
+            <div class="service-num">{{ loop.index0 + 1 if loop.index0 < 9 else loop.index }}</div>
+            <div class="service-icon"><i class="fas {{ s.icon }}"></i></div>
+            <div class="service-name">{{ s.name }}</div>
+          </div>
+          <!-- Back -->
+          <div class="service-card-back">
+            <div class="service-desc">{{ s.description }}</div>
+            <div class="service-price-box">
+              <div class="service-price-lbl">Pricing</div>
+              <div class="service-price-val">{{ s.price }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endendfor %}
     </div>
+    {% endfor %}
+    
   </div>
 </section>
 <div class="divider"></div>
@@ -502,7 +519,18 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
           <div class="form-group"><label>WhatsApp No.</label><input type="tel" id="contact-whatsapp" placeholder="10-digit number"></div>
         </div>
         <div class="form-group"><label>Service Required</label>
-          <select id="contact-service"><option>Select a Service</option><option>GST Compliance &amp; Filing</option><option>GST Notice / Litigation</option><option>Income Tax Return</option><option>MSME Registration</option><option>Business Consulting</option><option>Virtual CFO</option><option>MYBBT Tools Help</option><option>Other</option></select>
+          <select id="contact-service">
+            <option>Select a Service</option>
+            {% for category, services in services_grouped.items() %}
+              <optgroup label="{{ category }}">
+              {% for s in services %}
+                <option value="{{ s.name }}">{{ s.name }}</option>
+              {% endfor %}
+              </optgroup>
+            {% endfor %}
+            <option>MYBBT Tools Help</option>
+            <option>Other</option>
+          </select>
         </div>
         <div class="form-group"><label>Tell Us About Your Business</label><textarea id="contact-desc" placeholder="Brief description of your business and what you need help with..."></textarea></div>
         <button class="btn-primary" id="contact-submit" style="width:100%;justify-content:center" onclick="handleFormSubmit()"><i class="fas fa-paper-plane"></i> Request Call Back</button>

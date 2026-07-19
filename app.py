@@ -172,6 +172,49 @@ def init_db():
         )
     ''')
     
+    # Services table for YA Advisory
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS services (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            category TEXT NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT,
+            price TEXT,
+            icon TEXT,
+            is_active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    # Pre-populate services if empty
+    svc_count = c.execute('SELECT COUNT(*) as count FROM services').fetchone()
+    s_count = svc_count['count'] if isinstance(svc_count, dict) else svc_count[0]
+    if s_count == 0:
+        default_services = [
+            # Valuation
+            ('Valuation', 'Business Valuation', 'Comprehensive valuation of business operations and equity.', 'Contact for Pricing', 'fa-chart-line'),
+            ('Valuation', 'Valuation under Income Tax Act', 'Valuation as per Rule 11UA and other IT Act provisions.', 'Contact for Pricing', 'fa-file-invoice-dollar'),
+            ('Valuation', 'Valuation of Intangible Assets & Intellectual Property', 'Valuation of brands, patents, trademarks and IP.', 'Contact for Pricing', 'fa-lightbulb'),
+            ('Valuation', 'Purchase Price Allocations for Mergers & Acquisitions', 'Fair value allocation of assets acquired in M&A.', 'Contact for Pricing', 'fa-handshake'),
+            ('Valuation', 'Valuation of Startups / Portfolios for VC and PE Firms', 'Startup valuation for fundraising and portfolio reporting.', 'Contact for Pricing', 'fa-rocket'),
+            ('Valuation', 'Valuation of ESOP’s and Sweat Equity', 'Valuation for employee stock options and sweat equity shares.', 'Contact for Pricing', 'fa-users-cog'),
+            ('Valuation', 'Valuation of Financial Securities, Instruments & Derivatives', 'Complex financial instrument and derivative valuation.', 'Contact for Pricing', 'fa-money-bill-trend-up'),
+            ('Valuation', 'Valuation for Compliance and Regulatory purposes', 'FEMA, Companies Act, and SEBI compliance valuation.', 'Contact for Pricing', 'fa-scale-balanced'),
+            ('Valuation', 'Virtual CFO Services', 'On-demand CFO services for strategic financial management.', 'Starts at ₹15,000/mo', 'fa-user-tie'),
+            ('Valuation', 'Fundraising / Bridge Financing', 'Advisory for startup fundraising and debt syndication.', 'Contact for Pricing', 'fa-coins'),
+            # Tax & Compliance
+            ('Tax & Compliance', 'GST Compliance & Filing', 'Complete GSTR-1, GSTR-3B, GSTR-9 filing with reconciliation.', 'Starts at ₹2,000/mo', 'fa-file-invoice'),
+            ('Tax & Compliance', 'GST Litigation & Notices', 'Expert handling of GST notices, appeals, and litigation.', 'Contact for Pricing', 'fa-gavel'),
+            ('Tax & Compliance', 'Income Tax Return Filing', 'Accurate ITR filing for individuals, startups, and corporates.', 'Starts at ₹1,500', 'fa-receipt'),
+            ('Tax & Compliance', 'Business Consulting', 'Strategic advisory for entity structure and growth.', 'Contact for Pricing', 'fa-briefcase'),
+            ('Tax & Compliance', 'MSME Registration & Advisory', 'Udyam registration and advisory on MSME benefits.', 'Starts at ₹1,000', 'fa-industry'),
+            ('Tax & Compliance', 'Tax Planning & Advisory', 'Year-round tax planning to minimize liability.', 'Contact for Pricing', 'fa-chart-pie'),
+            ('Tax & Compliance', 'Compliance Management', 'End-to-end ROC filings and regulatory compliance.', 'Contact for Pricing', 'fa-shield-alt')
+        ]
+        
+        for svc in default_services:
+            c.execute('INSERT INTO services (category, name, description, price, icon) VALUES (?, ?, ?, ?, ?)', svc)
+            
     conn.commit()
     conn.close()
 
@@ -321,7 +364,19 @@ def login_page():
 
 @app.route('/advisory')
 def advisory_page():
-    return render_template('advisory.html')
+    conn = get_db()
+    services_raw = conn.execute('SELECT * FROM services WHERE is_active=1 ORDER BY category DESC, id ASC').fetchall()
+    conn.close()
+    
+    # Group services by category
+    services_grouped = {}
+    for s in services_raw:
+        cat = s['category']
+        if cat not in services_grouped:
+            services_grouped[cat] = []
+        services_grouped[cat].append(dict(s))
+        
+    return render_template('advisory.html', services_grouped=services_grouped)
 
 
 @app.route('/dashboard')
@@ -655,7 +710,43 @@ def api_admin_users():
     conn = get_db()
     users = conn.execute('SELECT id, name, email, plan, is_active, role, created_at FROM users ORDER BY id DESC').fetchall()
     conn.close()
-    return jsonify({'success': True, 'users': [dict(u) for u in users]})
+    return jsonify([dict(u) for u in users])
+
+@app.route('/api/admin/services', methods=['GET', 'POST'])
+@admin_required
+def api_admin_services():
+    conn = get_db()
+    if request.method == 'GET':
+        services = conn.execute('SELECT * FROM services ORDER BY category, id DESC').fetchall()
+        conn.close()
+        return jsonify([dict(s) for s in services])
+        
+    elif request.method == 'POST':
+        data = request.json
+        c = conn.cursor()
+        c.execute('INSERT INTO services (category, name, description, price, icon, is_active) VALUES (?, ?, ?, ?, ?, ?)',
+                  (data.get('category'), data.get('name'), data.get('description'), data.get('price'), data.get('icon', 'fa-asterisk'), data.get('is_active', 1)))
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True})
+
+@app.route('/api/admin/services/<int:service_id>', methods=['PUT', 'DELETE'])
+@admin_required
+def api_admin_service_op(service_id):
+    conn = get_db()
+    c = conn.cursor()
+    if request.method == 'PUT':
+        data = request.json
+        c.execute('UPDATE services SET category=?, name=?, description=?, price=?, icon=?, is_active=? WHERE id=?',
+                  (data.get('category'), data.get('name'), data.get('description'), data.get('price'), data.get('icon'), data.get('is_active'), service_id))
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True})
+    elif request.method == 'DELETE':
+        c.execute('DELETE FROM services WHERE id=?', (service_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True})
 
 
 @app.route('/api/admin/users/<int:user_id>/plan', methods=['POST'])
