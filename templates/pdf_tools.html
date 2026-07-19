@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}MyBBT PDF Tools — Free Online PDF Tools{% endblock %}
+{% block title %}MYBBT PDF Tools — Complete PDF Suite{% endblock %}
 {% block page_id %}pdf-tools{% endblock %}
 {% block topbar_title %}PDF Tools{% endblock %}
 {% block topbar_breadcrumb %}<span>Tools</span> › PDF Tools{% endblock %}
@@ -8,1163 +8,1245 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
-/* ═══════════════════════════════════ GLOBAL ════════════ */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-.pdfw { font-family: 'Inter', sans-serif; background: var(--background); color: var(--text); min-height: 100vh; }
-
-/* ══════════════════════ HERO ════════════════════════════ */
-.pdfw-hero {
-  text-align: center;
-  padding: 64px 24px 40px;
-  background: linear-gradient(160deg, rgba(201,168,76,.1) 0%, transparent 50%);
-  border-bottom: 1px solid rgba(201,168,76,.12);
-}
-.pdfw-hero h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900; color: var(--white); margin-bottom: 16px; line-height: 1.15; }
-.pdfw-hero h1 span { background: linear-gradient(135deg,#c9a84c,#e8c96a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.pdfw-hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 620px; margin: 0 auto; line-height: 1.7; }
-
-/* ══════════════════════ FILTER PILLS ═══════════════════ */
-.pdfw-pills {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
-  margin: 32px auto 0; max-width: 900px; padding: 0 24px;
-}
-.pdfw-pill {
-  padding: 9px 20px; border-radius: 50px;
-  border: 1px solid rgba(201,168,76,.25);
-  background: transparent; color: var(--text-muted);
-  font-size: 14px; font-weight: 600; cursor: pointer;
-  transition: all 0.2s; white-space: nowrap;
-}
-.pdfw-pill:hover { border-color: #c9a84c; color: #c9a84c; }
-.pdfw-pill.active { background: #c9a84c; color: #0a0f1e; border-color: #c9a84c; }
-
-/* ══════════════════════ CATEGORY HEADER ══════════════ */
-.pdfw-cat-header {
-  max-width: 1300px; margin: 48px auto 0; padding: 0 24px;
-  display: flex; align-items: center; gap: 14px;
-}
-.pdfw-cat-header h2 { font-size: 1rem; font-weight: 700; color: #c9a84c; text-transform: uppercase; letter-spacing: .1em; }
-.pdfw-cat-line { flex: 1; height: 1px; background: rgba(201,168,76,.15); }
-
-/* ══════════════════════ TOOLS GRID ════════════════════ */
-.pdfw-grid {
-  max-width: 1300px; margin: 28px auto 0; padding: 0 24px 48px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-.pdfw-card {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; padding: 32px 20px 28px;
-  background: var(--surface);
-  border: 1px solid rgba(255,255,255,.05);
-  border-radius: 16px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-.pdfw-card::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(circle at 50% 0%, rgba(201,168,76,.12), transparent 70%);
-  opacity: 0; transition: .3s;
-}
-.pdfw-card:hover { border-color: rgba(201,168,76,.4); transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,.4); }
-.pdfw-card:hover::after { opacity: 1; }
-.pdfw-card:hover .pdfw-card-icon { transform: scale(1.12); }
-
-.pdfw-card-icon {
-  font-size: 2.8rem;
-  margin-bottom: 18px;
-  transition: transform 0.3s ease;
-  position: relative; z-index: 1;
-  display: flex; align-items: center; justify-content: center;
-  width: 72px; height: 72px;
-}
-.pdfw-card-name {
-  font-size: 1.05rem; font-weight: 800;
-  color: var(--white); line-height: 1.3;
-  margin-bottom: 8px; position: relative; z-index: 1;
-}
-.pdfw-card-desc {
-  font-size: .82rem; color: var(--text-muted);
-  line-height: 1.5; position: relative; z-index: 1;
-}
-
-/* ══════════════════════ FULLSCREEN WORKSPACE ══════════ */
-#pdfw-workspace {
-  display: none;
-  position: fixed; inset: 0; z-index: 9999;
-  background: var(--background);
-  overflow: hidden;
-}
-
-.ws-nav {
-  display: flex; align-items: center; gap: 12px;
-  height: 58px; padding: 0 24px;
-  background: var(--surface);
-  border-bottom: 1px solid rgba(201,168,76,.15);
-  position: sticky; top: 0; z-index: 10;
-}
-.ws-back {
-  display: flex; align-items: center; gap: 6px;
-  padding: 8px 16px; border-radius: 8px;
-  background: transparent;
-  border: 1px solid rgba(201,168,76,.3);
-  color: #c9a84c; font-size: .9rem; font-weight: 600;
-  cursor: pointer; transition: all .2s;
-  white-space: nowrap;
-}
-.ws-back:hover { background: rgba(201,168,76,.1); }
-.ws-tool-name {
-  flex: 1; text-align: center; font-size: 1.2rem;
-  font-weight: 800; color: var(--white);
-  margin-right: 100px;
-}
-
-/* Split body */
-.ws-body {
-  display: flex;
-  height: calc(100vh - 58px);
-  overflow: hidden;
-}
-
-/* Left — main upload/drop area */
-.ws-main {
-  flex: 1;
-  overflow-y: auto;
-  padding: 40px;
-  background: #080d1a;
+/* ══════════════════════════════════════════════════════
+   PDF WORLD — Takes over entire screen
+   ══════════════════════════════════════════════════════ */
+#pdf-world {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
   display: flex;
   flex-direction: column;
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+}
+
+/* ── iLovePDF-style navbar ───────────────────────── */
+.pnav {
+  background: #0d1525;
+  border-bottom: 1px solid rgba(201,168,76,.15);
+  height: 58px;
+  display: flex;
   align-items: center;
+  padding: 0 20px;
+  gap: 0;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+.pnav-logo {
+  display: flex; align-items: center; gap: 8px;
+  margin-right: 30px; cursor: pointer; text-decoration: none;
+}
+.pnav-logo-icon {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg,#c9a84c,#e8c96a);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; color: #040d1f; font-size: 13px;
+}
+.pnav-logo-text {
+  font-weight: 800; font-size: 15px; color: #fff;
+  letter-spacing: .3px;
+}
+.pnav-logo-text span { color: #c9a84c; }
+
+/* Quick tool links in nav */
+.pnav-links {
+  display: flex; gap: 2px; flex: 1; overflow-x: auto;
+  scrollbar-width: none;
+}
+.pnav-links::-webkit-scrollbar { display: none; }
+.pnav-link {
+  padding: 8px 14px; border-radius: 8px;
+  color: #8899bb; font-size: 13px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+  transition: all .2s; background: none; border: none;
+}
+.pnav-link:hover { color: #c9a84c; background: rgba(201,168,76,.08); }
+.pnav-link.active { color: #c9a84c; background: rgba(201,168,76,.12); }
+
+.pnav-right {
+  display: flex; align-items: center; gap: 10px;
+  margin-left: 16px; flex-shrink: 0;
+}
+.pnav-exit-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 8px;
+  border: 1px solid rgba(201,168,76,.3);
+  background: transparent; color: #c9a84c;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: all .2s;
+}
+.pnav-exit-btn:hover { background: rgba(201,168,76,.1); }
+
+/* ══════════════════════════════════════════════════════
+   HOME VIEW
+   ══════════════════════════════════════════════════════ */
+#pdf-home {
+  flex: 1; overflow-y: auto;
+  background: #070e1c;
 }
 
-/* Right sidebar */
-.ws-side {
-  width: 340px; min-width: 300px;
-  display: flex; flex-direction: column;
-  background: var(--surface);
-  border-left: 1px solid rgba(201,168,76,.12);
-  overflow-y: auto;
-  padding: 28px 22px;
+/* Hero */
+.phero {
+  text-align: center;
+  padding: 56px 24px 36px;
+  background: linear-gradient(160deg, rgba(201,168,76,.1) 0%, transparent 55%);
+  border-bottom: 1px solid rgba(201,168,76,.1);
 }
-.ws-side h2 { font-size: 1.5rem; font-weight: 900; color: var(--white); margin-bottom: 14px; }
-.ws-side-info {
-  background: rgba(59,130,246,.1); border: 1px solid rgba(59,130,246,.25);
-  border-radius: 10px; padding: 12px 14px; font-size: .875rem; color: #93c5fd;
-  margin-bottom: 20px; line-height: 1.6;
+.phero h1 {
+  font-size: clamp(1.6rem,3.5vw,2.6rem);
+  font-weight: 900; color: #fff; line-height: 1.15;
+  margin-bottom: 14px;
 }
-.ws-side-spacer { flex: 1; }
+.phero h1 em {
+  font-style: normal;
+  background: linear-gradient(135deg,#c9a84c,#f0de8a);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.phero p { color: #8899bb; font-size: 1rem; max-width: 580px; margin: 0 auto; line-height: 1.7; }
 
-/* ── LARGE UPLOAD DROP ZONE ── */
-.ws-dropzone {
-  width: 100%; max-width: 560px;
-  border: 2px dashed rgba(201,168,76,.3);
-  border-radius: 20px;
+/* Pills */
+.ppills {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  justify-content: center; padding: 28px 20px 0;
+  max-width: 1000px; margin: 0 auto;
+}
+.ppill {
+  padding: 8px 18px; border-radius: 50px;
+  border: 1px solid rgba(255,255,255,.08);
   background: rgba(255,255,255,.03);
-  padding: 64px 32px;
+  color: #8899bb; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.ppill:hover { border-color: rgba(201,168,76,.4); color: #c9a84c; }
+.ppill.active { background: #c9a84c; color: #040d1f; border-color: #c9a84c; }
+
+/* Section header */
+.psection-hdr {
+  max-width: 1280px; margin: 44px auto 20px;
+  padding: 0 24px;
+  display: flex; align-items: center; gap: 14px;
+}
+.psection-hdr h2 {
+  font-size: .8rem; font-weight: 700; color: #c9a84c;
+  text-transform: uppercase; letter-spacing: .12em;
+  white-space: nowrap;
+}
+.psection-hdr-line { flex: 1; height: 1px; background: rgba(201,168,76,.12); }
+
+/* Tool grid */
+.pgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px,1fr));
+  gap: 18px;
+  max-width: 1280px; margin: 0 auto;
+  padding: 0 24px 50px;
+}
+
+/* iLovePDF-style card: icon top-left, text below */
+.pcard {
+  background: #0d1525;
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 14px;
+  padding: 24px 20px 22px;
+  cursor: pointer;
+  transition: all .2s ease;
+  display: flex; flex-direction: column; align-items: flex-start;
+  position: relative; overflow: hidden;
+}
+.pcard:hover {
+  border-color: rgba(201,168,76,.35);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,.5);
+  background: #111e35;
+}
+.pcard::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at top left, rgba(201,168,76,.08), transparent 60%);
+  opacity: 0; transition: .3s;
+}
+.pcard:hover::after { opacity: 1; }
+
+.pcard-icon {
+  width: 52px; height: 52px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+  margin-bottom: 16px;
+  transition: transform .2s;
+  flex-shrink: 0;
+  position: relative; z-index: 1;
+}
+.pcard:hover .pcard-icon { transform: scale(1.08); }
+
+.pcard-name {
+  font-size: 1rem; font-weight: 800; color: #fff;
+  margin-bottom: 7px; line-height: 1.3;
+  position: relative; z-index: 1;
+}
+.pcard-desc {
+  font-size: .8rem; color: #5f7499; line-height: 1.5;
+  position: relative; z-index: 1;
+}
+
+/* ── Icon colour classes ── */
+.ic-r  { background: rgba(239,68,68,.12);  color: #ef4444; }
+.ic-o  { background: rgba(249,115,22,.12); color: #f97316; }
+.ic-g  { background: rgba(34,197,94,.12);  color: #22c55e; }
+.ic-b  { background: rgba(59,130,246,.12); color: #3b82f6; }
+.ic-p  { background: rgba(168,85,247,.12); color: #a855f7; }
+.ic-t  { background: rgba(20,184,166,.12); color: #14b8a6; }
+.ic-au { background: rgba(201,168,76,.12); color: #c9a84c; }
+.ic-pk { background: rgba(236,72,153,.12); color: #ec4899; }
+
+/* ══════════════════════════════════════════════════════
+   TOOL WORKSPACE (fullscreen app)
+   ══════════════════════════════════════════════════════ */
+#pdf-ws {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  background: #070e1c;
+  overflow: hidden;
+}
+#pdf-ws.active { display: flex; }
+
+/* Workspace header bar */
+.pws-bar {
+  display: flex; align-items: center;
+  padding: 0 24px; height: 54px;
+  background: #0d1525;
+  border-bottom: 1px solid rgba(201,168,76,.12);
+  flex-shrink: 0; gap: 14px;
+}
+.pws-back {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 15px; border-radius: 8px;
+  border: 1px solid rgba(201,168,76,.3);
+  color: #c9a84c; font-size: .85rem; font-weight: 700;
+  cursor: pointer; transition: all .2s; background: none;
+  white-space: nowrap;
+}
+.pws-back:hover { background: rgba(201,168,76,.1); }
+.pws-tool-name {
+  flex: 1; text-align: center;
+  font-size: 1.1rem; font-weight: 900; color: #fff;
+  margin-right: 88px;
+}
+
+/* Split layout */
+.pws-body {
+  display: flex; flex: 1; overflow: hidden;
+}
+.pws-main {
+  flex: 1; overflow-y: auto;
+  background: #060c18;
+  padding: 40px 30px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 24px;
+}
+.pws-side {
+  width: 320px; min-width: 280px;
+  background: #0d1525;
+  border-left: 1px solid rgba(201,168,76,.1);
+  display: flex; flex-direction: column;
+  padding: 26px 20px;
+  overflow-y: auto;
+  gap: 0;
+}
+.pws-side h2 { font-size: 1.4rem; font-weight: 900; color: #fff; margin-bottom: 10px; }
+.pws-side-info {
+  background: rgba(59,130,246,.1);
+  border: 1px solid rgba(59,130,246,.2);
+  border-radius: 10px; padding: 12px;
+  font-size: .85rem; color: #93c5fd; line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* ── DROPZONE ── */
+.pdrop {
+  width: 100%; max-width: 560px;
+  border: 2px dashed rgba(201,168,76,.25);
+  border-radius: 18px;
+  padding: 60px 28px;
   text-align: center;
   cursor: pointer;
   transition: all .2s;
   position: relative;
+  background: rgba(201,168,76,.02);
 }
-.ws-dropzone:hover, .ws-dropzone.drag-over {
+.pdrop:hover, .pdrop.drag-over {
   border-color: #c9a84c;
-  background: rgba(201,168,76,.07);
+  background: rgba(201,168,76,.05);
 }
-.ws-dropzone input[type=file] {
-  position: absolute; inset: 0; opacity: 0;
-  cursor: pointer; width: 100%; height: 100%;
+.pdrop input[type=file] {
+  position: absolute; inset: 0;
+  opacity: 0; cursor: pointer; width: 100%; height: 100%;
 }
-.ws-dropzone-icon { font-size: 4rem; margin-bottom: 20px; display: block; }
-.ws-dropzone-title {
-  font-size: 1.3rem; font-weight: 700;
-  color: var(--white); margin-bottom: 10px;
-}
-.ws-dropzone-sub { color: var(--text-muted); font-size: .9rem; margin-bottom: 24px; }
-.ws-dropzone-btn {
+.pdrop-emoji { font-size: 3.5rem; display: block; margin-bottom: 16px; }
+.pdrop-title { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.pdrop-sub { color: #5f7499; font-size: .875rem; margin-bottom: 22px; }
+.pdrop-btn {
   display: inline-block;
-  background: #c9a84c; color: #0a0f1e;
-  padding: 12px 36px; border-radius: 50px;
-  font-weight: 800; font-size: 1rem;
+  background: #c9a84c; color: #040d1f;
+  padding: 11px 32px; border-radius: 50px;
+  font-weight: 800; font-size: .95rem;
   pointer-events: none;
 }
 
-/* ── FILE THUMBNAIL GRID (Merge/Organize style) ── */
-.ws-thumb-grid {
-  display: none;
+/* ── FILE THUMBNAIL GRID ── */
+.pthumb-grid {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(170px,1fr));
+  gap: 18px;
   align-content: start;
 }
-.ws-thumb-card {
-  background: #0d1525;
-  border: 2px solid rgba(255,255,255,.07);
+.pthumb-card {
+  background: #0d1a2e;
+  border: 2px solid rgba(255,255,255,.06);
   border-radius: 12px;
   overflow: hidden;
   cursor: grab;
   transition: all .2s;
   user-select: none;
-  position: relative;
 }
-.ws-thumb-card:hover { border-color: rgba(201,168,76,.4); box-shadow: 0 8px 24px rgba(0,0,0,.5); }
-.ws-thumb-card.sortable-ghost { opacity: .4; }
-.ws-thumb-preview {
-  height: 180px;
+.pthumb-card:active { cursor: grabbing; transform: scale(.97); }
+.pthumb-card:hover { border-color: rgba(201,168,76,.3); }
+.pthumb-card.sortable-ghost { opacity: .35; }
+.pthumb-card.sortable-chosen { box-shadow: 0 12px 36px rgba(0,0,0,.7); z-index: 9; }
+.pthumb-preview {
+  height: 175px;
   background: #1a2540;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
 }
-.ws-thumb-preview canvas { max-width: 100%; max-height: 100%; }
-.ws-thumb-preview-placeholder { font-size: 3.5rem; opacity: .5; }
-.ws-thumb-footer {
+.pthumb-preview canvas { max-width: 100%; max-height: 100%; }
+.pthumb-preview-icon { font-size: 3.5rem; opacity: .4; }
+.pthumb-footer {
   padding: 8px 10px;
-  background: #0d1525;
-  border-top: 1px solid rgba(255,255,255,.07);
-  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  background: #0a1120;
+  border-top: 1px solid rgba(255,255,255,.06);
+  display: flex; align-items: center; justify-content: space-between;
 }
-.ws-thumb-name {
-  font-size: .75rem; color: var(--text-muted);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  flex: 1;
+.pthumb-name {
+  font-size: .72rem; color: #5f7499;
+  white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; flex: 1;
 }
-.ws-thumb-remove {
-  background: none; border: none;
-  color: var(--text-muted); cursor: pointer;
-  font-size: 1rem; padding: 2px 5px;
-  border-radius: 4px; line-height: 1;
-  flex-shrink: 0;
+.pthumb-del {
+  background: none; border: none; color: #5f7499;
+  cursor: pointer; padding: 2px 5px; border-radius: 4px;
+  font-size: .95rem; line-height: 1;
 }
-.ws-thumb-remove:hover { background: rgba(239,68,68,.15); color: #ef4444; }
+.pthumb-del:hover { background: rgba(239,68,68,.15); color: #ef4444; }
 
-/* Floating "add more" button (red circle + icon, bottom right of main) */
-.ws-add-more {
-  position: fixed; bottom: 36px; right: 360px;
-  width: 56px; height: 56px; border-radius: 50%;
-  background: #ef4444;
-  color: white; font-size: 28px; font-weight: 300;
-  display: none; align-items: center; justify-content: center;
-  cursor: pointer; box-shadow: 0 6px 20px rgba(239,68,68,.5);
-  transition: all .2s; z-index: 100;
-  position: fixed;
-  border: none;
+/* ── ADD MORE FLOATING BTN ── */
+#p-add-more {
+  display: none;
+  position: fixed; bottom: 32px; right: 340px;
+  width: 54px; height: 54px; border-radius: 50%;
+  background: #ef4444; color: #fff;
+  font-size: 26px; font-weight: 300;
+  align-items: center; justify-content: center;
+  cursor: pointer; border: none;
+  box-shadow: 0 6px 20px rgba(239,68,68,.5);
+  transition: all .2s; z-index: 500;
 }
-.ws-add-more:hover { background: #dc2626; transform: scale(1.05); }
+#p-add-more:hover { background: #dc2626; transform: scale(1.08); }
 
-/* ── SINGLE FILE UPLOAD (for single-file tools) ── */
-.ws-single-area { width: 100%; max-width: 560px; }
-.ws-options {
-  width: 100%;
+/* ── OPTIONS PANEL ── */
+.popt {
   background: rgba(255,255,255,.03);
-  border: 1px solid rgba(201,168,76,.12);
-  border-radius: 12px; padding: 20px;
+  border: 1px solid rgba(201,168,76,.1);
+  border-radius: 12px;
+  padding: 18px;
   margin-top: 0;
+  margin-bottom: 16px;
 }
-.ws-options-title {
-  font-size: .75rem; font-weight: 700;
+.popt-title {
+  font-size: .72rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .12em;
-  color: #c9a84c; margin-bottom: 16px;
+  color: #c9a84c; margin-bottom: 14px;
 }
-.ws-radio-group { display: flex; flex-direction: column; gap: 10px; }
-.ws-radio-label {
+.popt-radio { display: flex; flex-direction: column; gap: 8px; }
+.popt-radio-lbl {
   display: flex; align-items: flex-start; gap: 10px;
-  padding: 12px 14px; border-radius: 10px;
-  border: 1px solid rgba(255,255,255,.08);
+  padding: 10px 12px; border-radius: 9px;
+  border: 1px solid rgba(255,255,255,.07);
   cursor: pointer; transition: all .2s;
 }
-.ws-radio-label:hover { border-color: rgba(201,168,76,.3); background: rgba(201,168,76,.05); }
-.ws-radio-label.selected { border-color: #c9a84c; background: rgba(201,168,76,.1); }
-.ws-radio-label input { margin-top: 3px; accent-color: #c9a84c; }
-.ws-radio-text strong { display: block; color: var(--white); font-size: .9rem; margin-bottom: 2px; }
-.ws-radio-text span { color: var(--text-muted); font-size: .78rem; }
+.popt-radio-lbl:hover { border-color: rgba(201,168,76,.25); background: rgba(201,168,76,.04); }
+.popt-radio-lbl.selected { border-color: #c9a84c; background: rgba(201,168,76,.1); }
+.popt-radio-lbl input { margin-top: 3px; accent-color: #c9a84c; }
+.popt-text strong { display: block; color: #d4e0f5; font-size: .875rem; }
+.popt-text span { color: #5f7499; font-size: .78rem; }
+
+.pinput {
+  width: 100%; padding: 10px 13px;
+  background: #060c18; border: 1px solid rgba(255,255,255,.1);
+  color: #d4e0f5; border-radius: 9px; font-size: .875rem;
+  outline: none; transition: border .2s; font-family: 'Inter',sans-serif;
+}
+.pinput:focus { border-color: #c9a84c; box-shadow: 0 0 0 3px rgba(201,168,76,.1); }
+.pinput::placeholder { color: #3a4a6a; }
+
+pselect {
+  width: 100%; padding: 10px 13px;
+  background: #060c18; border: 1px solid rgba(255,255,255,.1);
+  color: #d4e0f5; border-radius: 9px; font-size: .875rem;
+  font-family: 'Inter',sans-serif;
+}
+
+/* ── SIDEBAR SPACER ── */
+.pside-spacer { flex: 1; min-height: 20px; }
 
 /* ── ACTION BUTTON ── */
-.ws-action-btn {
-  width: 100%; padding: 17px;
-  background: #ef4444; color: white;
+.pact-btn {
+  width: 100%; padding: 15px;
+  background: #ef4444; color: #fff;
   border: none; border-radius: 12px;
-  font-size: 1.1rem; font-weight: 800;
+  font-size: 1rem; font-weight: 800;
   cursor: pointer; transition: all .2s;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  margin-top: 0;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
   letter-spacing: .2px;
 }
-.ws-action-btn:hover:not(:disabled) { background: #dc2626; box-shadow: 0 6px 20px rgba(239,68,68,.4); transform: translateY(-1px); }
-.ws-action-btn:disabled { opacity: .5; cursor: not-allowed; }
-.ws-action-btn.gold-btn { background: #c9a84c; color: #0a0f1e; }
-.ws-action-btn.gold-btn:hover:not(:disabled) { background: #b8953f; box-shadow: 0 6px 20px rgba(201,168,76,.4); }
+.pact-btn:hover:not(:disabled) { background: #dc2626; box-shadow: 0 8px 24px rgba(239,68,68,.4); transform: translateY(-1px); }
+.pact-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.pact-btn.gold { background: #c9a84c; color: #040d1f; }
+.pact-btn.gold:hover:not(:disabled) { background: #b8953f; box-shadow: 0 8px 24px rgba(201,168,76,.4); }
 
 /* ── RESULT BOX ── */
-.ws-result {
-  display: none; margin-top: 20px;
-  border-radius: 12px; padding: 18px;
-  border: 1px solid; font-size: .9rem;
+.pres {
+  display: none; border-radius: 12px; padding: 16px;
+  border: 1px solid; margin-bottom: 14px;
 }
-.ws-result.success { border-color: rgba(34,197,94,.3); background: rgba(34,197,94,.08); }
-.ws-result.error { border-color: rgba(239,68,68,.3); background: rgba(239,68,68,.08); }
-.ws-result-title { font-weight: 700; color: var(--white); margin-bottom: 6px; }
-.ws-result-sub { color: var(--text-muted); font-size: .8rem; margin-bottom: 14px; }
-.ws-download-btn {
+.pres.ok { border-color: rgba(34,197,94,.3); background: rgba(34,197,94,.08); }
+.pres.err { border-color: rgba(239,68,68,.3); background: rgba(239,68,68,.08); }
+.pres-title { font-weight: 700; color: #fff; margin-bottom: 6px; font-size: .9rem; }
+.pres-sub { color: #5f7499; font-size: .78rem; margin-bottom: 12px; }
+.pres-dl {
   display: inline-flex; align-items: center; gap: 8px;
-  background: #c9a84c; color: #0a0f1e;
-  padding: 10px 24px; border-radius: 8px;
-  text-decoration: none; font-weight: 800; font-size: .9rem;
+  background: #c9a84c; color: #040d1f;
+  padding: 9px 20px; border-radius: 8px;
+  text-decoration: none; font-weight: 800; font-size: .85rem;
   transition: all .2s;
 }
-.ws-download-btn:hover { background: #b8953f; transform: translateY(-1px); }
+.pres-dl:hover { background: #b8953f; transform: translateY(-1px); }
 
-/* ── LOADER OVERLAY ── */
-.ws-loader {
+/* ── LOADER ── */
+.ploader {
   display: none; position: fixed; inset: 0;
-  background: rgba(8,13,26,.88); z-index: 99999;
+  background: rgba(4,8,20,.9); z-index: 99999;
   align-items: center; justify-content: center;
-  flex-direction: column; gap: 16px;
+  flex-direction: column; gap: 14px;
   backdrop-filter: blur(8px);
 }
-.ws-loader.active { display: flex; }
-.ws-loader-ring {
-  width: 56px; height: 56px;
-  border: 4px solid rgba(201,168,76,.2);
+.ploader.on { display: flex; }
+.ploader-ring {
+  width: 52px; height: 52px;
+  border: 4px solid rgba(201,168,76,.15);
   border-top-color: #c9a84c;
   border-radius: 50%;
   animation: spin .75s linear infinite;
 }
-.ws-loader-text { font-size: 1rem; color: #c9a84c; font-weight: 600; letter-spacing: .5px; }
+.ploader-txt { color: #c9a84c; font-weight: 600; font-size: .95rem; letter-spacing: .4px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── PAYMENT MODAL ── */
-.pay-modal-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,.8); z-index: 999999;
+.ppay {
+  display: none; position: fixed; inset: 0; z-index: 99998;
+  background: rgba(0,0,0,.85); backdrop-filter: blur(8px);
   align-items: center; justify-content: center;
-  backdrop-filter: blur(6px);
 }
-.pay-modal-overlay.active { display: flex; }
-.pay-modal {
-  background: #0f1929; border: 1px solid rgba(201,168,76,.3);
+.ppay.on { display: flex; }
+.ppay-box {
+  background: #0d1525;
+  border: 1px solid rgba(201,168,76,.25);
   border-radius: 20px; padding: 36px;
-  max-width: 400px; width: 90%;
+  max-width: 380px; width: 92%; text-align: center;
   box-shadow: 0 24px 64px rgba(0,0,0,.6);
-  text-align: center;
 }
-.pay-modal h3 { font-size: 1.5rem; font-weight: 900; color: var(--white); margin-bottom: 6px; }
-.pay-modal p { color: var(--text-muted); font-size: .9rem; margin-bottom: 24px; }
-.pay-amount {
-  font-size: 3rem; font-weight: 900;
-  background: linear-gradient(135deg,#c9a84c,#e8c96a);
+.ppay-box h3 { font-size: 1.4rem; font-weight: 900; color: #fff; margin-bottom: 8px; }
+.ppay-box p { color: #5f7499; font-size: .875rem; margin-bottom: 22px; }
+.ppay-amt {
+  font-size: 2.8rem; font-weight: 900;
+  background: linear-gradient(135deg,#c9a84c,#f0de8a);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
-.pay-per { color: var(--text-muted); font-size: .85rem; margin-bottom: 28px; }
-.pay-confirm-btn {
-  width: 100%; padding: 16px;
-  background: #c9a84c; color: #0a0f1e;
+.ppay-per { color: #5f7499; font-size: .82rem; margin-bottom: 26px; }
+.ppay-pay-btn {
+  width: 100%; padding: 15px;
+  background: #c9a84c; color: #040d1f;
   border: none; border-radius: 12px;
-  font-size: 1.1rem; font-weight: 800;
-  cursor: pointer; margin-bottom: 12px;
-  transition: all .2s;
+  font-size: 1rem; font-weight: 800; cursor: pointer;
+  transition: all .2s; margin-bottom: 10px;
 }
-.pay-confirm-btn:hover { background: #b8953f; }
-.pay-cancel-btn {
+.ppay-pay-btn:hover { background: #b8953f; }
+.ppay-cancel {
+  width: 100%; padding: 10px;
   background: none; border: 1px solid rgba(255,255,255,.1);
-  color: var(--text-muted); width: 100%; padding: 12px;
-  border-radius: 10px; cursor: pointer; font-size: .9rem;
-  transition: all .2s;
+  color: #5f7499; border-radius: 10px;
+  cursor: pointer; font-size: .875rem; transition: all .2s;
 }
-.pay-cancel-btn:hover { border-color: rgba(255,255,255,.3); color: var(--white); }
+.ppay-cancel:hover { border-color: rgba(255,255,255,.25); color: #d4e0f5; }
 
-/* RESPONSIVE */
-@media (max-width: 720px) {
-  .ws-body { flex-direction: column; }
-  .ws-side { width: 100%; min-width: auto; border-left: none; border-top: 1px solid rgba(201,168,76,.12); }
-  .ws-thumb-grid { grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); }
-  .ws-add-more { right: 24px; }
-  .pdfw-grid { grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 14px; }
+/* ── File selected indicator ── */
+.pfile-selected {
+  display: none;
+  background: #0d1525; border: 1px solid rgba(201,168,76,.2);
+  border-radius: 12px; padding: 14px 16px;
+  width: 100%; max-width: 560px;
+  display: none; align-items: center; gap: 12px;
+}
+.pfile-selected.show { display: flex; }
+.pfile-selected-name { flex: 1; font-weight: 600; color: #d4e0f5; font-size: .9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pfile-clear { background: none; border: none; color: #5f7499; cursor: pointer; font-size: 1.1rem; }
+.pfile-clear:hover { color: #ef4444; }
+
+/* Responsive */
+@media (max-width: 700px) {
+  .pws-body { flex-direction: column; }
+  .pws-side { width: 100%; min-width: auto; border-left: none; border-top: 1px solid rgba(201,168,76,.1); max-height: 50vh; }
+  .pthumb-grid { grid-template-columns: repeat(auto-fill,minmax(130px,1fr)); }
+  #p-add-more { right: 20px; }
+  .pgrid { grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="pdfw">
 
-<!-- ══════════ LOADING OVERLAY ══════════ -->
-<div class="ws-loader" id="ws-loader">
-  <div class="ws-loader-ring"></div>
-  <div class="ws-loader-text" id="ws-loader-text">Processing…</div>
-</div>
+<!-- ════════════════════════════════════════════════════════════
+     PDF WORLD — Entire screen taken over
+     ════════════════════════════════════════════════════════════ -->
+<div id="pdf-world">
 
-<!-- ══════════ PAYMENT MODAL ══════════ -->
-<div class="pay-modal-overlay" id="pay-modal">
-  <div class="pay-modal">
-    <h3>Advanced Processing</h3>
-    <p>Powered by iLovePDF engine — highest accuracy & speed</p>
-    <div class="pay-amount">₹1</div>
-    <div class="pay-per">per task</div>
-    <button class="pay-confirm-btn" onclick="payConfirmed()">Pay ₹1 & Process</button>
-    <button class="pay-cancel-btn" onclick="payCancel()">Cancel</button>
-  </div>
-</div>
-
-<!-- ══════════ HOME — HERO ══════════ -->
-<div id="pdfw-home">
-  <div class="pdfw-hero">
-    <h1>Every tool you need to<br><span>work with PDFs</span> in one place</h1>
-    <p>Merge, split, compress, convert, rotate, unlock and watermark PDFs with just a few clicks. All 100% FREE — Advanced powered by iLovePDF.</p>
+  <!-- ── LOADER ── -->
+  <div class="ploader" id="ploader">
+    <div class="ploader-ring"></div>
+    <div class="ploader-txt" id="ploader-txt">Processing…</div>
   </div>
 
-  <!-- Filter pills -->
-  <div class="pdfw-pills" id="pdfw-pills">
-    <button class="pdfw-pill active" data-cat="all" onclick="filterCat('all', this)">All</button>
-    <button class="pdfw-pill" data-cat="organize" onclick="filterCat('organize', this)">Organize PDF</button>
-    <button class="pdfw-pill" data-cat="optimize" onclick="filterCat('optimize', this)">Optimize PDF</button>
-    <button class="pdfw-pill" data-cat="convert-to" onclick="filterCat('convert-to', this)">Convert to PDF</button>
-    <button class="pdfw-pill" data-cat="convert-from" onclick="filterCat('convert-from', this)">Convert from PDF</button>
-    <button class="pdfw-pill" data-cat="edit" onclick="filterCat('edit', this)">Edit PDF</button>
-    <button class="pdfw-pill" data-cat="security" onclick="filterCat('security', this)">PDF Security</button>
+  <!-- ── PAYMENT MODAL ── -->
+  <div class="ppay" id="ppay">
+    <div class="ppay-box">
+      <h3>Advanced Processing</h3>
+      <p>Powered by iLovePDF engine — highest accuracy, speed & quality</p>
+      <div class="ppay-amt">₹1</div>
+      <div class="ppay-per">per task · Razorpay secure payment</div>
+      <button class="ppay-pay-btn" onclick="payConfirmed()">✔ Pay ₹1 & Process Now</button>
+      <button class="ppay-cancel" onclick="payCancel()">Cancel</button>
+    </div>
   </div>
 
-  <!-- Grid of tools -->
-  <div class="pdfw-grid" id="pdfw-grid">
+  <!-- ── ADD MORE FAB ── -->
+  <button id="p-add-more" title="Add more PDFs" onclick="triggerAddMore()">+</button>
 
-    <!-- ORGANIZE PDF -->
-    <div class="pdfw-card" data-cat="organize" onclick="openTool('merge')">
-      <div class="pdfw-card-icon">🔗</div>
-      <div class="pdfw-card-name">Merge PDF</div>
-      <div class="pdfw-card-desc">Combine PDFs in the order you want</div>
+  <!-- ══════════════ iLovePDF NAVBAR ══════════════ -->
+  <nav class="pnav">
+    <a class="pnav-logo" onclick="showHome()" href="javascript:void(0)">
+      <div class="pnav-logo-icon">M</div>
+      <div class="pnav-logo-text">MY<span>BBT</span> PDF</div>
+    </a>
+
+    <div class="pnav-links">
+      <button class="pnav-link" onclick="openTool('merge')">Merge PDF</button>
+      <button class="pnav-link" onclick="openTool('split')">Split PDF</button>
+      <button class="pnav-link" onclick="openTool('compress')">Compress PDF</button>
+      <button class="pnav-link" onclick="openTool('images-to-pdf')">JPG to PDF</button>
+      <button class="pnav-link" onclick="openTool('pdf-to-images')">PDF to JPG</button>
+      <button class="pnav-link" onclick="openTool('word-to-pdf')">Word to PDF</button>
+      <button class="pnav-link" onclick="openTool('pdf-to-word')">PDF to Word</button>
+      <button class="pnav-link" onclick="openTool('rotate')">Rotate PDF</button>
+      <button class="pnav-link" onclick="openTool('protect')">Protect PDF</button>
+      <button class="pnav-link" onclick="openTool('unlock')">Unlock PDF</button>
+      <button class="pnav-link" onclick="showHome()">All PDF Tools ▾</button>
     </div>
 
-    <div class="pdfw-card" data-cat="organize" onclick="openTool('split')">
-      <div class="pdfw-card-icon">✂️</div>
-      <div class="pdfw-card-name">Split PDF</div>
-      <div class="pdfw-card-desc">Separate one PDF into multiple files</div>
+    <div class="pnav-right">
+      <a href="/dashboard" class="pnav-exit-btn">← Back to MYBBT</a>
+    </div>
+  </nav>
+
+  <!-- ══════════════ HOME ══════════════ -->
+  <div id="pdf-home" style="flex:1; overflow-y:auto; background:#070e1c;">
+
+    <!-- Hero -->
+    <div class="phero">
+      <h1>Every tool you need to<br>work with <em>PDFs in one place</em></h1>
+      <p>Merge, split, compress, convert, rotate, unlock and watermark PDFs with just a few clicks. Free + Advanced powered by iLovePDF.</p>
     </div>
 
-    <div class="pdfw-card" data-cat="organize" onclick="openTool('remove-pages')">
-      <div class="pdfw-card-icon">🗑️</div>
-      <div class="pdfw-card-name">Remove Pages</div>
-      <div class="pdfw-card-desc">Delete specific pages from a PDF</div>
+    <!-- Filter Pills -->
+    <div class="ppills" id="ppills">
+      <button class="ppill active" onclick="filterPDF('all',this)">All</button>
+      <button class="ppill" onclick="filterPDF('organize',this)">Organize PDF</button>
+      <button class="ppill" onclick="filterPDF('optimize',this)">Optimize PDF</button>
+      <button class="ppill" onclick="filterPDF('convert-to',this)">Convert to PDF</button>
+      <button class="ppill" onclick="filterPDF('convert-from',this)">Convert from PDF</button>
+      <button class="ppill" onclick="filterPDF('edit',this)">Edit PDF</button>
+      <button class="ppill" onclick="filterPDF('security',this)">PDF Security</button>
     </div>
 
-    <div class="pdfw-card" data-cat="organize" onclick="openTool('extract')">
-      <div class="pdfw-card-icon">📤</div>
-      <div class="pdfw-card-name">Extract Pages</div>
-      <div class="pdfw-card-desc">Select and extract pages from PDF</div>
+    <!-- ORGANIZE PDF section -->
+    <div class="psection-hdr" data-section="organize">
+      <h2>Organize PDF</h2><div class="psection-hdr-line"></div>
     </div>
-
-    <div class="pdfw-card" data-cat="organize" onclick="openTool('organize')">
-      <div class="pdfw-card-icon">📋</div>
-      <div class="pdfw-card-name">Organize PDF</div>
-      <div class="pdfw-card-desc">Reorder, rotate or remove pages</div>
-    </div>
-
-    <div class="pdfw-card" data-cat="organize" onclick="openTool('page-numbers')">
-      <div class="pdfw-card-icon">🔢</div>
-      <div class="pdfw-card-name">Page Numbers</div>
-      <div class="pdfw-card-desc">Add page numbers to a PDF</div>
+    <div class="pgrid">
+      <div class="pcard" data-cat="organize" onclick="openTool('merge')">
+        <div class="pcard-icon ic-r">🔗</div>
+        <div class="pcard-name">Merge PDF</div>
+        <div class="pcard-desc">Combine multiple PDFs in the order you want</div>
+      </div>
+      <div class="pcard" data-cat="organize" onclick="openTool('split')">
+        <div class="pcard-icon ic-o">✂️</div>
+        <div class="pcard-name">Split PDF</div>
+        <div class="pcard-desc">Separate one PDF into multiple files</div>
+      </div>
+      <div class="pcard" data-cat="organize" onclick="openTool('remove-pages')">
+        <div class="pcard-icon ic-r">🗑️</div>
+        <div class="pcard-name">Remove Pages</div>
+        <div class="pcard-desc">Delete specific pages from your PDF</div>
+      </div>
+      <div class="pcard" data-cat="organize" onclick="openTool('extract')">
+        <div class="pcard-icon ic-b">📤</div>
+        <div class="pcard-name">Extract Pages</div>
+        <div class="pcard-desc">Select and save certain pages from PDF</div>
+      </div>
+      <div class="pcard" data-cat="organize" onclick="openTool('organize')">
+        <div class="pcard-icon ic-p">📋</div>
+        <div class="pcard-name">Organize PDF</div>
+        <div class="pcard-desc">Reorder or delete pages in a PDF</div>
+      </div>
+      <div class="pcard" data-cat="organize" onclick="openTool('page-numbers')">
+        <div class="pcard-icon ic-b">🔢</div>
+        <div class="pcard-name">Page Numbers</div>
+        <div class="pcard-desc">Add page numbers to a PDF document</div>
+      </div>
     </div>
 
     <!-- OPTIMIZE PDF -->
-    <div class="pdfw-card" data-cat="optimize" onclick="openTool('compress')">
-      <div class="pdfw-card-icon">🗜️</div>
-      <div class="pdfw-card-name">Compress PDF</div>
-      <div class="pdfw-card-desc">Reduce file size while maintaining quality</div>
+    <div class="psection-hdr" data-section="optimize">
+      <h2>Optimize PDF</h2><div class="psection-hdr-line"></div>
     </div>
-
-    <div class="pdfw-card" data-cat="optimize" onclick="openTool('repair')">
-      <div class="pdfw-card-icon">🔧</div>
-      <div class="pdfw-card-name">Repair PDF</div>
-      <div class="pdfw-card-desc">Fix damaged or corrupted PDFs</div>
-    </div>
-
-    <div class="pdfw-card" data-cat="optimize" onclick="openTool('flatten')">
-      <div class="pdfw-card-icon">⬜</div>
-      <div class="pdfw-card-name">Flatten PDF</div>
-      <div class="pdfw-card-desc">Remove interactive form elements</div>
-    </div>
-
-    <div class="pdfw-card" data-cat="optimize" onclick="openTool('ocr')">
-      <div class="pdfw-card-icon">🔍</div>
-      <div class="pdfw-card-name">OCR PDF</div>
-      <div class="pdfw-card-desc">Make scanned PDF text searchable</div>
+    <div class="pgrid">
+      <div class="pcard" data-cat="optimize" onclick="openTool('compress')">
+        <div class="pcard-icon ic-o">🗜️</div>
+        <div class="pcard-name">Compress PDF</div>
+        <div class="pcard-desc">Reduce file size while maintaining quality</div>
+      </div>
+      <div class="pcard" data-cat="optimize" onclick="openTool('ocr')">
+        <div class="pcard-icon ic-b">🔍</div>
+        <div class="pcard-name">OCR PDF</div>
+        <div class="pcard-desc">Make scanned PDFs searchable and editable</div>
+      </div>
+      <div class="pcard" data-cat="optimize" onclick="openTool('repair')">
+        <div class="pcard-icon ic-g">🔧</div>
+        <div class="pcard-name">Repair PDF</div>
+        <div class="pcard-desc">Fix corrupted or broken PDF files</div>
+      </div>
+      <div class="pcard" data-cat="optimize" onclick="openTool('flatten')">
+        <div class="pcard-icon ic-au">⬜</div>
+        <div class="pcard-name">Flatten PDF</div>
+        <div class="pcard-desc">Remove interactive form fields</div>
+      </div>
     </div>
 
     <!-- CONVERT TO PDF -->
-    <div class="pdfw-card" data-cat="convert-to" onclick="openTool('images-to-pdf')">
-      <div class="pdfw-card-icon">🖼️</div>
-      <div class="pdfw-card-name">JPG to PDF</div>
-      <div class="pdfw-card-desc">Convert images to PDF format</div>
+    <div class="psection-hdr" data-section="convert-to">
+      <h2>Convert to PDF</h2><div class="psection-hdr-line"></div>
     </div>
-
-    <div class="pdfw-card" data-cat="convert-to" onclick="openTool('word-to-pdf')">
-      <div class="pdfw-card-icon">📝</div>
-      <div class="pdfw-card-name">Word to PDF</div>
-      <div class="pdfw-card-desc">Convert DOC and DOCX to PDF</div>
-    </div>
-
-    <div class="pdfw-card" data-cat="convert-to" onclick="openTool('excel-to-pdf')">
-      <div class="pdfw-card-icon">📊</div>
-      <div class="pdfw-card-name">Excel to PDF</div>
-      <div class="pdfw-card-desc">Convert XLSX and XLS to PDF</div>
-    </div>
-
-    <div class="pdfw-card" data-cat="convert-to" onclick="openTool('ppt-to-pdf')">
-      <div class="pdfw-card-icon">📽️</div>
-      <div class="pdfw-card-name">PowerPoint to PDF</div>
-      <div class="pdfw-card-desc">Convert PPTX and PPT to PDF</div>
-    </div>
-
-    <div class="pdfw-card" data-cat="convert-to" onclick="openTool('html-to-pdf')">
-      <div class="pdfw-card-icon">🌐</div>
-      <div class="pdfw-card-name">HTML to PDF</div>
-      <div class="pdfw-card-desc">Convert web page URL to PDF</div>
+    <div class="pgrid">
+      <div class="pcard" data-cat="convert-to" onclick="openTool('images-to-pdf')">
+        <div class="pcard-icon ic-b">🖼️</div>
+        <div class="pcard-name">JPG to PDF</div>
+        <div class="pcard-desc">Convert JPG, PNG images to PDF format</div>
+      </div>
+      <div class="pcard" data-cat="convert-to" onclick="openTool('word-to-pdf')">
+        <div class="pcard-icon ic-b">📝</div>
+        <div class="pcard-name">Word to PDF</div>
+        <div class="pcard-desc">Convert DOC and DOCX files to PDF</div>
+      </div>
+      <div class="pcard" data-cat="convert-to" onclick="openTool('excel-to-pdf')">
+        <div class="pcard-icon ic-g">📊</div>
+        <div class="pcard-name">Excel to PDF</div>
+        <div class="pcard-desc">Convert XLSX and XLS to PDF</div>
+      </div>
+      <div class="pcard" data-cat="convert-to" onclick="openTool('ppt-to-pdf')">
+        <div class="pcard-icon ic-o">📽️</div>
+        <div class="pcard-name">PowerPoint to PDF</div>
+        <div class="pcard-desc">Convert PPTX presentations to PDF</div>
+      </div>
+      <div class="pcard" data-cat="convert-to" onclick="openTool('html-to-pdf')">
+        <div class="pcard-icon ic-t">🌐</div>
+        <div class="pcard-name">HTML to PDF</div>
+        <div class="pcard-desc">Convert any web URL to a PDF file</div>
+      </div>
     </div>
 
     <!-- CONVERT FROM PDF -->
-    <div class="pdfw-card" data-cat="convert-from" onclick="openTool('pdf-to-images')">
-      <div class="pdfw-card-icon">📸</div>
-      <div class="pdfw-card-name">PDF to JPG</div>
-      <div class="pdfw-card-desc">Extract each page as an image</div>
+    <div class="psection-hdr" data-section="convert-from">
+      <h2>Convert from PDF</h2><div class="psection-hdr-line"></div>
     </div>
-
-    <div class="pdfw-card" data-cat="convert-from" onclick="openTool('pdf-to-word')">
-      <div class="pdfw-card-icon">📄</div>
-      <div class="pdfw-card-name">PDF to Word</div>
-      <div class="pdfw-card-desc">Convert PDF to editable DOC</div>
-    </div>
-
-    <div class="pdfw-card" data-cat="convert-from" onclick="openTool('pdf-to-excel')">
-      <div class="pdfw-card-icon">📉</div>
-      <div class="pdfw-card-name">PDF to Excel</div>
-      <div class="pdfw-card-desc">Extract tables to XLSX format</div>
-    </div>
-
-    <div class="pdfw-card" data-cat="convert-from" onclick="openTool('pdf-to-pptx')">
-      <div class="pdfw-card-icon">🎞️</div>
-      <div class="pdfw-card-name">PDF to PowerPoint</div>
-      <div class="pdfw-card-desc">Turn your PDF into editable slides</div>
-    </div>
-
-    <div class="pdfw-card" data-cat="convert-from" onclick="openTool('extract-text')">
-      <div class="pdfw-card-icon">📃</div>
-      <div class="pdfw-card-name">Extract Text</div>
-      <div class="pdfw-card-desc">Copy all text content from PDF</div>
+    <div class="pgrid">
+      <div class="pcard" data-cat="convert-from" onclick="openTool('pdf-to-images')">
+        <div class="pcard-icon ic-pk">📸</div>
+        <div class="pcard-name">PDF to JPG</div>
+        <div class="pcard-desc">Convert each page to a high quality image</div>
+      </div>
+      <div class="pcard" data-cat="convert-from" onclick="openTool('pdf-to-word')">
+        <div class="pcard-icon ic-b">📄</div>
+        <div class="pcard-name">PDF to Word</div>
+        <div class="pcard-desc">Convert PDF to editable DOC files</div>
+      </div>
+      <div class="pcard" data-cat="convert-from" onclick="openTool('pdf-to-excel')">
+        <div class="pcard-icon ic-g">📉</div>
+        <div class="pcard-name">PDF to Excel</div>
+        <div class="pcard-desc">Extract tables and data to XLSX</div>
+      </div>
+      <div class="pcard" data-cat="convert-from" onclick="openTool('pdf-to-pptx')">
+        <div class="pcard-icon ic-o">🎞️</div>
+        <div class="pcard-name">PDF to PowerPoint</div>
+        <div class="pcard-desc">Turn your PDF into editable slides</div>
+      </div>
+      <div class="pcard" data-cat="convert-from" onclick="openTool('extract-text')">
+        <div class="pcard-icon ic-au">📃</div>
+        <div class="pcard-name">Extract Text</div>
+        <div class="pcard-desc">Copy all text content from a PDF</div>
+      </div>
     </div>
 
     <!-- EDIT PDF -->
-    <div class="pdfw-card" data-cat="edit" onclick="openTool('rotate')">
-      <div class="pdfw-card-icon">🔄</div>
-      <div class="pdfw-card-name">Rotate PDF</div>
-      <div class="pdfw-card-desc">Rotate one or all pages</div>
+    <div class="psection-hdr" data-section="edit">
+      <h2>Edit PDF</h2><div class="psection-hdr-line"></div>
+    </div>
+    <div class="pgrid">
+      <div class="pcard" data-cat="edit" onclick="openTool('rotate')">
+        <div class="pcard-icon ic-o">🔄</div>
+        <div class="pcard-name">Rotate PDF</div>
+        <div class="pcard-desc">Rotate one or all PDF pages easily</div>
+      </div>
+      <div class="pcard" data-cat="edit" onclick="openTool('watermark')">
+        <div class="pcard-icon ic-b">💧</div>
+        <div class="pcard-name">Add Watermark</div>
+        <div class="pcard-desc">Stamp a text watermark on your PDF</div>
+      </div>
+      <div class="pcard" data-cat="edit" onclick="openTool('crop')">
+        <div class="pcard-icon ic-p">🔲</div>
+        <div class="pcard-name">Crop PDF</div>
+        <div class="pcard-desc">Adjust page margins and crop PDF</div>
+      </div>
+      <div class="pcard" data-cat="edit" onclick="openTool('scan-to-pdf')">
+        <div class="pcard-icon ic-g">📷</div>
+        <div class="pcard-name">Scan to PDF</div>
+        <div class="pcard-desc">Use camera photos to create a PDF</div>
+      </div>
     </div>
 
-    <div class="pdfw-card" data-cat="edit" onclick="openTool('watermark')">
-      <div class="pdfw-card-icon">💧</div>
-      <div class="pdfw-card-name">Add Watermark</div>
-      <div class="pdfw-card-desc">Stamp text or image on pages</div>
+    <!-- PDF SECURITY -->
+    <div class="psection-hdr" data-section="security">
+      <h2>PDF Security</h2><div class="psection-hdr-line"></div>
     </div>
-
-    <div class="pdfw-card" data-cat="edit" onclick="openTool('scan-to-pdf')">
-      <div class="pdfw-card-icon">📷</div>
-      <div class="pdfw-card-name">Scan to PDF</div>
-      <div class="pdfw-card-desc">Use camera to create PDF</div>
+    <div class="pgrid" style="padding-bottom:60px;">
+      <div class="pcard" data-cat="security" onclick="openTool('unlock')">
+        <div class="pcard-icon ic-g">🔓</div>
+        <div class="pcard-name">Unlock PDF</div>
+        <div class="pcard-desc">Remove password protection from PDF</div>
+      </div>
+      <div class="pcard" data-cat="security" onclick="openTool('protect')">
+        <div class="pcard-icon ic-r">🔐</div>
+        <div class="pcard-name">Protect PDF</div>
+        <div class="pcard-desc">Encrypt your PDF with a strong password</div>
+      </div>
     </div>
+  </div><!-- END #pdf-home -->
 
-    <div class="pdfw-card" data-cat="edit" onclick="openTool('crop')">
-      <div class="pdfw-card-icon">🔲</div>
-      <div class="pdfw-card-name">Crop PDF</div>
-      <div class="pdfw-card-desc">Adjust page margins and size</div>
+  <!-- ══════════════ WORKSPACE ══════════════ -->
+  <div id="pdf-ws">
+    <div class="pws-bar">
+      <button class="pws-back" onclick="showHome()">← All PDF Tools</button>
+      <span class="pws-tool-name" id="pws-name">Tool</span>
     </div>
-
-    <!-- SECURITY -->
-    <div class="pdfw-card" data-cat="security" onclick="openTool('unlock')">
-      <div class="pdfw-card-icon">🔓</div>
-      <div class="pdfw-card-name">Unlock PDF</div>
-      <div class="pdfw-card-desc">Remove password from a PDF</div>
-    </div>
-
-    <div class="pdfw-card" data-cat="security" onclick="openTool('protect')">
-      <div class="pdfw-card-icon">🔐</div>
-      <div class="pdfw-card-name">Protect PDF</div>
-      <div class="pdfw-card-desc">Encrypt PDF with a password</div>
-    </div>
-  </div>
-</div><!-- END #pdfw-home -->
-
-
-<!-- ══════════ FULLSCREEN WORKSPACE ══════════ -->
-<div id="pdfw-workspace">
-  <div class="ws-nav">
-    <button class="ws-back" onclick="goHome()">← All PDF Tools</button>
-    <span class="ws-tool-name" id="ws-tool-name">Tool</span>
-  </div>
-
-  <div class="ws-body">
-    <!-- LEFT MAIN AREA -->
-    <div class="ws-main" id="ws-main">
-      <!-- Content injected by JS -->
-    </div>
-
-    <!-- RIGHT SIDEBAR -->
-    <div class="ws-side" id="ws-side">
-      <!-- Content injected by JS -->
+    <div class="pws-body">
+      <div class="pws-main" id="pws-main"></div>
+      <div class="pws-side" id="pws-side"></div>
     </div>
   </div>
-</div>
 
-</div><!-- END .pdfw -->
+</div><!-- END #pdf-world -->
 
-<!-- ══════════ JAVASCRIPT ══════════ -->
+<!-- ════════════════════════════════════════════════════════ JAVASCRIPT -->
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 window.MYBBT_LOGGED_IN = {{ 'true' if session.get('user_id') else 'false' }};
 
-// ─────────────────── FILTER ──────────────────────────
-function filterCat(cat, btn) {
-  document.querySelectorAll('.pdfw-pill').forEach(p => p.classList.remove('active'));
+/* ─── FILTER ─────────────────────── */
+function filterPDF(cat, btn) {
+  document.querySelectorAll('.ppill').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
-  document.querySelectorAll('.pdfw-card').forEach(card => {
-    if (cat === 'all' || card.dataset.cat === cat) {
-      card.style.display = 'flex';
-    } else {
-      card.style.display = 'none';
-    }
+  document.querySelectorAll('.pcard').forEach(c => {
+    c.style.display = (cat === 'all' || c.dataset.cat === cat) ? 'flex' : 'none';
+  });
+  // Show/hide section headers
+  document.querySelectorAll('.psection-hdr').forEach(h => {
+    h.style.display = (cat === 'all' || h.dataset.section === cat) ? 'flex' : 'none';
   });
 }
 
-// ─────────────────── NAVIGATION ──────────────────────
-const TOOL_META = {
-  merge:          { name: 'Merge PDF',         info: 'To change the order of your PDFs, drag and drop the files as you want.', type: 'multi' },
-  split:          { name: 'Split PDF',          info: 'Choose how to split your PDF.',                                          type: 'single', apiUrl: '/api/pdf/split' },
-  compress:       { name: 'Compress PDF',       info: 'Reduce the size of your PDF online without sacrificing quality.',        type: 'single', apiUrl: '/api/pdf/compress' },
-  rotate:         { name: 'Rotate PDF',         info: 'Choose the rotation angle for your PDF pages.',                         type: 'single', apiUrl: '/api/pdf/rotate' },
-  watermark:      { name: 'Add Watermark',      info: 'Add a text watermark to your PDF document.',                            type: 'single', apiUrl: '/api/pdf/watermark' },
-  protect:        { name: 'Protect PDF',        info: 'Encrypt your PDF with a password.',                                     type: 'single', apiUrl: '/api/pdf/protect' },
-  unlock:         { name: 'Unlock PDF',         info: 'Remove password protection from a PDF.',                                type: 'single', apiUrl: '/api/pdf/unlock' },
-  'remove-pages': { name: 'Remove Pages',       info: 'Enter page numbers you want to delete.',                                type: 'single', apiUrl: '/api/pdf/remove-pages' },
-  extract:        { name: 'Extract Pages',      info: 'Select which pages to extract from your PDF.',                         type: 'single', apiUrl: '/api/pdf/extract' },
-  organize:       { name: 'Organize PDF',       info: 'Drag pages to reorder, rotate or delete them.',                        type: 'single', apiUrl: '/api/pdf/organize' },
-  'page-numbers': { name: 'Page Numbers',       info: 'Add page numbers to your PDF.',                                        type: 'single', apiUrl: '/api/pdf/page-numbers' },
-  ocr:            { name: 'OCR PDF',            info: 'Make scanned PDFs searchable and editable.',                           type: 'single', apiUrl: '/api/pdf/ocr' },
-  repair:         { name: 'Repair PDF',         info: 'Fix corrupted or damaged PDF files.',                                  type: 'single', apiUrl: '/api/pdf/repair' },
-  flatten:        { name: 'Flatten PDF',        info: 'Remove interactive form fields.',                                      type: 'single', apiUrl: '/api/pdf/flatten' },
-  crop:           { name: 'Crop PDF',           info: 'Adjust page margins and crop your PDF.',                               type: 'single', apiUrl: '/api/pdf/crop' },
-  'scan-to-pdf':  { name: 'Scan to PDF',        info: 'Convert camera images to a PDF.',                                      type: 'single', apiUrl: '/api/pdf/scan-to-pdf' },
-  'images-to-pdf':{ name: 'JPG to PDF',         info: 'Convert images to PDF. Drag to reorder.',                             type: 'image-multi', apiUrl: '/api/pdf/images-to-pdf' },
-  'word-to-pdf':  { name: 'Word to PDF',        info: 'Convert DOC or DOCX to PDF.',                                         type: 'single', apiUrl: '/api/pdf/word-to-pdf', accept: '.doc,.docx' },
-  'excel-to-pdf': { name: 'Excel to PDF',       info: 'Convert XLSX or XLS to PDF.',                                         type: 'single', apiUrl: '/api/pdf/excel-to-pdf', accept: '.xls,.xlsx' },
-  'ppt-to-pdf':   { name: 'PowerPoint to PDF',  info: 'Convert PPT or PPTX to PDF.',                                         type: 'single', apiUrl: '/api/pdf/ppt-to-pdf', accept: '.ppt,.pptx' },
-  'html-to-pdf':  { name: 'HTML to PDF',        info: 'Enter a URL to convert it to PDF.',                                   type: 'url', apiUrl: '/api/pdf/html-to-pdf' },
-  'pdf-to-images':{ name: 'PDF to JPG',         info: 'Convert each page to a JPG image.',                                   type: 'single', apiUrl: '/api/pdf/to-images' },
-  'pdf-to-word':  { name: 'PDF to Word',        info: 'Convert PDF to an editable Word document.',                           type: 'single', apiUrl: '/api/pdf/to-word' },
-  'pdf-to-excel': { name: 'PDF to Excel',       info: 'Extract tables from PDF to Excel.',                                   type: 'single', apiUrl: '/api/pdf/to-excel' },
-  'pdf-to-pptx':  { name: 'PDF to PowerPoint',  info: 'Convert PDF to editable slides.',                                     type: 'single', apiUrl: '/api/pdf/pdf-to-pptx' },
-  'extract-text': { name: 'Extract Text',       info: 'Extract all text from PDF.',                                          type: 'single', apiUrl: '/api/pdf/extract-text' },
-  'ai-summarize': { name: 'AI Summarizer',      info: 'Get an AI-powered summary of your PDF.',                              type: 'single', apiUrl: '/api/pdf/ai-summarize' },
-  translate:      { name: 'Translate PDF',      info: 'Translate your PDF into another language.',                           type: 'single', apiUrl: '/api/pdf/translate' },
-};
+/* ─── NAVIGATION ─────────────────── */
+function showHome() {
+  document.getElementById('pdf-home').style.display = 'block';
+  document.getElementById('pdf-ws').classList.remove('active');
+  document.getElementById('p-add-more').style.display = 'none';
+  currentTool = null; mergeFiles = []; mergeSortable = null;
+  // Reset nav links
+  document.querySelectorAll('.pnav-link').forEach(l => l.classList.remove('active'));
+}
 
 let currentTool = null;
 let pendingAction = null;
 
+const TMETA = {
+  merge:           { name:'Merge PDF',         info:'Drag files to reorder before merging.', multi: true },
+  split:           { name:'Split PDF',          info:'Split your PDF into multiple files.',               api:'/api/pdf/split' },
+  compress:        { name:'Compress PDF',       info:'Reduce file size while maintaining quality.',        api:'/api/pdf/compress' },
+  rotate:          { name:'Rotate PDF',         info:'Rotate your PDF pages.',                            api:'/api/pdf/rotate' },
+  watermark:       { name:'Add Watermark',      info:'Add a text watermark to your PDF.',                 api:'/api/pdf/watermark' },
+  protect:         { name:'Protect PDF',        info:'Encrypt PDF with a secure password.',               api:'/api/pdf/protect' },
+  unlock:          { name:'Unlock PDF',         info:'Remove password protection from PDF.',              api:'/api/pdf/unlock' },
+  'remove-pages':  { name:'Remove Pages',       info:'Enter page numbers to delete.',                     api:'/api/pdf/remove-pages' },
+  extract:         { name:'Extract Pages',      info:'Select which pages to extract.',                    api:'/api/pdf/extract' },
+  organize:        { name:'Organize PDF',       info:'Reorder, rotate, or delete pages.',                 api:'/api/pdf/organize' },
+  'page-numbers':  { name:'Page Numbers',       info:'Add page numbers to your PDF.',                     api:'/api/pdf/page-numbers' },
+  ocr:             { name:'OCR PDF',            info:'Make scanned PDF text searchable.',                  api:'/api/pdf/ocr' },
+  repair:          { name:'Repair PDF',         info:'Fix corrupted or damaged PDFs.',                    api:'/api/pdf/repair' },
+  flatten:         { name:'Flatten PDF',        info:'Remove interactive form fields from PDF.',          api:'/api/pdf/flatten' },
+  crop:            { name:'Crop PDF',           info:'Adjust page margins and crop.',                     api:'/api/pdf/crop' },
+  'scan-to-pdf':   { name:'Scan to PDF',        info:'Convert camera photos to PDF.',                     api:'/api/pdf/scan-to-pdf' },
+  'images-to-pdf': { name:'JPG to PDF',         info:'Drag to reorder your images.',                      multi:true, imgMulti:true, api:'/api/pdf/images-to-pdf' },
+  'word-to-pdf':   { name:'Word to PDF',        info:'Convert DOC or DOCX to PDF.',                       api:'/api/pdf/word-to-pdf', accept:'.doc,.docx' },
+  'excel-to-pdf':  { name:'Excel to PDF',       info:'Convert XLS or XLSX to PDF.',                       api:'/api/pdf/excel-to-pdf', accept:'.xls,.xlsx' },
+  'ppt-to-pdf':    { name:'PowerPoint to PDF',  info:'Convert PPT or PPTX to PDF.',                       api:'/api/pdf/ppt-to-pdf', accept:'.ppt,.pptx' },
+  'html-to-pdf':   { name:'HTML to PDF',        info:'Enter a website URL to convert to PDF.',            url: true, api:'/api/pdf/html-to-pdf' },
+  'pdf-to-images': { name:'PDF to JPG',         info:'Convert each page to a high quality image.',        api:'/api/pdf/to-images' },
+  'pdf-to-word':   { name:'PDF to Word',        info:'Convert PDF to editable Word document.',            api:'/api/pdf/to-word' },
+  'pdf-to-excel':  { name:'PDF to Excel',       info:'Extract tables from PDF to Excel.',                 api:'/api/pdf/to-excel' },
+  'pdf-to-pptx':   { name:'PDF to PowerPoint',  info:'Convert PDF to editable slides.',                   api:'/api/pdf/pdf-to-pptx' },
+  'extract-text':  { name:'Extract Text',       info:'Extract all text from PDF.',                        api:'/api/pdf/extract-text' },
+  'ai-summarize':  { name:'AI Summarizer',      info:'Get AI summary of PDF with Gemini.',                api:'/api/pdf/ai-summarize' },
+  translate:       { name:'Translate PDF',      info:'Translate PDF into another language.',              api:'/api/pdf/translate' },
+};
+
 function openTool(key) {
-  const meta = TOOL_META[key];
-  if (!meta) return;
+  const m = TMETA[key];
+  if (!m) return;
   currentTool = key;
 
-  document.getElementById('pdfw-home').style.display = 'none';
-  document.getElementById('pdfw-workspace').style.display = 'block';
-  document.getElementById('ws-tool-name').textContent = meta.name;
-  window.scrollTo(0, 0);
+  document.getElementById('pdf-home').style.display = 'none';
+  document.getElementById('pdf-ws').classList.add('active');
+  document.getElementById('pws-name').textContent = m.name;
+  document.querySelectorAll('.pnav-link').forEach(l => l.classList.remove('active'));
+  window.scrollTo(0,0);
 
-  if (key === 'merge') {
-    buildMergeUI(meta);
-  } else if (meta.type === 'url') {
-    buildUrlUI(meta);
-  } else {
-    buildSingleUI(meta, key);
-  }
+  if (m.multi) buildMultiTool(key, m);
+  else if (m.url) buildUrlTool(m);
+  else buildSingleTool(key, m);
 }
 
-function goHome() {
-  document.getElementById('pdfw-home').style.display = 'block';
-  document.getElementById('pdfw-workspace').style.display = 'none';
-  mergeFiles = [];
-  mergeSortable = null;
-  document.getElementById('ws-add-more-btn') && (document.getElementById('ws-add-more-btn').style.display = 'none');
+/* ─── LOADER ─────────────────────── */
+function showLoader(t) {
+  document.getElementById('ploader-txt').textContent = t || 'Processing…';
+  document.getElementById('ploader').classList.add('on');
 }
+function hideLoader() { document.getElementById('ploader').classList.remove('on'); }
 
-// ─────────────────── LOADER ──────────────────────────
-function showLoader(msg) {
-  document.getElementById('ws-loader-text').textContent = msg || 'Processing…';
-  document.getElementById('ws-loader').classList.add('active');
-}
-function hideLoader() {
-  document.getElementById('ws-loader').classList.remove('active');
-}
+/* ─── PAYMENT ────────────────────── */
+function openPay(action) { pendingAction = action; document.getElementById('ppay').classList.add('on'); }
+function payCancel() { document.getElementById('ppay').classList.remove('on'); pendingAction = null; }
+function payConfirmed() { document.getElementById('ppay').classList.remove('on'); if (pendingAction) { pendingAction(); pendingAction = null; } }
 
-// ─────────────────── PAYMENT MODAL ───────────────────
-function openPayModal(action) {
-  pendingAction = action;
-  document.getElementById('pay-modal').classList.add('active');
-}
-function payCancel() {
-  document.getElementById('pay-modal').classList.remove('active');
-  pendingAction = null;
-}
-function payConfirmed() {
-  document.getElementById('pay-modal').classList.remove('active');
-  if (pendingAction) {
-    pendingAction();
-    pendingAction = null;
-  }
-}
-
-// ─────────────────── RESULT ──────────────────────────
-function showResult(el, success, title, sub, filename) {
+/* ─── RESULT ─────────────────────── */
+function showResult(el, ok, title, sub, filename) {
   hideLoader();
   if (!el) return;
   el.style.display = 'block';
-  el.className = 'ws-result ' + (success ? 'success' : 'error');
+  el.className = 'pres ' + (ok ? 'ok' : 'err');
   el.innerHTML = `
-    <div class="ws-result-title">${success ? '✅' : '❌'} ${title}</div>
-    ${sub ? `<div class="ws-result-sub">${sub}</div>` : ''}
-    ${success && filename ? `<a class="ws-download-btn" href="/download/${filename}" download>⬇ Download</a>` : ''}
+    <div class="pres-title">${ok ? '✅' : '❌'} ${title}</div>
+    ${sub ? `<div class="pres-sub">${sub}</div>` : ''}
+    ${ok && filename ? `<a class="pres-dl" href="/download/${filename}" download>⬇ Download</a>` : ''}
   `;
 }
 
-async function callApi(url, formData, resultEl, loadMsg) {
-  showLoader(loadMsg || 'Processing…');
+async function callApi(url, fd, resEl, msg) {
+  showLoader(msg || 'Processing…');
   try {
-    const res = await fetch(url, { method: 'POST', body: formData });
-    const data = await res.json();
+    const r = await fetch(url, {method:'POST', body:fd});
+    const d = await r.json();
     hideLoader();
-    if (data.success) {
-      showResult(resultEl, true, data.message || 'Done!',
-        data.reduction ? `Size reduced by ${data.reduction}%` :
-        data.pages ? `${data.pages} pages processed` : '',
-        data.filename || data.file
-      );
+    if (d.success) {
+      showResult(resEl, true, d.message || 'Done!',
+        d.reduction ? `Size reduced by ${d.reduction}%` : d.pages ? `${d.pages} pages processed` : '',
+        d.filename || d.file);
     } else {
-      showResult(resultEl, false, data.error || 'Something went wrong.', '');
+      showResult(resEl, false, d.error || 'Something went wrong.', '');
     }
-    return data;
+    return d;
   } catch(e) {
     hideLoader();
-    showResult(resultEl, false, 'Network error: ' + e.message, '');
+    showResult(resEl, false, 'Network error: ' + e.message, '');
     return null;
   }
 }
 
-// ─────────────────── DRAG-DROP SETUP ─────────────────
-function setupDropzone(el, inputId, onFiles) {
+/* ─── DRAG-DROP ──────────────────── */
+function setupDrop(el, onFiles) {
   el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
   el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
   el.addEventListener('drop', e => {
     e.preventDefault(); el.classList.remove('drag-over');
-    if (e.dataTransfer.files.length) {
-      const inp = document.getElementById(inputId);
-      if (inp) {
-        inp.files = e.dataTransfer.files;
-        inp.dispatchEvent(new Event('change'));
-      } else if (onFiles) {
-        onFiles(Array.from(e.dataTransfer.files));
-      }
-    }
+    if (e.dataTransfer.files.length) onFiles(Array.from(e.dataTransfer.files));
   });
 }
 
-// ─────────────────── PDF THUMBNAIL ───────────────────
-async function renderThumb(file, canvasId) {
+/* ─── PDF THUMBNAIL ──────────────── */
+async function renderThumb(file, cid) {
   try {
     const buf = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+    const pdf = await pdfjsLib.getDocument({data:buf}).promise;
     const page = await pdf.getPage(1);
-    const vp = page.getViewport({scale: 1});
-    const scale = Math.min(160/vp.width, 180/vp.height);
-    const svp = page.getViewport({scale});
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    canvas.width = svp.width;
-    canvas.height = svp.height;
-    await page.render({canvasContext: ctx, viewport: svp}).promise;
-  } catch(e) {
-    console.warn('Thumb error:', e);
-  }
+    const vp = page.getViewport({scale:1});
+    const sc = Math.min(160/vp.width, 175/vp.height);
+    const svp = page.getViewport({scale:sc});
+    const c = document.getElementById(cid);
+    if (!c) return;
+    c.width = svp.width; c.height = svp.height;
+    await page.render({canvasContext: c.getContext('2d'), viewport: svp}).promise;
+  } catch(e) { console.warn('thumb err', e); }
 }
 
-// ═══════════════════════════════════════════════════
-//   MERGE TOOL — full iLovePDF UI
-// ═══════════════════════════════════════════════════
-let mergeFiles = [];
-let mergeSortable = null;
+/* ═══════════════════════════════════════════════════
+   MULTI-FILE TOOL (Merge & JPG to PDF)
+   ═══════════════════════════════════════════════════ */
+let mergeFiles = [], mergeSortable = null;
 
-function buildMergeUI(meta) {
-  mergeFiles = [];
-  mergeSortable = null;
+function buildMultiTool(key, m) {
+  mergeFiles = []; mergeSortable = null;
+  const accept = m.imgMulti ? 'image/*' : '.pdf';
+  const isImg = !!m.imgMulti;
 
-  // MAIN AREA: dropzone
-  document.getElementById('ws-main').innerHTML = `
-    <div class="ws-dropzone" id="merge-dropzone">
-      <input type="file" id="merge-input" accept=".pdf" multiple onchange="onMergeAdd(this.files)"/>
-      <span class="ws-dropzone-icon">📄</span>
-      <div class="ws-dropzone-title">Select PDF files</div>
-      <div class="ws-dropzone-sub">or drop PDF files here</div>
-      <div class="ws-dropzone-btn">Select PDF files</div>
+  // MAIN
+  document.getElementById('pws-main').innerHTML = `
+    <div class="pdrop" id="pdrop-zone">
+      <input type="file" id="pmulti-inp" accept="${accept}" multiple onchange="onMultiAdd(this.files)"/>
+      <span class="pdrop-emoji">${isImg ? '🖼️' : '📄'}</span>
+      <div class="pdrop-title">Select ${isImg ? 'Image' : 'PDF'} files</div>
+      <div class="pdrop-sub">or drop files here · Drag to reorder</div>
+      <div class="pdrop-btn">Select files</div>
     </div>
-    <div class="ws-thumb-grid" id="merge-grid" style="display:none; width:100%;"></div>
+    <div class="pthumb-grid" id="pthumb-grid" style="display:none;"></div>
   `;
-  setupDropzone(document.getElementById('merge-dropzone'), null, files => onMergeAdd(files));
+  setupDrop(document.getElementById('pdrop-zone'), f => onMultiAdd(f));
 
   // SIDEBAR
-  document.getElementById('ws-side').innerHTML = `
-    <h2>Merge PDF</h2>
-    <div class="ws-side-info">ℹ️ ${meta.info}</div>
-    <div class="ws-options">
-      <div class="ws-options-title">Processing Mode</div>
-      <div class="ws-radio-group">
-        <label class="ws-radio-label selected" id="mode-free-lbl">
-          <input type="radio" name="merge-mode" id="mode-free" value="free" checked onchange="onModeChange(this)"/>
-          <div class="ws-radio-text">
-            <strong>Free (Local)</strong>
-            <span>Standard quality, always free</span>
-          </div>
+  const extra = !isImg ? `
+    <div class="popt">
+      <div class="popt-title">Processing Mode</div>
+      <div class="popt-radio" id="pmode-radio">
+        <label class="popt-radio-lbl selected">
+          <input type="radio" name="pmode" value="free" checked onchange="onModeChg(this)"/>
+          <div class="popt-text"><strong>Free (Local)</strong><span>Standard quality, always free</span></div>
         </label>
-        <label class="ws-radio-label" id="mode-pro-lbl">
-          <input type="radio" name="merge-mode" id="mode-pro" value="pro" onchange="onModeChange(this)"/>
-          <div class="ws-radio-text">
-            <strong>Advanced — ₹1/task</strong>
-            <span>iLovePDF engine: highest accuracy</span>
-          </div>
+        <label class="popt-radio-lbl">
+          <input type="radio" name="pmode" value="pro" onchange="onModeChg(this)"/>
+          <div class="popt-text"><strong>Advanced — ₹1/task</strong><span>iLovePDF engine · Maximum accuracy</span></div>
         </label>
       </div>
-    </div>
-    <div class="ws-side-spacer"></div>
-    <div class="ws-result" id="merge-result"></div>
-    <button class="ws-action-btn" id="merge-btn" onclick="doMerge()" disabled>Merge PDF →</button>
+    </div>` : '';
+
+  document.getElementById('pws-side').innerHTML = `
+    <h2>${m.name}</h2>
+    <div class="pws-side-info">ℹ️ ${m.info}</div>
+    ${extra}
+    <div class="pside-spacer"></div>
+    <div class="pres" id="pmulti-res"></div>
+    <button class="pact-btn" id="pmulti-btn" onclick="doMultiTool('${key}','${m.api||''}',${isImg})" disabled>
+      ${m.name} <span style="font-size:1.2rem">→</span>
+    </button>
   `;
-
-  // Ensure add-more button exists
-  ensureAddMoreBtn();
 }
 
-function ensureAddMoreBtn() {
-  let btn = document.getElementById('ws-add-more-btn');
-  if (!btn) {
-    btn = document.createElement('button');
-    btn.id = 'ws-add-more-btn';
-    btn.className = 'ws-add-more';
-    btn.title = 'Add more files';
-    btn.innerHTML = '+';
-    btn.style.display = 'none';
-    btn.style.position = 'fixed';
-    btn.style.bottom = '36px';
-    btn.style.right = '360px';
-    btn.style.zIndex = '1000';
-    btn.onclick = () => {
-      const inp = document.createElement('input');
-      inp.type = 'file'; inp.accept = '.pdf'; inp.multiple = true;
-      inp.onchange = () => onMergeAdd(inp.files);
-      inp.click();
-    };
-    document.body.appendChild(btn);
-  }
-  return btn;
-}
-
-function onMergeAdd(fileList) {
+function onMultiAdd(fileList) {
   Array.from(fileList).forEach(f => mergeFiles.push(f));
-  renderMergeGrid();
-  const btn = document.getElementById('merge-btn');
-  if (btn) btn.disabled = mergeFiles.length < 2;
+  renderThumbGrid();
+  const btn = document.getElementById('pmulti-btn');
+  if (btn) btn.disabled = mergeFiles.length < (currentTool === 'merge' ? 2 : 1);
 }
 
-function renderMergeGrid() {
-  const dropzone = document.getElementById('merge-dropzone');
-  const grid = document.getElementById('merge-grid');
-  const addBtn = document.getElementById('ws-add-more-btn');
+function renderThumbGrid() {
+  const drop = document.getElementById('pdrop-zone');
+  const grid = document.getElementById('pthumb-grid');
+  const fab = document.getElementById('p-add-more');
 
   if (mergeFiles.length === 0) {
-    if (dropzone) dropzone.style.display = 'block';
+    if (drop) drop.style.display = 'block';
     if (grid) grid.style.display = 'none';
-    if (addBtn) addBtn.style.display = 'none';
+    if (fab) fab.style.display = 'none';
     return;
   }
 
-  if (dropzone) dropzone.style.display = 'none';
+  if (drop) drop.style.display = 'none';
   if (grid) {
     grid.style.display = 'grid';
     grid.innerHTML = mergeFiles.map((f, i) => `
-      <div class="ws-thumb-card" data-idx="${i}">
-        <div class="ws-thumb-preview">
-          <canvas id="mthumb-${i}"></canvas>
+      <div class="pthumb-card" data-i="${i}">
+        <div class="pthumb-preview" id="prev-wrap-${i}">
+          <canvas id="pcanv-${i}"></canvas>
         </div>
-        <div class="ws-thumb-footer">
-          <span class="ws-thumb-name" title="${f.name}">${f.name}</span>
-          <button class="ws-thumb-remove" onclick="removeMergeFile(${i})">✕</button>
+        <div class="pthumb-footer">
+          <span class="pthumb-name" title="${f.name}">${f.name}</span>
+          <button class="pthumb-del" onclick="removeFile(${i})">✕</button>
         </div>
       </div>
     `).join('');
-    // Render thumbnails
-    mergeFiles.forEach((file, i) => renderThumb(file, `mthumb-${i}`));
+
+    // Thumbnails
+    mergeFiles.forEach((file, i) => {
+      if (file.type === 'application/pdf') {
+        renderThumb(file, `pcanv-${i}`);
+      } else if (file.type.startsWith('image/')) {
+        const c = document.getElementById(`pcanv-${i}`);
+        if (c) {
+          const url = URL.createObjectURL(file);
+          const img = new Image();
+          img.onload = () => {
+            const sc = Math.min(160/img.width, 175/img.height);
+            c.width = img.width * sc; c.height = img.height * sc;
+            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+            URL.revokeObjectURL(url);
+          };
+          img.src = url;
+        }
+      }
+    });
+
     // Sortable
-    if (mergeSortable) { try { mergeSortable.destroy(); } catch(e) {} }
+    if (mergeSortable) { try { mergeSortable.destroy(); } catch(e){} }
     mergeSortable = Sortable.create(grid, {
       animation: 200,
       ghostClass: 'sortable-ghost',
+      chosenClass: 'sortable-chosen',
       onEnd: evt => {
         const moved = mergeFiles.splice(evt.oldIndex, 1)[0];
         mergeFiles.splice(evt.newIndex, 0, moved);
       }
     });
   }
-  if (addBtn) addBtn.style.display = 'flex';
+  if (fab) fab.style.display = 'flex';
 }
 
-function removeMergeFile(i) {
+function removeFile(i) {
   mergeFiles.splice(i, 1);
-  renderMergeGrid();
-  const btn = document.getElementById('merge-btn');
-  if (btn) btn.disabled = mergeFiles.length < 2;
+  renderThumbGrid();
+  const btn = document.getElementById('pmulti-btn');
+  if (btn) btn.disabled = mergeFiles.length < (currentTool === 'merge' ? 2 : 1);
 }
 
-function onModeChange(radio) {
-  document.querySelectorAll('.ws-radio-label').forEach(l => l.classList.remove('selected'));
-  radio.closest('.ws-radio-label').classList.add('selected');
+function triggerAddMore() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = currentTool === 'images-to-pdf' ? 'image/*' : '.pdf';
+  inp.multiple = true;
+  inp.onchange = () => onMultiAdd(inp.files);
+  inp.click();
 }
 
-async function doMerge() {
-  if (mergeFiles.length < 2) return;
-  const mode = document.querySelector('input[name="merge-mode"]:checked')?.value || 'free';
+function onModeChg(r) {
+  document.querySelectorAll('input[name="pmode"]').forEach(x =>
+    x.closest('.popt-radio-lbl').classList.toggle('selected', x.checked)
+  );
+}
+
+async function doMultiTool(key, apiUrl, isImg) {
+  if (mergeFiles.length < 1) return;
+  const mode = document.querySelector('input[name="pmode"]:checked')?.value || 'free';
+  const resEl = document.getElementById('pmulti-res');
 
   const run = async () => {
     const fd = new FormData();
-    mergeFiles.forEach(f => fd.append('files', f));
-    fd.append('mode', mode);
-    await callApi('/api/pdf/merge', fd, document.getElementById('merge-result'), mode === 'pro' ? 'Processing with iLovePDF…' : 'Merging PDFs…');
+    const field = isImg ? 'images' : 'files';
+    mergeFiles.forEach(f => fd.append(field, f));
+    if (!isImg) fd.append('mode', mode);
+    await callApi(apiUrl || '/api/pdf/merge', fd, resEl,
+      mode === 'pro' ? 'Processing with iLovePDF…' : 'Processing…');
   };
 
-  if (mode === 'pro') {
-    openPayModal(run);
-  } else {
-    await run();
-  }
+  if (mode === 'pro') openPay(run); else await run();
 }
 
-// ═══════════════════════════════════════════════════
-//   SINGLE FILE TOOLS
-// ═══════════════════════════════════════════════════
-function buildSingleUI(meta, key) {
-  const accept = meta.accept || '.pdf';
+/* ═══════════════════════════════════════════════════
+   SINGLE-FILE TOOL
+   ═══════════════════════════════════════════════════ */
+function buildSingleTool(key, m) {
+  const accept = m.accept || '.pdf';
 
-  // Build options HTML for specific tools
-  let optionsHtml = '';
-  if (key === 'compress') {
-    optionsHtml = `
-      <div class="ws-options">
-        <div class="ws-options-title">Compression Level</div>
-        <div class="ws-radio-group" id="compress-opts">
-          <label class="ws-radio-label"><input type="radio" name="cq" value="low" onchange="onOptChange(this)"/> <div class="ws-radio-text"><strong>Extreme Compression</strong><span>Smallest size</span></div></label>
-          <label class="ws-radio-label selected"><input type="radio" name="cq" value="medium" checked onchange="onOptChange(this)"/> <div class="ws-radio-text"><strong>Recommended</strong><span>Good balance</span></div></label>
-          <label class="ws-radio-label"><input type="radio" name="cq" value="high" onchange="onOptChange(this)"/> <div class="ws-radio-text"><strong>Low Compression</strong><span>Best quality</span></div></label>
-        </div>
-      </div>`;
-  } else if (key === 'rotate') {
-    optionsHtml = `
-      <div class="ws-options">
-        <div class="ws-options-title">Rotation</div>
-        <div class="ws-radio-group">
-          <label class="ws-radio-label"><input type="radio" name="rot" value="90" checked onchange="onOptChange(this)"/> <div class="ws-radio-text"><strong>90° Clockwise</strong></div></label>
-          <label class="ws-radio-label"><input type="radio" name="rot" value="180" onchange="onOptChange(this)"/> <div class="ws-radio-text"><strong>180°</strong></div></label>
-          <label class="ws-radio-label"><input type="radio" name="rot" value="270" onchange="onOptChange(this)"/> <div class="ws-radio-text"><strong>90° Counter-clockwise</strong></div></label>
-        </div>
-        <div style="margin-top:14px;">
-          <label class="ws-options-title">Pages</label>
-          <select id="rot-pages" style="width:100%; margin-top:8px; padding:10px; background:#0f1929; border:1px solid rgba(255,255,255,.1); color:white; border-radius:8px;">
-            <option value="all">All pages</option>
-            <option value="first">First page only</option>
-          </select>
-        </div>
-      </div>`;
-  } else if (key === 'protect') {
-    optionsHtml = `
-      <div class="ws-options">
-        <div class="ws-options-title">Set Password</div>
-        <input type="password" id="protect-pwd" placeholder="Enter password" style="width:100%; padding:10px 14px; background:#0f1929; border:1px solid rgba(255,255,255,.1); color:white; border-radius:8px; font-size:.9rem; margin-top:4px;"/>
-      </div>`;
-  } else if (key === 'watermark') {
-    optionsHtml = `
-      <div class="ws-options">
-        <div class="ws-options-title">Watermark Text</div>
-        <input type="text" id="wm-text" value="CONFIDENTIAL" style="width:100%; padding:10px 14px; background:#0f1929; border:1px solid rgba(255,255,255,.1); color:white; border-radius:8px; font-size:.9rem; margin-bottom:10px;"/>
-        <div class="ws-options-title" style="margin-top:10px;">Opacity</div>
-        <input type="range" id="wm-opacity" min="10" max="100" value="30" style="width:100%; accent-color:#c9a84c;"/>
-      </div>`;
-  } else if (key === 'split') {
-    optionsHtml = `
-      <div class="ws-options">
-        <div class="ws-options-title">Split Mode</div>
-        <div class="ws-radio-group">
-          <label class="ws-radio-label selected"><input type="radio" name="spm" value="all" checked onchange="onOptChange(this)"/> <div class="ws-radio-text"><strong>Extract all pages</strong><span>One PDF per page</span></div></label>
-          <label class="ws-radio-label"><input type="radio" name="spm" value="range" onchange="onOptChange(this)"/> <div class="ws-radio-text"><strong>By range</strong><span>E.g. 1-3, 5, 7-</span></div></label>
-        </div>
-        <input type="text" id="split-ranges" placeholder="e.g. 1-3, 5, 7" style="width:100%; margin-top:12px; padding:10px; background:#0f1929; border:1px solid rgba(255,255,255,.1); color:white; border-radius:8px; font-size:.9rem; display:none;"/>
-      </div>`;
-  } else if (key === 'remove-pages' || key === 'extract') {
-    optionsHtml = `
-      <div class="ws-options">
-        <div class="ws-options-title">Page Numbers</div>
-        <input type="text" id="pages-input" placeholder="e.g. 1, 3, 5-7" style="width:100%; padding:10px; background:#0f1929; border:1px solid rgba(255,255,255,.1); color:white; border-radius:8px; font-size:.9rem;"/>
-        <div style="font-size:.75rem; color:var(--text-muted); margin-top:8px;">Separate pages with comma. Ranges: 5-7</div>
-      </div>`;
-  } else if (key === 'unlock') {
-    optionsHtml = `
-      <div class="ws-options">
-        <div class="ws-options-title">PDF Password (if any)</div>
-        <input type="password" id="unlock-pwd" placeholder="Leave blank if unknown" style="width:100%; padding:10px; background:#0f1929; border:1px solid rgba(255,255,255,.1); color:white; border-radius:8px; font-size:.9rem;"/>
-      </div>`;
-  }
+  // Tool-specific options
+  let opts = '';
+  if (key === 'compress') opts = `<div class="popt"><div class="popt-title">Compression Level</div><div class="popt-radio">
+    <label class="popt-radio-lbl"><input type="radio" name="cq" value="low" onchange="onRadioChg(this)"/><div class="popt-text"><strong>Extreme</strong><span>Smallest file size</span></div></label>
+    <label class="popt-radio-lbl selected"><input type="radio" name="cq" value="medium" checked onchange="onRadioChg(this)"/><div class="popt-text"><strong>Recommended</strong><span>Best balance</span></div></label>
+    <label class="popt-radio-lbl"><input type="radio" name="cq" value="high" onchange="onRadioChg(this)"/><div class="popt-text"><strong>Low Compression</strong><span>Best quality</span></div></label>
+  </div></div>`;
+  else if (key === 'rotate') opts = `<div class="popt"><div class="popt-title">Rotation</div><div class="popt-radio">
+    <label class="popt-radio-lbl selected"><input type="radio" name="rot" value="90" checked onchange="onRadioChg(this)"/><div class="popt-text"><strong>90° Clockwise</strong></div></label>
+    <label class="popt-radio-lbl"><input type="radio" name="rot" value="180" onchange="onRadioChg(this)"/><div class="popt-text"><strong>180°</strong></div></label>
+    <label class="popt-radio-lbl"><input type="radio" name="rot" value="270" onchange="onRadioChg(this)"/><div class="popt-text"><strong>90° Counter-clockwise</strong></div></label>
+  </div><div style="margin-top:12px;"><div class="popt-title">Pages</div>
+    <select id="rot-pg" class="pinput" style="margin-top:6px;"><option value="all">All pages</option><option value="first">First page</option></select>
+  </div></div>`;
+  else if (key === 'split') opts = `<div class="popt"><div class="popt-title">Split Mode</div><div class="popt-radio">
+    <label class="popt-radio-lbl selected"><input type="radio" name="spm" value="all" checked onchange="onSplitMode(this)"/><div class="popt-text"><strong>Extract all pages</strong><span>One PDF per page</span></div></label>
+    <label class="popt-radio-lbl"><input type="radio" name="spm" value="range" onchange="onSplitMode(this)"/><div class="popt-text"><strong>By ranges</strong><span>e.g. 1-3, 5, 7</span></div></label>
+  </div><input type="text" class="pinput" id="spm-ranges" placeholder="e.g. 1-3, 5, 7" style="margin-top:12px;display:none;"/></div>`;
+  else if (key === 'protect') opts = `<div class="popt"><div class="popt-title">Password</div><input type="password" class="pinput" id="pp-pwd" placeholder="Enter password" style="margin-top:4px;"/></div>`;
+  else if (key === 'unlock') opts = `<div class="popt"><div class="popt-title">PDF Password (if known)</div><input type="password" class="pinput" id="ul-pwd" placeholder="Leave blank if unknown" style="margin-top:4px;"/></div>`;
+  else if (key === 'watermark') opts = `<div class="popt"><div class="popt-title">Watermark Text</div>
+    <input type="text" class="pinput" id="wm-txt" value="CONFIDENTIAL" style="margin-bottom:10px;"/>
+    <div class="popt-title" style="margin-top:10px;">Opacity (%)</div>
+    <input type="range" id="wm-op" min="10" max="100" value="30" style="width:100%;accent-color:#c9a84c;margin-top:6px;"/>
+  </div>`;
+  else if (key === 'remove-pages' || key === 'extract') opts = `<div class="popt"><div class="popt-title">${key === 'remove-pages' ? 'Pages to Remove' : 'Pages to Extract'}</div>
+    <input type="text" class="pinput" id="pg-inp" placeholder="e.g. 1, 3, 5-7" style="margin-top:4px;"/>
+    <div style="font-size:.75rem;color:#5f7499;margin-top:8px;">Use commas and ranges like 5-7</div>
+  </div>`;
 
-  // MAIN AREA
-  document.getElementById('ws-main').innerHTML = `
-    <div class="ws-single-area">
-      <div class="ws-dropzone" id="single-dropzone">
-        <input type="file" id="single-file" accept="${accept}" onchange="onSingleFileSelect(this)"/>
-        <span class="ws-dropzone-icon">${accept === '.pdf' ? '📄' : accept.includes('image') ? '🖼️' : '📁'}</span>
-        <div class="ws-dropzone-title">Select ${accept === '.pdf' ? 'PDF' : ''} file</div>
-        <div class="ws-dropzone-sub">or drop the file here</div>
-        <div class="ws-dropzone-btn">Select file</div>
-      </div>
-      <div id="single-file-name" style="display:none; margin-top:20px; padding:14px 18px; background:#0d1525; border:1px solid rgba(201,168,76,.2); border-radius:12px; color:white; display:flex; align-items:center; gap:10px;">
-        <span style="font-size:1.5rem;">📄</span>
-        <span id="single-file-label" style="flex:1; font-weight:600;"></span>
-        <button onclick="clearSingleFile()" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.2rem;">✕</button>
-      </div>
+  // MAIN
+  document.getElementById('pws-main').innerHTML = `
+    <div class="pdrop" id="pdrop-zone">
+      <input type="file" id="psingle-inp" accept="${accept}" onchange="onSingleSel(this)"/>
+      <span class="pdrop-emoji">${accept==='.pdf'?'📄':'📁'}</span>
+      <div class="pdrop-title">Select file</div>
+      <div class="pdrop-sub">or drop file here</div>
+      <div class="pdrop-btn">Select ${accept==='.pdf'?'PDF':'file'}</div>
+    </div>
+    <div class="pfile-selected" id="pfile-sel">
+      <span style="font-size:1.8rem;">📄</span>
+      <span class="pfile-selected-name" id="pfile-lbl"></span>
+      <button class="pfile-clear" onclick="clearSingle()">✕</button>
+    </div>
+    <div id="psingle-thumb-wrap" style="display:none;margin-top:20px;background:#0d1525;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.5);">
+      <canvas id="psingle-thumb" style="display:block;max-width:100%;max-height:360px;margin:0 auto;"></canvas>
     </div>
   `;
-  setupDropzone(document.getElementById('single-dropzone'), 'single-file', null);
+  setupDrop(document.getElementById('pdrop-zone'), f => { if(f[0]) { document.getElementById('psingle-inp').files = f; onSingleSel({files: f}); } });
 
   // SIDEBAR
-  document.getElementById('ws-side').innerHTML = `
-    <h2>${meta.name}</h2>
-    <div class="ws-side-info">ℹ️ ${meta.info}</div>
-    ${optionsHtml}
-    <div class="ws-side-spacer"></div>
-    <div class="ws-result" id="single-result"></div>
-    <button class="ws-action-btn gold-btn" id="single-btn" onclick="doSingleTool('${key}', '${meta.apiUrl}')" disabled>${meta.name} →</button>
+  document.getElementById('pws-side').innerHTML = `
+    <h2>${m.name}</h2>
+    <div class="pws-side-info">ℹ️ ${m.info}</div>
+    ${opts}
+    <div class="pside-spacer"></div>
+    <div class="pres" id="psingle-res"></div>
+    <button class="pact-btn gold" id="psingle-btn" onclick="doSingleTool('${key}','${m.api}')" disabled>${m.name} →</button>
   `;
 }
 
-function onOptChange(radio) {
-  const name = radio.name;
-  document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
-    r.closest('.ws-radio-label').classList.toggle('selected', r.checked);
-  });
-  // Show/hide range input for split
-  if (name === 'spm') {
-    const ri = document.getElementById('split-ranges');
-    if (ri) ri.style.display = radio.value === 'range' ? 'block' : 'none';
+function onSingleSel(input) {
+  const f = Array.isArray(input) ? input[0] : (input.files && input.files[0]);
+  if (!f) return;
+  const drop = document.getElementById('pdrop-zone');
+  const sel = document.getElementById('pfile-sel');
+  const lbl = document.getElementById('pfile-lbl');
+  const btn = document.getElementById('psingle-btn');
+  const tw = document.getElementById('psingle-thumb-wrap');
+  if (drop) drop.style.display = 'none';
+  if (sel) sel.classList.add('show');
+  if (lbl) lbl.textContent = f.name + ' (' + fmt(f.size) + ')';
+  if (btn) btn.disabled = false;
+  if (tw && f.type === 'application/pdf') {
+    tw.style.display = 'block';
+    renderThumb(f, 'psingle-thumb');
   }
 }
 
-function onSingleFileSelect(input) {
-  const f = input.files[0];
-  const nameEl = document.getElementById('single-file-name');
-  const label = document.getElementById('single-file-label');
-  const dropzone = document.getElementById('single-dropzone');
-  const btn = document.getElementById('single-btn');
-  if (f) {
-    if (nameEl) { nameEl.style.display = 'flex'; }
-    if (label) label.textContent = f.name + ' (' + fmtSize(f.size) + ')';
-    if (dropzone) dropzone.style.display = 'none';
-    if (btn) btn.disabled = false;
-  }
-}
-
-function clearSingleFile() {
-  const inp = document.getElementById('single-file');
+function clearSingle() {
+  const inp = document.getElementById('psingle-inp');
   if (inp) inp.value = '';
-  const nameEl = document.getElementById('single-file-name');
-  if (nameEl) nameEl.style.display = 'none';
-  const dropzone = document.getElementById('single-dropzone');
-  if (dropzone) dropzone.style.display = 'block';
-  const btn = document.getElementById('single-btn');
+  const sel = document.getElementById('pfile-sel');
+  if (sel) sel.classList.remove('show');
+  const drop = document.getElementById('pdrop-zone');
+  if (drop) drop.style.display = 'block';
+  const btn = document.getElementById('psingle-btn');
   if (btn) btn.disabled = true;
+  const tw = document.getElementById('psingle-thumb-wrap');
+  if (tw) tw.style.display = 'none';
+}
+
+function onRadioChg(r) {
+  const name = r.name;
+  document.querySelectorAll(`input[name="${name}"]`).forEach(x =>
+    x.closest('.popt-radio-lbl').classList.toggle('selected', x.checked)
+  );
+}
+
+function onSplitMode(r) {
+  onRadioChg(r);
+  const ri = document.getElementById('spm-ranges');
+  if (ri) ri.style.display = r.value === 'range' ? 'block' : 'none';
 }
 
 async function doSingleTool(key, apiUrl) {
-  const file = document.getElementById('single-file')?.files[0];
+  const file = document.getElementById('psingle-inp')?.files[0];
   if (!file) return;
   const fd = new FormData();
   fd.append('file', file);
 
-  // Add extra params per tool
-  if (key === 'compress') {
-    fd.append('quality', document.querySelector('input[name="cq"]:checked')?.value || 'medium');
-  } else if (key === 'rotate') {
-    fd.append('angle', document.querySelector('input[name="rot"]:checked')?.value || '90');
-    fd.append('pages', document.getElementById('rot-pages')?.value || 'all');
-  } else if (key === 'protect') {
-    const pwd = document.getElementById('protect-pwd')?.value;
-    if (!pwd) return alert('Please enter a password');
-    fd.append('password', pwd);
-  } else if (key === 'unlock') {
-    fd.append('password', document.getElementById('unlock-pwd')?.value || '');
-  } else if (key === 'watermark') {
-    fd.append('text', document.getElementById('wm-text')?.value || 'WATERMARK');
-    fd.append('opacity', document.getElementById('wm-opacity')?.value || '30');
-  } else if (key === 'split') {
-    fd.append('split_mode', document.querySelector('input[name="spm"]:checked')?.value || 'all');
-    fd.append('page_ranges', document.getElementById('split-ranges')?.value || '');
-  } else if (key === 'remove-pages' || key === 'extract') {
-    const pages = document.getElementById('pages-input')?.value;
-    if (!pages) return alert('Please enter page numbers');
-    fd.append('pages', pages);
-  }
+  if (key === 'compress') fd.append('quality', document.querySelector('input[name="cq"]:checked')?.value || 'medium');
+  else if (key === 'rotate') { fd.append('angle', document.querySelector('input[name="rot"]:checked')?.value||'90'); fd.append('pages', document.getElementById('rot-pg')?.value||'all'); }
+  else if (key === 'protect') { const p=document.getElementById('pp-pwd')?.value; if(!p) return alert('Enter a password'); fd.append('password',p); }
+  else if (key === 'unlock') fd.append('password', document.getElementById('ul-pwd')?.value||'');
+  else if (key === 'watermark') { fd.append('text', document.getElementById('wm-txt')?.value||'WATERMARK'); fd.append('opacity', document.getElementById('wm-op')?.value||'30'); }
+  else if (key === 'split') { fd.append('split_mode', document.querySelector('input[name="spm"]:checked')?.value||'all'); fd.append('page_ranges', document.getElementById('spm-ranges')?.value||''); }
+  else if (key === 'remove-pages' || key === 'extract') { const pg=document.getElementById('pg-inp')?.value; if(!pg) return alert('Enter page numbers'); fd.append('pages',pg); }
 
-  await callApi(apiUrl, fd, document.getElementById('single-result'), 'Processing…');
+  await callApi(apiUrl, fd, document.getElementById('psingle-res'), 'Processing…');
 }
 
-// ═══════════════════════════════════════════════════
-//   URL TOOL (HTML to PDF)
-// ═══════════════════════════════════════════════════
-function buildUrlUI(meta) {
-  document.getElementById('ws-main').innerHTML = `
-    <div class="ws-single-area">
-      <div style="padding:40px; background:#0d1525; border:1px solid rgba(201,168,76,.15); border-radius:16px; width:100%; max-width:560px;">
-        <div style="font-size:3rem; text-align:center; margin-bottom:20px;">🌐</div>
-        <input type="url" id="url-input" placeholder="https://example.com" style="width:100%; padding:14px 18px; background:#080d1a; border:1px solid rgba(255,255,255,.1); color:white; border-radius:10px; font-size:1rem; outline:none;"/>
-      </div>
+/* ─── URL TOOL ───────────────────── */
+function buildUrlTool(m) {
+  document.getElementById('pws-main').innerHTML = `
+    <div style="width:100%;max-width:560px;background:#0d1525;border:1px solid rgba(201,168,76,.15);border-radius:16px;padding:40px;text-align:center;">
+      <span style="font-size:3rem;display:block;margin-bottom:20px;">🌐</span>
+      <input type="url" class="pinput" id="url-inp" placeholder="https://example.com" style="font-size:1rem;padding:14px 18px;"/>
     </div>
   `;
-  document.getElementById('ws-side').innerHTML = `
-    <h2>${meta.name}</h2>
-    <div class="ws-side-info">ℹ️ ${meta.info}</div>
-    <div class="ws-side-spacer"></div>
-    <div class="ws-result" id="url-result"></div>
-    <button class="ws-action-btn gold-btn" onclick="doUrlTool('${meta.apiUrl}')">Convert to PDF →</button>
+  document.getElementById('pws-side').innerHTML = `
+    <h2>${m.name}</h2>
+    <div class="pws-side-info">ℹ️ ${m.info}</div>
+    <div class="pside-spacer"></div>
+    <div class="pres" id="url-res"></div>
+    <button class="pact-btn gold" onclick="doUrlTool('${m.api}')">Convert to PDF →</button>
   `;
 }
 
 async function doUrlTool(apiUrl) {
-  const url = document.getElementById('url-input')?.value;
+  const url = document.getElementById('url-inp')?.value;
   if (!url) return alert('Please enter a URL');
   const fd = new FormData();
   fd.append('url', url);
-  await callApi(apiUrl, fd, document.getElementById('url-result'), 'Converting…');
+  await callApi(apiUrl, fd, document.getElementById('url-res'), 'Converting…');
 }
 
-// ─────────────────── HELPERS ─────────────────────────
-function fmtSize(b) {
-  if (b < 1024) return b + ' B';
-  if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
-  return (b/1024/1024).toFixed(2) + ' MB';
+/* ─── HELPERS ────────────────────── */
+function fmt(b) {
+  if(b<1024) return b+' B';
+  if(b<1048576) return (b/1024).toFixed(1)+' KB';
+  return (b/1048576).toFixed(2)+' MB';
 }
 </script>
 {% endblock %}
