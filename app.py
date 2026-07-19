@@ -470,7 +470,8 @@ def api_register():
         c = conn.cursor()
         
         # Check if first user -> make them admin
-        count = c.execute('SELECT COUNT(*) FROM users').fetchone()[0]
+        row = c.execute('SELECT COUNT(*) as count FROM users').fetchone()
+        count = row['count'] if isinstance(row, dict) else row[0]
         role = 'admin' if count == 0 or email.lower() == 'youradvisor.ca@gmail.com' else 'user'
         
         pw_hash = generate_password_hash(password)
