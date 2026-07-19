@@ -1138,6 +1138,17 @@ def merge_pdfs():
     if len(pdfs) < 2:
         return jsonify({'success': False, 'error': 'Please upload at least 2 PDF files'}), 400
     saved = save_uploaded_files(pdfs, 'pdf_merge')
+    
+    # Try iLovePDF Engine First
+    import ilovepdf_engine
+    if ilovepdf_engine.ILOVEPDF_PUBLIC_KEY:
+        try:
+            res_path = ilovepdf_engine.process_hybrid('merge', saved, os.path.dirname(saved[0]))
+            return jsonify({'success': True, 'file': os.path.basename(res_path)})
+        except Exception as e:
+            print(f"[iLovePDF Fallback triggered] {e}")
+            
+    # Fallback to local python tools
     return jsonify(pdf_tools.merge(saved))
 
 
