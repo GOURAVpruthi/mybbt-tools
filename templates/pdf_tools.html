@@ -906,6 +906,10 @@ select:focus{border-color:#c9a84c}
 <!-- ═══════════════════════════════════════════════════
      JAVASCRIPT
 ═══════════════════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+</script>
 <script>
 // ── Auth state from Flask session (set by Jinja) ──────────
 window.MYBBT_LOGGED_IN = {{ 'true' if session.get('user_id') else 'false' }};
@@ -1146,8 +1150,11 @@ function renderMergeList() {
   const grid = document.getElementById('merge-grid');
   if (!grid) return;
   grid.innerHTML = mergeFiles.map((f,i) => `
-    <div class="org-page-card" data-idx="${i}" style="height:200px; display:flex; flex-direction:column;">
-      <div class="file-drag-handle" style="flex:1; background:#1e293b; display:flex; align-items:center; justify-content:center; font-size:3rem; border-bottom:1px solid #334155;">📄</div>
+    <div class="org-page-card" data-idx="${i}" style="height:200px; display:flex; flex-direction:column; background: #0f172a;">
+      <div class="file-drag-handle" style="flex:1; background:#0f172a; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #1e293b; overflow: hidden; position: relative;">
+        <!-- Canvas for PDF thumbnail -->
+        <canvas id="merge-thumb-${i}" style="max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 4px 6px rgba(0,0,0,0.3);"></canvas>
+      </div>
       <div class="org-page-footer" style="background:var(--surface);">
         <span class="org-page-num" style="max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${f.name}">${f.name}</span>
         <div class="org-page-controls">
@@ -1156,6 +1163,37 @@ function renderMergeList() {
       </div>
     </div>`).join('');
   initMergeSortable();
+  
+  // Render thumbnails
+  mergeFiles.forEach((file, i) => renderPdfThumbnail(file, `merge-thumb-${i}`));
+}
+
+async function renderPdfThumbnail(file, canvasId) {
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+    const page = await pdf.getPage(1);
+    
+    const viewport = page.getViewport({scale: 1.0});
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    
+    const context = canvas.getContext('2d');
+    
+    // Scale down for thumbnail
+    const scale = Math.min(150 / viewport.width, 150 / viewport.height);
+    const scaledViewport = page.getViewport({scale: scale});
+    
+    canvas.width = scaledViewport.width;
+    canvas.height = scaledViewport.height;
+    
+    await page.render({
+      canvasContext: context,
+      viewport: scaledViewport
+    }).promise;
+  } catch(e) {
+    console.error('Error rendering thumbnail:', e);
+  }
 }
 
 function removeMergeFile(i) {
