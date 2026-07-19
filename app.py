@@ -710,7 +710,7 @@ def api_admin_users():
     conn = get_db()
     users = conn.execute('SELECT id, name, email, plan, is_active, role, created_at FROM users ORDER BY id DESC').fetchall()
     conn.close()
-    return jsonify([dict(u) for u in users])
+    return jsonify({'success': True, 'users': [dict(u) for u in users]})
 
 @app.route('/api/admin/services', methods=['GET', 'POST'])
 @admin_required

@@ -402,17 +402,17 @@ async function updatePlan(id, plan) {
 
 async function toggleStatus(id, currentlyActive) {
   const newStatus = currentlyActive ? 'blocked' : 'active';
-  if (!confirm(`User ko ${newStatus} karna chahte hain?`)) return;
+  if (!confirm(`Are you sure you want to mark this user as ${newStatus}?`)) return;
   const res = await fetch(`/api/admin/users/${id}/status`, {
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({status: newStatus})
   });
-  if (res.ok) { showToast(`User ${newStatus} kar diya.`); loadUsers(); }
+  if (res.ok) { showToast(`User successfully marked as ${newStatus}.`); loadUsers(); }
   else showToast('Error updating status', 'error');
 }
 
 async function logout() {
-  if (!confirm('Logout karna chahte hain?')) return;
+  if (!confirm('Are you sure you want to log out?')) return;
   await fetch('/api/auth/logout', {method:'POST'});
   window.location.href = '/login';
 }
