@@ -490,98 +490,122 @@ def api_register():
     except DBIntegrityError:
         if conn.is_postgres: conn.conn.rollback()
         return jsonify({'success': False, 'error': 'Email already registered'})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        if 'conn' in locals() and conn.is_postgres: conn.conn.rollback()
+        return jsonify({'success': False, 'error': f'Server error: {str(e)}'})
     finally:
-        conn.close()
+        if 'conn' in locals():
+            conn.close()
 
 @app.route('/api/auth/send_otp', methods=['POST'])
 def api_send_otp():
-    data = request.json
-    email = data.get('email', '').strip().lower()
-    if not email:
-        return jsonify({'success': False, 'error': 'Email required'})
-    conn = get_db()
-    otp_code = str(uuid.uuid4().int)[:6]
-    conn.execute('INSERT INTO otps (email, otp_code, expires_at) VALUES (?, ?, datetime("now", "+15 minutes"))', (email, otp_code))
-    conn.commit()
-    conn.close()
-    
-    success, error_msg = send_otp_email(email, otp_code)
-    if success:
-        return jsonify({'success': True})
-    else:
-        return jsonify({'success': False, 'error': f'Failed to send OTP email: {error_msg}'})
-
+    try:
+        data = request.json
+        email = data.get('email', '').strip().lower()
+        if not email:
+            return jsonify({'success': False, 'error': 'Email required'})
+        conn = get_db()
+        otp_code = str(uuid.uuid4().int)[:6]
+        conn.execute('INSERT INTO otps (email, otp_code, expires_at) VALUES (?, ?, datetime("now", "+15 minutes"))', (email, otp_code))
+        conn.commit()
+        conn.close()
+        
+        success, error_msg = send_otp_email(email, otp_code)
+        if success:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': f'Failed to send OTP email: {error_msg}'})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        if 'conn' in locals() and conn.is_postgres: conn.conn.rollback()
+        return jsonify({'success': False, 'error': f'Server error: {str(e)}'})
+        
 @app.route('/api/auth/verify_otp', methods=['POST'])
 def api_verify_otp():
-    data = request.json
-    email = data.get('email', '').strip().lower()
-    otp = data.get('otp', '').strip()
+    try:
+        data = request.json
+        email = data.get('email', '').strip().lower()
+        otp = data.get('otp', '').strip()
 
-    conn = get_db()
-    # Check OTP
-    valid = conn.execute('SELECT * FROM otps WHERE email = ? AND otp_code = ? AND expires_at > datetime("now") ORDER BY id DESC LIMIT 1', (email, otp)).fetchone()
-    
-    if not valid:
-        conn.close()
-        return jsonify({'success': False, 'error': 'Invalid or expired OTP'})
+        conn = get_db()
+        # Check OTP
+        valid = conn.execute('SELECT * FROM otps WHERE email = ? AND otp_code = ? AND expires_at > datetime("now") ORDER BY id DESC LIMIT 1', (email, otp)).fetchone()
         
-    # Mark user verified
-    conn.execute('UPDATE users SET is_verified = 1 WHERE email = ?', (email,))
-    user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
-    
-    # Delete used OTP
-    conn.execute('DELETE FROM otps WHERE email = ?', (email,))
-    conn.commit()
-    conn.close()
-
-    # Login
-    session['user_id'] = user['id']
-    session['name'] = user['name']
-    session['role'] = user['role']
-    session['plan'] = user['plan']
-    return jsonify({'success': True, 'role': user['role']})
-
-
-@app.route('/api/auth/login', methods=['POST'])
-def api_login():
-    data = request.json
-    email = data.get('email', '').strip().lower()
-    password = data.get('password', '')
-
-    if not email or not password:
-        return jsonify({'success': False, 'error': 'Email and password required'})
-
-    conn = get_db()
-    user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
-
-    if user and check_password_hash(user['password_hash'], password):
-        user_dict = dict(user)
-        if user_dict['is_active'] == 0:
+        if not valid:
             conn.close()
-            return jsonify({'success': False, 'error': 'Account is blocked. Contact support.'})
+            return jsonify({'success': False, 'error': 'Invalid or expired OTP'})
             
-        if user_dict.get('is_verified', 0) == 0:
-            # Generate new OTP
-            otp_code = str(uuid.uuid4().int)[:6]
-            conn.execute('INSERT INTO otps (email, otp_code, expires_at) VALUES (?, ?, datetime("now", "+15 minutes"))', (email, otp_code))
-            conn.commit()
-            conn.close()
-            
-            success, error_msg = send_otp_email(email, otp_code)
-            if success:
-                return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'Account not verified. OTP sent to email.'})
-            else:
-                return jsonify({'success': False, 'error': f'Failed to send OTP email: {error_msg}'})
-            
+        # Mark user verified
+        conn.execute('UPDATE users SET is_verified = 1 WHERE email = ?', (email,))
+        user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+        
+        # Delete used OTP
+        conn.execute('DELETE FROM otps WHERE email = ?', (email,))
+        conn.commit()
         conn.close()
+
+        # Login
         session['user_id'] = user['id']
         session['name'] = user['name']
         session['role'] = user['role']
         session['plan'] = user['plan']
         return jsonify({'success': True, 'role': user['role']})
-    
-    conn.close()
-    return jsonify({'success': False, 'error': 'Invalid credentials'})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        if 'conn' in locals() and conn.is_postgres: conn.conn.rollback()
+        return jsonify({'success': False, 'error': f'Server error: {str(e)}'})
+
+
+@app.route('/api/auth/login', methods=['POST'])
+def api_login():
+    try:
+        data = request.json
+        email = data.get('email', '').strip().lower()
+        password = data.get('password', '')
+
+        if not email or not password:
+            return jsonify({'success': False, 'error': 'Email and password required'})
+
+        conn = get_db()
+        user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+
+        if user and check_password_hash(user['password_hash'], password):
+            user_dict = dict(user)
+            if user_dict['is_active'] == 0:
+                conn.close()
+                return jsonify({'success': False, 'error': 'Account is blocked. Contact support.'})
+                
+            if user_dict.get('is_verified', 0) == 0:
+                # Generate new OTP
+                otp_code = str(uuid.uuid4().int)[:6]
+                conn.execute('INSERT INTO otps (email, otp_code, expires_at) VALUES (?, ?, datetime("now", "+15 minutes"))', (email, otp_code))
+                conn.commit()
+                conn.close()
+                
+                success, error_msg = send_otp_email(email, otp_code)
+                if success:
+                    return jsonify({'success': True, 'requires_otp': True, 'email': email, 'message': 'Account not verified. OTP sent to email.'})
+                else:
+                    return jsonify({'success': False, 'error': f'Failed to send OTP email: {error_msg}'})
+                
+            conn.close()
+            session['user_id'] = user['id']
+            session['name'] = user['name']
+            session['role'] = user['role']
+            session['plan'] = user['plan']
+            return jsonify({'success': True, 'role': user['role']})
+        
+        if 'conn' in locals(): conn.close()
+        return jsonify({'success': False, 'error': 'Invalid credentials'})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        if 'conn' in locals() and conn.is_postgres: conn.conn.rollback()
+        return jsonify({'success': False, 'error': f'Server error: {str(e)}'})
 
 @app.route('/api/user/update', methods=['POST'])
 @login_required
