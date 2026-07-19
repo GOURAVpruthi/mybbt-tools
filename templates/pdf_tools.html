@@ -1,776 +1,556 @@
 {% extends "base.html" %}
 {% block title %}MYBBT PDF Tools — Free Online PDF Toolkit{% endblock %}
 {% block page_id %}pdf-tools{% endblock %}
-{% block topbar_title %}PDF Tools{% endblock %}
-{% block topbar_breadcrumb %}<span>Tools</span> › PDF Tools{% endblock %}
 
 {% block extra_css %}
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
-/* ══════════════════════════════════════════════════════
-   PDF WORLD — Takes over entire screen
-   ══════════════════════════════════════════════════════ */
+/* ─── RESET THIS PAGE ────────────────────────── */
+body { background: #070e1c !important; cursor: default !important; }
+#app-wrapper, .sidebar, .sidebar-overlay, .topbar { display: none !important; }
+.main-content { margin-left: 0 !important; }
+.page-body { padding: 0 !important; }
+
+/* ─── PDF WORLD ──────────────────────────────── */
 #pdf-world {
-  position: fixed;
-  inset: 0;
-  z-index: 9000;
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  width: 100vw;
   font-family: 'Inter', sans-serif;
   overflow: hidden;
-}
-
-/* ── iLovePDF-style navbar ───────────────────────── */
-.pnav {
-  background: #0d1525;
-  border-bottom: 1px solid rgba(201,168,76,.15);
-  height: 58px;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  gap: 0;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 10;
-}
-.pnav-logo {
-  display: flex; align-items: center; gap: 8px;
-  margin-right: 30px; cursor: pointer; text-decoration: none;
-}
-.pnav-logo-icon {
-  width: 34px; height: 34px;
-  background: linear-gradient(135deg,#c9a84c,#e8c96a);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 900; color: #040d1f; font-size: 13px;
-}
-.pnav-logo-text {
-  font-weight: 800; font-size: 15px; color: #fff;
-  letter-spacing: .3px;
-}
-.pnav-logo-text span { color: #c9a84c; }
-
-/* Quick tool links in nav */
-.pnav-links {
-  display: flex; gap: 2px; flex: 1; overflow-x: auto;
-  scrollbar-width: none;
-}
-.pnav-links::-webkit-scrollbar { display: none; }
-.pnav-link {
-  padding: 8px 14px; border-radius: 8px;
-  color: #8899bb; font-size: 13px; font-weight: 600;
-  cursor: pointer; white-space: nowrap;
-  transition: all .2s; background: none; border: none;
-}
-.pnav-link:hover { color: #c9a84c; background: rgba(201,168,76,.08); }
-.pnav-link.active { color: #c9a84c; background: rgba(201,168,76,.12); }
-
-.pnav-right {
-  display: flex; align-items: center; gap: 10px;
-  margin-left: 16px; flex-shrink: 0;
-}
-.pnav-exit-btn {
-  display: flex; align-items: center; gap: 6px;
-  padding: 7px 14px; border-radius: 8px;
-  border: 1px solid rgba(201,168,76,.3);
-  background: transparent; color: #c9a84c;
-  font-size: 13px; font-weight: 600; cursor: pointer;
-  transition: all .2s;
-}
-.pnav-exit-btn:hover { background: rgba(201,168,76,.1); }
-
-/* ══════════════════════════════════════════════════════
-   HOME VIEW
-   ══════════════════════════════════════════════════════ */
-#pdf-home {
-  flex: 1; overflow-y: auto;
   background: #070e1c;
 }
 
-/* Hero */
+/* ═════ NAVBAR ═════ */
+.pnav {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  background: #0d1525;
+  border-bottom: 1px solid rgba(201,168,76,.15);
+  padding: 0 16px;
+  flex-shrink: 0;
+  gap: 0;
+  z-index: 100;
+}
+.pnav-logo {
+  display: flex; align-items: center; gap: 8px;
+  margin-right: 24px; cursor: pointer;
+  text-decoration: none; flex-shrink: 0;
+}
+.pnav-logo-icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg,#c9a84c,#e8c96a);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; color: #040d1f; font-size: 13px;
+}
+.pnav-logo-text { font-weight: 800; font-size: 14px; color: #fff; }
+.pnav-logo-text span { color: #c9a84c; }
+.pnav-links {
+  display: flex; flex: 1; gap: 2px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.pnav-links::-webkit-scrollbar { display: none; }
+.pnav-btn {
+  padding: 7px 13px; border-radius: 7px;
+  color: #7a8faa; font-size: 13px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+  border: none; background: none; font-family: 'Inter',sans-serif;
+  transition: all .15s;
+}
+.pnav-btn:hover { color: #c9a84c; background: rgba(201,168,76,.08); }
+.pnav-btn.on { color: #c9a84c; background: rgba(201,168,76,.12); }
+.pnav-exit {
+  flex-shrink: 0; margin-left: 12px;
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 8px;
+  border: 1px solid rgba(201,168,76,.3);
+  background: none; color: #c9a84c;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  white-space: nowrap; text-decoration: none;
+  font-family: 'Inter',sans-serif;
+  transition: background .15s;
+}
+.pnav-exit:hover { background: rgba(201,168,76,.1); }
+
+/* ═════ HOME ═════ */
+#phome {
+  flex: 1; overflow-y: auto; background: #070e1c;
+}
 .phero {
   text-align: center;
-  padding: 56px 24px 36px;
-  background: linear-gradient(160deg, rgba(201,168,76,.1) 0%, transparent 55%);
-  border-bottom: 1px solid rgba(201,168,76,.1);
+  padding: 52px 24px 32px;
+  background: linear-gradient(160deg,rgba(201,168,76,.08) 0%,transparent 55%);
+  border-bottom: 1px solid rgba(201,168,76,.08);
 }
 .phero h1 {
-  font-size: clamp(1.6rem,3.5vw,2.6rem);
-  font-weight: 900; color: #fff; line-height: 1.15;
-  margin-bottom: 14px;
+  font-size: clamp(1.6rem,3.2vw,2.6rem);
+  font-weight: 900; color: #fff; line-height: 1.2; margin-bottom: 12px;
 }
 .phero h1 em {
   font-style: normal;
   background: linear-gradient(135deg,#c9a84c,#f0de8a);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
-.phero p { color: #8899bb; font-size: 1rem; max-width: 580px; margin: 0 auto; line-height: 1.7; }
+.phero p { color: #6b7f99; font-size: .95rem; max-width: 560px; margin: 0 auto; }
 
-/* Pills */
 .ppills {
   display: flex; flex-wrap: wrap; gap: 8px;
-  justify-content: center; padding: 28px 20px 0;
-  max-width: 1000px; margin: 0 auto;
+  justify-content: center; padding: 24px 20px 0;
+  max-width: 960px; margin: 0 auto;
 }
 .ppill {
-  padding: 8px 18px; border-radius: 50px;
-  border: 1px solid rgba(255,255,255,.08);
-  background: rgba(255,255,255,.03);
-  color: #8899bb; font-size: 13px; font-weight: 600;
-  cursor: pointer; transition: all .2s; white-space: nowrap;
+  padding: 7px 18px; border-radius: 50px;
+  border: 1px solid rgba(255,255,255,.07);
+  background: rgba(255,255,255,.02);
+  color: #6b7f99; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
 }
-.ppill:hover { border-color: rgba(201,168,76,.4); color: #c9a84c; }
-.ppill.active { background: #c9a84c; color: #040d1f; border-color: #c9a84c; }
+.ppill:hover { border-color: rgba(201,168,76,.35); color: #c9a84c; }
+.ppill.on { background: #c9a84c; color: #040d1f; border-color: #c9a84c; }
 
-/* Section header */
-.psection-hdr {
-  max-width: 1280px; margin: 44px auto 20px;
-  padding: 0 24px;
+.psec-hdr {
+  max-width: 1240px; margin: 36px auto 16px;
+  padding: 0 22px;
   display: flex; align-items: center; gap: 14px;
 }
-.psection-hdr h2 {
-  font-size: .8rem; font-weight: 700; color: #c9a84c;
-  text-transform: uppercase; letter-spacing: .12em;
+.psec-hdr span {
+  font-size: .72rem; font-weight: 700;
+  color: #c9a84c; text-transform: uppercase; letter-spacing: .12em;
   white-space: nowrap;
 }
-.psection-hdr-line { flex: 1; height: 1px; background: rgba(201,168,76,.12); }
+.psec-hdr hr { flex: 1; border: none; border-top: 1px solid rgba(201,168,76,.1); }
 
-/* Tool grid */
 .pgrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px,1fr));
-  gap: 18px;
-  max-width: 1280px; margin: 0 auto;
-  padding: 0 24px 50px;
+  grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
+  gap: 16px; max-width: 1240px;
+  margin: 0 auto; padding: 0 22px 44px;
 }
-
-/* iLovePDF-style card: icon top-left, text below */
 .pcard {
   background: #0d1525;
   border: 1px solid rgba(255,255,255,.06);
-  border-radius: 14px;
-  padding: 24px 20px 22px;
-  cursor: pointer;
-  transition: all .2s ease;
-  display: flex; flex-direction: column; align-items: flex-start;
-  position: relative; overflow: hidden;
+  border-radius: 13px; padding: 22px 18px;
+  cursor: pointer; transition: all .2s;
+  display: flex; flex-direction: column;
 }
 .pcard:hover {
   border-color: rgba(201,168,76,.35);
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0,0,0,.5);
+  box-shadow: 0 12px 28px rgba(0,0,0,.5);
   background: #111e35;
 }
-.pcard::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(circle at top left, rgba(201,168,76,.08), transparent 60%);
-  opacity: 0; transition: .3s;
-}
-.pcard:hover::after { opacity: 1; }
-
-.pcard-icon {
-  width: 52px; height: 52px;
-  border-radius: 12px;
+.pcard-ic {
+  width: 48px; height: 48px; border-radius: 11px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.6rem;
-  margin-bottom: 16px;
-  transition: transform .2s;
-  flex-shrink: 0;
-  position: relative; z-index: 1;
+  font-size: 1.5rem; margin-bottom: 14px;
 }
-.pcard:hover .pcard-icon { transform: scale(1.08); }
+.pcard-nm { font-size: .95rem; font-weight: 800; color: #fff; margin-bottom: 6px; }
+.pcard-ds { font-size: .78rem; color: #3d5070; line-height: 1.5; }
+.ic-r { background: rgba(239,68,68,.12); }
+.ic-o { background: rgba(249,115,22,.12); }
+.ic-g { background: rgba(34,197,94,.12); }
+.ic-b { background: rgba(59,130,246,.12); }
+.ic-p { background: rgba(168,85,247,.12); }
+.ic-t { background: rgba(20,184,166,.12); }
+.ic-au{ background: rgba(201,168,76,.12); }
+.ic-pk{ background: rgba(236,72,153,.12); }
 
-.pcard-name {
-  font-size: 1rem; font-weight: 800; color: #fff;
-  margin-bottom: 7px; line-height: 1.3;
-  position: relative; z-index: 1;
-}
-.pcard-desc {
-  font-size: .8rem; color: #5f7499; line-height: 1.5;
-  position: relative; z-index: 1;
-}
-
-/* ── Icon colour classes ── */
-.ic-r  { background: rgba(239,68,68,.12);  color: #ef4444; }
-.ic-o  { background: rgba(249,115,22,.12); color: #f97316; }
-.ic-g  { background: rgba(34,197,94,.12);  color: #22c55e; }
-.ic-b  { background: rgba(59,130,246,.12); color: #3b82f6; }
-.ic-p  { background: rgba(168,85,247,.12); color: #a855f7; }
-.ic-t  { background: rgba(20,184,166,.12); color: #14b8a6; }
-.ic-au { background: rgba(201,168,76,.12); color: #c9a84c; }
-.ic-pk { background: rgba(236,72,153,.12); color: #ec4899; }
-
-/* ══════════════════════════════════════════════════════
-   TOOL WORKSPACE (fullscreen app)
-   ══════════════════════════════════════════════════════ */
-#pdf-ws {
-  display: none;
-  flex: 1;
-  flex-direction: column;
+/* ═════ WORKSPACE ═════ */
+#pws {
+  display: none; flex: 1;
+  flex-direction: column; overflow: hidden;
   background: #070e1c;
-  overflow: hidden;
 }
-#pdf-ws.active { display: flex; }
-
-/* Workspace header bar */
+#pws.on { display: flex; }
 .pws-bar {
   display: flex; align-items: center;
-  padding: 0 24px; height: 54px;
+  height: 52px; padding: 0 22px;
   background: #0d1525;
-  border-bottom: 1px solid rgba(201,168,76,.12);
+  border-bottom: 1px solid rgba(201,168,76,.1);
   flex-shrink: 0; gap: 14px;
 }
 .pws-back {
   display: flex; align-items: center; gap: 6px;
-  padding: 7px 15px; border-radius: 8px;
-  border: 1px solid rgba(201,168,76,.3);
-  color: #c9a84c; font-size: .85rem; font-weight: 700;
-  cursor: pointer; transition: all .2s; background: none;
-  white-space: nowrap;
+  padding: 7px 14px; border-radius: 8px;
+  border: 1px solid rgba(201,168,76,.25);
+  color: #c9a84c; font-size: .83rem; font-weight: 700;
+  cursor: pointer; background: none; font-family: 'Inter',sans-serif;
+  transition: background .15s; white-space: nowrap;
 }
-.pws-back:hover { background: rgba(201,168,76,.1); }
-.pws-tool-name {
+.pws-back:hover { background: rgba(201,168,76,.08); }
+.pws-nm {
   flex: 1; text-align: center;
-  font-size: 1.1rem; font-weight: 900; color: #fff;
-  margin-right: 88px;
+  font-size: 1.05rem; font-weight: 900; color: #fff;
 }
-
-/* Split layout */
-.pws-body {
-  display: flex; flex: 1; overflow: hidden;
-}
+.pws-body { display: flex; flex: 1; overflow: hidden; }
 .pws-main {
   flex: 1; overflow-y: auto;
-  background: #060c18;
-  padding: 40px 30px;
-  display: flex; flex-direction: column; align-items: center;
-  gap: 24px;
+  background: #060c18; padding: 36px 28px;
+  display: flex; flex-direction: column; align-items: center; gap: 22px;
 }
 .pws-side {
-  width: 320px; min-width: 280px;
+  width: 300px; min-width: 280px;
   background: #0d1525;
   border-left: 1px solid rgba(201,168,76,.1);
   display: flex; flex-direction: column;
-  padding: 26px 20px;
-  overflow-y: auto;
-  gap: 0;
+  padding: 24px 18px; overflow-y: auto; gap: 0;
 }
-.pws-side h2 { font-size: 1.4rem; font-weight: 900; color: #fff; margin-bottom: 10px; }
-.pws-side-info {
-  background: rgba(59,130,246,.1);
-  border: 1px solid rgba(59,130,246,.2);
-  border-radius: 10px; padding: 12px;
-  font-size: .85rem; color: #93c5fd; line-height: 1.6;
-  margin-bottom: 20px;
+.pws-side h2 { font-size: 1.3rem; font-weight: 900; color: #fff; margin-bottom: 8px; }
+.pws-info {
+  background: rgba(59,130,246,.08);
+  border: 1px solid rgba(59,130,246,.18);
+  border-radius: 9px; padding: 11px;
+  font-size: .82rem; color: #93c5fd; line-height: 1.6; margin-bottom: 18px;
 }
-
-/* ── DROPZONE ── */
-.pdrop {
-  width: 100%; max-width: 560px;
-  border: 2px dashed rgba(201,168,76,.25);
-  border-radius: 18px;
-  padding: 60px 28px;
-  text-align: center;
-  cursor: pointer;
+.popt {
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(201,168,76,.1);
+  border-radius: 11px; padding: 16px;
+  margin-bottom: 14px;
+}
+.popt-ttl {
+  font-size: .7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: #c9a84c; margin-bottom: 12px;
+}
+.popt-radios { display: flex; flex-direction: column; gap: 7px; }
+.popt-lbl {
+  display: flex; align-items: flex-start; gap: 9px;
+  padding: 9px 11px; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.06);
+  cursor: pointer; transition: all .15s;
+}
+.popt-lbl:hover { border-color: rgba(201,168,76,.2); }
+.popt-lbl.on { border-color: #c9a84c; background: rgba(201,168,76,.08); }
+.popt-lbl input { margin-top: 3px; accent-color: #c9a84c; }
+.popt-txt strong { display: block; color: #d4e0f5; font-size: .85rem; }
+.popt-txt small { color: #3d5070; font-size: .76rem; }
+.pinput {
+  width: 100%; padding: 9px 12px;
+  background: #060c18; border: 1px solid rgba(255,255,255,.09);
+  color: #d4e0f5; border-radius: 8px; font-size: .85rem;
+  outline: none; font-family: 'Inter',sans-serif;
+  transition: border .15s;
+}
+.pinput:focus { border-color: #c9a84c; box-shadow: 0 0 0 3px rgba(201,168,76,.08); }
+.pinput::placeholder { color: #2a3a52; }
+.pspacer { flex: 1; min-height: 16px; }
+.pres {
+  display: none; border-radius: 11px;
+  padding: 14px; border: 1px solid; margin-bottom: 12px;
+}
+.pres.ok { border-color: rgba(34,197,94,.3); background: rgba(34,197,94,.07); }
+.pres.err { border-color: rgba(239,68,68,.3); background: rgba(239,68,68,.07); }
+.pres strong { display: block; color: #fff; font-size: .875rem; margin-bottom: 5px; }
+.pres small { color: #3d5070; font-size: .75rem; }
+.pdl {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: #c9a84c; color: #040d1f;
+  padding: 8px 18px; border-radius: 7px;
+  text-decoration: none; font-weight: 800; font-size: .82rem;
+  margin-top: 10px; transition: all .15s;
+}
+.pdl:hover { background: #b8953f; }
+.pact {
+  width: 100%; padding: 14px;
+  background: #ef4444; color: #fff;
+  border: none; border-radius: 11px;
+  font-size: .95rem; font-weight: 800;
+  cursor: pointer; font-family: 'Inter',sans-serif;
   transition: all .2s;
-  position: relative;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.pact:hover:not(:disabled) { background: #dc2626; box-shadow: 0 6px 20px rgba(239,68,68,.35); transform: translateY(-1px); }
+.pact:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+.pact.gold { background: #c9a84c; color: #040d1f; }
+.pact.gold:hover:not(:disabled) { background: #b8953f; box-shadow: 0 6px 20px rgba(201,168,76,.35); }
+
+/* DROPZONE */
+.pdrop {
+  width: 100%; max-width: 540px;
+  border: 2px dashed rgba(201,168,76,.2);
+  border-radius: 16px; padding: 56px 24px;
+  text-align: center; cursor: pointer;
+  transition: all .2s; position: relative;
   background: rgba(201,168,76,.02);
 }
-.pdrop:hover, .pdrop.drag-over {
-  border-color: #c9a84c;
-  background: rgba(201,168,76,.05);
+.pdrop:hover, .pdrop.dov {
+  border-color: #c9a84c; background: rgba(201,168,76,.05);
 }
 .pdrop input[type=file] {
-  position: absolute; inset: 0;
-  opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  position: absolute; inset: 0; opacity: 0;
+  cursor: pointer; width: 100%; height: 100%;
 }
-.pdrop-emoji { font-size: 3.5rem; display: block; margin-bottom: 16px; }
-.pdrop-title { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
-.pdrop-sub { color: #5f7499; font-size: .875rem; margin-bottom: 22px; }
-.pdrop-btn {
-  display: inline-block;
-  background: #c9a84c; color: #040d1f;
-  padding: 11px 32px; border-radius: 50px;
-  font-weight: 800; font-size: .95rem;
-  pointer-events: none;
+.pdrop-ico { font-size: 3.2rem; display: block; margin-bottom: 14px; }
+.pdrop-ttl { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 7px; }
+.pdrop-sub { color: #3d5070; font-size: .85rem; margin-bottom: 20px; }
+.pdrop-cta {
+  display: inline-block; background: #c9a84c; color: #040d1f;
+  padding: 10px 28px; border-radius: 50px;
+  font-weight: 800; font-size: .9rem; pointer-events: none;
 }
 
-/* ── FILE THUMBNAIL GRID ── */
-.pthumb-grid {
+/* FILE SELECTED */
+.psel {
+  display: none; width: 100%; max-width: 540px;
+  background: #0d1525; border: 1px solid rgba(201,168,76,.18);
+  border-radius: 11px; padding: 13px 15px;
+  align-items: center; gap: 11px;
+}
+.psel.on { display: flex; }
+.psel-nm { flex: 1; font-weight: 600; color: #d4e0f5; font-size: .875rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.psel-clr { background: none; border: none; color: #3d5070; cursor: pointer; font-size: 1.1rem; }
+.psel-clr:hover { color: #ef4444; }
+
+/* THUMB PREVIEW */
+.pthumb-wrap {
+  display: none;
+  width: 100%; max-width: 540px;
+  background: #0d1525; border-radius: 12px;
+  overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.5);
+}
+.pthumb-wrap canvas { display: block; max-width: 100%; max-height: 340px; margin: 0 auto; }
+
+/* THUMB GRID */
+.pgthumb {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px,1fr));
-  gap: 18px;
-  align-content: start;
+  grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
+  gap: 16px; align-content: start;
 }
-.pthumb-card {
+.ptcard {
   background: #0d1a2e;
-  border: 2px solid rgba(255,255,255,.06);
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: grab;
-  transition: all .2s;
-  user-select: none;
+  border: 2px solid rgba(255,255,255,.05);
+  border-radius: 11px; overflow: hidden;
+  cursor: grab; transition: all .2s; user-select: none;
 }
-.pthumb-card:active { cursor: grabbing; transform: scale(.97); }
-.pthumb-card:hover { border-color: rgba(201,168,76,.3); }
-.pthumb-card.sortable-ghost { opacity: .35; }
-.pthumb-card.sortable-chosen { box-shadow: 0 12px 36px rgba(0,0,0,.7); z-index: 9; }
-.pthumb-preview {
-  height: 175px;
-  background: #1a2540;
+.ptcard:hover { border-color: rgba(201,168,76,.25); }
+.ptcard:active { cursor: grabbing; }
+.ptcard.sortable-ghost { opacity: .3; }
+.ptcard.sortable-chosen { box-shadow: 0 10px 30px rgba(0,0,0,.7); }
+.ptprev {
+  height: 170px; background: #1a2540;
   display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
 }
-.pthumb-preview canvas { max-width: 100%; max-height: 100%; }
-.pthumb-preview-icon { font-size: 3.5rem; opacity: .4; }
-.pthumb-footer {
-  padding: 8px 10px;
-  background: #0a1120;
-  border-top: 1px solid rgba(255,255,255,.06);
+.ptprev canvas { max-width: 100%; max-height: 100%; }
+.ptfooter {
+  padding: 7px 9px; background: #0a1120;
+  border-top: 1px solid rgba(255,255,255,.05);
   display: flex; align-items: center; justify-content: space-between;
 }
-.pthumb-name {
-  font-size: .72rem; color: #5f7499;
-  white-space: nowrap; overflow: hidden;
-  text-overflow: ellipsis; flex: 1;
-}
-.pthumb-del {
-  background: none; border: none; color: #5f7499;
-  cursor: pointer; padding: 2px 5px; border-radius: 4px;
-  font-size: .95rem; line-height: 1;
-}
-.pthumb-del:hover { background: rgba(239,68,68,.15); color: #ef4444; }
+.ptnm { font-size: .7rem; color: #3d5070; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ptdel { background: none; border: none; color: #3d5070; cursor: pointer; padding: 2px 5px; font-size: .9rem; }
+.ptdel:hover { color: #ef4444; }
 
-/* ── ADD MORE FLOATING BTN ── */
-#p-add-more {
+/* ADD MORE FAB */
+#pfab {
   display: none;
-  position: fixed; bottom: 32px; right: 340px;
-  width: 54px; height: 54px; border-radius: 50%;
+  position: fixed; bottom: 28px; right: 320px;
+  width: 52px; height: 52px; border-radius: 50%;
   background: #ef4444; color: #fff;
-  font-size: 26px; font-weight: 300;
+  font-size: 26px; font-weight: 300; line-height: 1;
   align-items: center; justify-content: center;
-  cursor: pointer; border: none;
-  box-shadow: 0 6px 20px rgba(239,68,68,.5);
-  transition: all .2s; z-index: 500;
-}
-#p-add-more:hover { background: #dc2626; transform: scale(1.08); }
-
-/* ── OPTIONS PANEL ── */
-.popt {
-  background: rgba(255,255,255,.03);
-  border: 1px solid rgba(201,168,76,.1);
-  border-radius: 12px;
-  padding: 18px;
-  margin-top: 0;
-  margin-bottom: 16px;
-}
-.popt-title {
-  font-size: .72rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .12em;
-  color: #c9a84c; margin-bottom: 14px;
-}
-.popt-radio { display: flex; flex-direction: column; gap: 8px; }
-.popt-radio-lbl {
-  display: flex; align-items: flex-start; gap: 10px;
-  padding: 10px 12px; border-radius: 9px;
-  border: 1px solid rgba(255,255,255,.07);
-  cursor: pointer; transition: all .2s;
-}
-.popt-radio-lbl:hover { border-color: rgba(201,168,76,.25); background: rgba(201,168,76,.04); }
-.popt-radio-lbl.selected { border-color: #c9a84c; background: rgba(201,168,76,.1); }
-.popt-radio-lbl input { margin-top: 3px; accent-color: #c9a84c; }
-.popt-text strong { display: block; color: #d4e0f5; font-size: .875rem; }
-.popt-text span { color: #5f7499; font-size: .78rem; }
-
-.pinput {
-  width: 100%; padding: 10px 13px;
-  background: #060c18; border: 1px solid rgba(255,255,255,.1);
-  color: #d4e0f5; border-radius: 9px; font-size: .875rem;
-  outline: none; transition: border .2s; font-family: 'Inter',sans-serif;
-}
-.pinput:focus { border-color: #c9a84c; box-shadow: 0 0 0 3px rgba(201,168,76,.1); }
-.pinput::placeholder { color: #3a4a6a; }
-
-pselect {
-  width: 100%; padding: 10px 13px;
-  background: #060c18; border: 1px solid rgba(255,255,255,.1);
-  color: #d4e0f5; border-radius: 9px; font-size: .875rem;
+  border: none; cursor: pointer;
+  box-shadow: 0 6px 18px rgba(239,68,68,.5);
   font-family: 'Inter',sans-serif;
+  transition: all .2s; z-index: 200;
 }
+#pfab:hover { transform: scale(1.1); background: #dc2626; }
 
-/* ── SIDEBAR SPACER ── */
-.pside-spacer { flex: 1; min-height: 20px; }
-
-/* ── ACTION BUTTON ── */
-.pact-btn {
-  width: 100%; padding: 15px;
-  background: #ef4444; color: #fff;
-  border: none; border-radius: 12px;
-  font-size: 1rem; font-weight: 800;
-  cursor: pointer; transition: all .2s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  letter-spacing: .2px;
-}
-.pact-btn:hover:not(:disabled) { background: #dc2626; box-shadow: 0 8px 24px rgba(239,68,68,.4); transform: translateY(-1px); }
-.pact-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
-.pact-btn.gold { background: #c9a84c; color: #040d1f; }
-.pact-btn.gold:hover:not(:disabled) { background: #b8953f; box-shadow: 0 8px 24px rgba(201,168,76,.4); }
-
-/* ── RESULT BOX ── */
-.pres {
-  display: none; border-radius: 12px; padding: 16px;
-  border: 1px solid; margin-bottom: 14px;
-}
-.pres.ok { border-color: rgba(34,197,94,.3); background: rgba(34,197,94,.08); }
-.pres.err { border-color: rgba(239,68,68,.3); background: rgba(239,68,68,.08); }
-.pres-title { font-weight: 700; color: #fff; margin-bottom: 6px; font-size: .9rem; }
-.pres-sub { color: #5f7499; font-size: .78rem; margin-bottom: 12px; }
-.pres-dl {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: #c9a84c; color: #040d1f;
-  padding: 9px 20px; border-radius: 8px;
-  text-decoration: none; font-weight: 800; font-size: .85rem;
-  transition: all .2s;
-}
-.pres-dl:hover { background: #b8953f; transform: translateY(-1px); }
-
-/* ── LOADER ── */
-.ploader {
-  display: none; position: fixed; inset: 0;
-  background: rgba(4,8,20,.9); z-index: 99999;
+/* LOADER */
+#ploading {
+  display: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(4,8,20,.92);
+  backdrop-filter: blur(10px);
   align-items: center; justify-content: center;
   flex-direction: column; gap: 14px;
-  backdrop-filter: blur(8px);
 }
-.ploader.on { display: flex; }
-.ploader-ring {
-  width: 52px; height: 52px;
+#ploading.on { display: flex; }
+.pring {
+  width: 50px; height: 50px;
   border: 4px solid rgba(201,168,76,.15);
-  border-top-color: #c9a84c;
-  border-radius: 50%;
-  animation: spin .75s linear infinite;
+  border-top-color: #c9a84c; border-radius: 50%;
+  animation: pspin .7s linear infinite;
 }
-.ploader-txt { color: #c9a84c; font-weight: 600; font-size: .95rem; letter-spacing: .4px; }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pspin { to { transform: rotate(360deg); } }
+.ptxt { color: #c9a84c; font-weight: 600; font-size: .9rem; }
 
-/* ── PAYMENT MODAL ── */
-.ppay {
-  display: none; position: fixed; inset: 0; z-index: 99998;
-  background: rgba(0,0,0,.85); backdrop-filter: blur(8px);
+/* PAY MODAL */
+#ppay {
+  display: none;
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(0,0,0,.88); backdrop-filter: blur(10px);
   align-items: center; justify-content: center;
 }
-.ppay.on { display: flex; }
+#ppay.on { display: flex; }
 .ppay-box {
   background: #0d1525;
-  border: 1px solid rgba(201,168,76,.25);
-  border-radius: 20px; padding: 36px;
-  max-width: 380px; width: 92%; text-align: center;
-  box-shadow: 0 24px 64px rgba(0,0,0,.6);
+  border: 1px solid rgba(201,168,76,.22);
+  border-radius: 18px; padding: 34px;
+  max-width: 360px; width: 92%; text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,.6);
 }
-.ppay-box h3 { font-size: 1.4rem; font-weight: 900; color: #fff; margin-bottom: 8px; }
-.ppay-box p { color: #5f7499; font-size: .875rem; margin-bottom: 22px; }
+.ppay-box h3 { font-size: 1.35rem; font-weight: 900; color: #fff; margin-bottom: 7px; }
+.ppay-box p { color: #3d5070; font-size: .85rem; margin-bottom: 20px; }
 .ppay-amt {
-  font-size: 2.8rem; font-weight: 900;
+  font-size: 2.6rem; font-weight: 900;
   background: linear-gradient(135deg,#c9a84c,#f0de8a);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  margin-bottom: 4px;
 }
-.ppay-per { color: #5f7499; font-size: .82rem; margin-bottom: 26px; }
-.ppay-pay-btn {
-  width: 100%; padding: 15px;
+.ppay-per { color: #3d5070; font-size: .8rem; margin-bottom: 24px; }
+.ppay-confirm {
+  width: 100%; padding: 14px;
   background: #c9a84c; color: #040d1f;
-  border: none; border-radius: 12px;
-  font-size: 1rem; font-weight: 800; cursor: pointer;
+  border: none; border-radius: 11px;
+  font-size: .95rem; font-weight: 800; cursor: pointer;
+  font-family: 'Inter',sans-serif;
   transition: all .2s; margin-bottom: 10px;
 }
-.ppay-pay-btn:hover { background: #b8953f; }
+.ppay-confirm:hover { background: #b8953f; }
 .ppay-cancel {
-  width: 100%; padding: 10px;
-  background: none; border: 1px solid rgba(255,255,255,.1);
-  color: #5f7499; border-radius: 10px;
-  cursor: pointer; font-size: .875rem; transition: all .2s;
+  width: 100%; padding: 9px;
+  background: none; border: 1px solid rgba(255,255,255,.08);
+  color: #3d5070; border-radius: 9px;
+  cursor: pointer; font-size: .85rem;
+  font-family: 'Inter',sans-serif; transition: all .15s;
 }
-.ppay-cancel:hover { border-color: rgba(255,255,255,.25); color: #d4e0f5; }
+.ppay-cancel:hover { color: #d4e0f5; border-color: rgba(255,255,255,.2); }
 
-/* ── File selected indicator ── */
-.pfile-selected {
-  display: none;
-  background: #0d1525; border: 1px solid rgba(201,168,76,.2);
-  border-radius: 12px; padding: 14px 16px;
-  width: 100%; max-width: 560px;
-  display: none; align-items: center; gap: 12px;
-}
-.pfile-selected.show { display: flex; }
-.pfile-selected-name { flex: 1; font-weight: 600; color: #d4e0f5; font-size: .9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pfile-clear { background: none; border: none; color: #5f7499; cursor: pointer; font-size: 1.1rem; }
-.pfile-clear:hover { color: #ef4444; }
-
-/* Responsive */
-@media (max-width: 700px) {
+@media(max-width: 680px) {
   .pws-body { flex-direction: column; }
-  .pws-side { width: 100%; min-width: auto; border-left: none; border-top: 1px solid rgba(201,168,76,.1); max-height: 50vh; }
-  .pthumb-grid { grid-template-columns: repeat(auto-fill,minmax(130px,1fr)); }
-  #p-add-more { right: 20px; }
-  .pgrid { grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); }
+  .pws-side { width: 100%; min-width: auto; border-left: none; border-top: 1px solid rgba(201,168,76,.1); max-height: 48vh; }
+  #pfab { right: 18px; }
 }
 </style>
 {% endblock %}
 
-{% block content %}
-
-<!-- ════════════════════════════════════════════════════════════
-     PDF WORLD — Entire screen taken over
-     ════════════════════════════════════════════════════════════ -->
+{% block content_wrapper %}
+<!-- ════════════════════════════════════════
+     MYBBT PDF TOOLS — STANDALONE APP
+     ════════════════════════════════════════ -->
 <div id="pdf-world">
 
-  <!-- ── LOADER ── -->
-  <div class="ploader" id="ploader">
-    <div class="ploader-ring"></div>
-    <div class="ploader-txt" id="ploader-txt">Processing…</div>
+  <!-- LOADER -->
+  <div id="ploading">
+    <div class="pring"></div>
+    <div class="ptxt" id="ploading-txt">Processing…</div>
   </div>
 
-  <!-- ── PAYMENT MODAL ── -->
-  <div class="ppay" id="ppay">
+  <!-- PAY MODAL -->
+  <div id="ppay">
     <div class="ppay-box">
       <h3>Advanced Processing</h3>
-      <p>High-speed cloud engine — maximum accuracy & quality for complex PDFs</p>
+      <p>High-speed cloud engine — maximum quality & accuracy for complex PDFs</p>
       <div class="ppay-amt">₹1</div>
-      <div class="ppay-per">per task · Secure payment via Razorpay</div>
-      <button class="ppay-pay-btn" onclick="payConfirmed()">✔ Pay ₹1 & Process Now</button>
-      <button class="ppay-cancel" onclick="payCancel()">Cancel</button>
+      <div class="ppay-per">per task · Secure payment</div>
+      <button class="ppay-confirm" onclick="payOK()">✔ Pay ₹1 & Process Now</button>
+      <button class="ppay-cancel" onclick="payNo()">Cancel</button>
     </div>
   </div>
 
-  <!-- ── ADD MORE FAB ── -->
-  <button id="p-add-more" title="Add more PDFs" onclick="triggerAddMore()">+</button>
+  <!-- ADD MORE FAB -->
+  <button id="pfab" onclick="addMoreFiles()">+</button>
 
-  <!-- ══════════════ MYBBT PDF NAVBAR ══════════════ -->
+  <!-- ══════ NAVBAR ══════ -->
   <nav class="pnav">
-    <a class="pnav-logo" onclick="showHome()" href="javascript:void(0)">
+    <a class="pnav-logo" href="/pdf-tools">
       <div class="pnav-logo-icon">M</div>
       <div class="pnav-logo-text">MY<span>BBT</span> PDF</div>
     </a>
-
     <div class="pnav-links">
-      <button class="pnav-link" onclick="openTool('merge')">Merge PDF</button>
-      <button class="pnav-link" onclick="openTool('split')">Split PDF</button>
-      <button class="pnav-link" onclick="openTool('compress')">Compress PDF</button>
-      <button class="pnav-link" onclick="openTool('images-to-pdf')">JPG to PDF</button>
-      <button class="pnav-link" onclick="openTool('pdf-to-images')">PDF to JPG</button>
-      <button class="pnav-link" onclick="openTool('word-to-pdf')">Word to PDF</button>
-      <button class="pnav-link" onclick="openTool('pdf-to-word')">PDF to Word</button>
-      <button class="pnav-link" onclick="openTool('rotate')">Rotate PDF</button>
-      <button class="pnav-link" onclick="openTool('protect')">Protect PDF</button>
-      <button class="pnav-link" onclick="openTool('unlock')">Unlock PDF</button>
-      <button class="pnav-link" onclick="showHome()">All PDF Tools ▾</button>
+      <button class="pnav-btn" onclick="go('merge')">Merge PDF</button>
+      <button class="pnav-btn" onclick="go('split')">Split PDF</button>
+      <button class="pnav-btn" onclick="go('compress')">Compress PDF</button>
+      <button class="pnav-btn" onclick="go('images-to-pdf')">JPG to PDF</button>
+      <button class="pnav-btn" onclick="go('pdf-to-images')">PDF to JPG</button>
+      <button class="pnav-btn" onclick="go('word-to-pdf')">Word to PDF</button>
+      <button class="pnav-btn" onclick="go('rotate')">Rotate PDF</button>
+      <button class="pnav-btn" onclick="go('protect')">Protect PDF</button>
+      <button class="pnav-btn" onclick="go('unlock')">Unlock PDF</button>
+      <button class="pnav-btn" onclick="goHome()">All Tools ▾</button>
     </div>
-
-    <div class="pnav-right">
-      <a href="/dashboard" class="pnav-exit-btn">← Back to MYBBT</a>
-    </div>
+    <a href="/dashboard" class="pnav-exit">← MYBBT</a>
   </nav>
 
-  <!-- ══════════════ HOME ══════════════ -->
-  <div id="pdf-home" style="flex:1; overflow-y:auto; background:#070e1c;">
-
-    <!-- Hero -->
+  <!-- ══════ HOME ══════ -->
+  <div id="phome">
     <div class="phero">
       <h1>Every tool you need to<br>work with <em>PDFs in one place</em></h1>
-      <p>Merge, split, compress, convert, rotate, unlock and watermark PDFs with just a few clicks. All tools free to use — Advanced cloud mode available at ₹1/task.</p>
+      <p>Merge, split, compress, convert, rotate, unlock & watermark PDFs. All free — Advanced cloud mode at ₹1/task.</p>
     </div>
 
-    <!-- Filter Pills -->
-    <div class="ppills" id="ppills">
-      <button class="ppill active" onclick="filterPDF('all',this)">All</button>
-      <button class="ppill" onclick="filterPDF('organize',this)">Organize PDF</button>
-      <button class="ppill" onclick="filterPDF('optimize',this)">Optimize PDF</button>
-      <button class="ppill" onclick="filterPDF('convert-to',this)">Convert to PDF</button>
-      <button class="ppill" onclick="filterPDF('convert-from',this)">Convert from PDF</button>
-      <button class="ppill" onclick="filterPDF('edit',this)">Edit PDF</button>
-      <button class="ppill" onclick="filterPDF('security',this)">PDF Security</button>
+    <div class="ppills">
+      <button class="ppill on" onclick="filt('all',this)">All</button>
+      <button class="ppill" onclick="filt('org',this)">Organize PDF</button>
+      <button class="ppill" onclick="filt('opt',this)">Optimize PDF</button>
+      <button class="ppill" onclick="filt('cto',this)">Convert to PDF</button>
+      <button class="ppill" onclick="filt('cfr',this)">Convert from PDF</button>
+      <button class="ppill" onclick="filt('edt',this)">Edit PDF</button>
+      <button class="ppill" onclick="filt('sec',this)">Security</button>
     </div>
 
-    <!-- ORGANIZE PDF section -->
-    <div class="psection-hdr" data-section="organize">
-      <h2>Organize PDF</h2><div class="psection-hdr-line"></div>
-    </div>
+    <!-- ORGANIZE -->
+    <div class="psec-hdr" data-s="org"><span>Organize PDF</span><hr></div>
     <div class="pgrid">
-      <div class="pcard" data-cat="organize" onclick="openTool('merge')">
-        <div class="pcard-icon ic-r">🔗</div>
-        <div class="pcard-name">Merge PDF</div>
-        <div class="pcard-desc">Combine multiple PDFs in the order you want</div>
-      </div>
-      <div class="pcard" data-cat="organize" onclick="openTool('split')">
-        <div class="pcard-icon ic-o">✂️</div>
-        <div class="pcard-name">Split PDF</div>
-        <div class="pcard-desc">Separate one PDF into multiple files</div>
-      </div>
-      <div class="pcard" data-cat="organize" onclick="openTool('remove-pages')">
-        <div class="pcard-icon ic-r">🗑️</div>
-        <div class="pcard-name">Remove Pages</div>
-        <div class="pcard-desc">Delete specific pages from your PDF</div>
-      </div>
-      <div class="pcard" data-cat="organize" onclick="openTool('extract')">
-        <div class="pcard-icon ic-b">📤</div>
-        <div class="pcard-name">Extract Pages</div>
-        <div class="pcard-desc">Select and save certain pages from PDF</div>
-      </div>
-      <div class="pcard" data-cat="organize" onclick="openTool('organize')">
-        <div class="pcard-icon ic-p">📋</div>
-        <div class="pcard-name">Organize PDF</div>
-        <div class="pcard-desc">Reorder or delete pages in a PDF</div>
-      </div>
-      <div class="pcard" data-cat="organize" onclick="openTool('page-numbers')">
-        <div class="pcard-icon ic-b">🔢</div>
-        <div class="pcard-name">Page Numbers</div>
-        <div class="pcard-desc">Add page numbers to a PDF document</div>
-      </div>
+      <div class="pcard" data-c="org" onclick="go('merge')"><div class="pcard-ic ic-r">🔗</div><div class="pcard-nm">Merge PDF</div><div class="pcard-ds">Combine multiple PDFs in the order you want</div></div>
+      <div class="pcard" data-c="org" onclick="go('split')"><div class="pcard-ic ic-o">✂️</div><div class="pcard-nm">Split PDF</div><div class="pcard-ds">Separate one PDF into multiple files</div></div>
+      <div class="pcard" data-c="org" onclick="go('remove-pages')"><div class="pcard-ic ic-r">🗑️</div><div class="pcard-nm">Remove Pages</div><div class="pcard-ds">Delete specific pages from your PDF</div></div>
+      <div class="pcard" data-c="org" onclick="go('extract')"><div class="pcard-ic ic-b">📤</div><div class="pcard-nm">Extract Pages</div><div class="pcard-ds">Pull out specific pages as a new PDF</div></div>
+      <div class="pcard" data-c="org" onclick="go('page-numbers')"><div class="pcard-ic ic-b">🔢</div><div class="pcard-nm">Page Numbers</div><div class="pcard-ds">Add page numbers to your PDF</div></div>
     </div>
 
-    <!-- OPTIMIZE PDF -->
-    <div class="psection-hdr" data-section="optimize">
-      <h2>Optimize PDF</h2><div class="psection-hdr-line"></div>
-    </div>
+    <!-- OPTIMIZE -->
+    <div class="psec-hdr" data-s="opt"><span>Optimize PDF</span><hr></div>
     <div class="pgrid">
-      <div class="pcard" data-cat="optimize" onclick="openTool('compress')">
-        <div class="pcard-icon ic-o">🗜️</div>
-        <div class="pcard-name">Compress PDF</div>
-        <div class="pcard-desc">Reduce file size while maintaining quality</div>
-      </div>
-      <div class="pcard" data-cat="optimize" onclick="openTool('ocr')">
-        <div class="pcard-icon ic-b">🔍</div>
-        <div class="pcard-name">OCR PDF</div>
-        <div class="pcard-desc">Make scanned PDFs searchable and editable</div>
-      </div>
-      <div class="pcard" data-cat="optimize" onclick="openTool('repair')">
-        <div class="pcard-icon ic-g">🔧</div>
-        <div class="pcard-name">Repair PDF</div>
-        <div class="pcard-desc">Fix corrupted or broken PDF files</div>
-      </div>
-      <div class="pcard" data-cat="optimize" onclick="openTool('flatten')">
-        <div class="pcard-icon ic-au">⬜</div>
-        <div class="pcard-name">Flatten PDF</div>
-        <div class="pcard-desc">Remove interactive form fields</div>
-      </div>
+      <div class="pcard" data-c="opt" onclick="go('compress')"><div class="pcard-ic ic-o">🗜️</div><div class="pcard-nm">Compress PDF</div><div class="pcard-ds">Reduce file size while maintaining quality</div></div>
+      <div class="pcard" data-c="opt" onclick="go('ocr')"><div class="pcard-ic ic-b">🔍</div><div class="pcard-nm">OCR PDF</div><div class="pcard-ds">Make scanned PDFs searchable text</div></div>
+      <div class="pcard" data-c="opt" onclick="go('repair')"><div class="pcard-ic ic-g">🔧</div><div class="pcard-nm">Repair PDF</div><div class="pcard-ds">Fix corrupted or broken PDF files</div></div>
     </div>
 
-    <!-- CONVERT TO PDF -->
-    <div class="psection-hdr" data-section="convert-to">
-      <h2>Convert to PDF</h2><div class="psection-hdr-line"></div>
-    </div>
+    <!-- CONVERT TO -->
+    <div class="psec-hdr" data-s="cto"><span>Convert to PDF</span><hr></div>
     <div class="pgrid">
-      <div class="pcard" data-cat="convert-to" onclick="openTool('images-to-pdf')">
-        <div class="pcard-icon ic-b">🖼️</div>
-        <div class="pcard-name">JPG to PDF</div>
-        <div class="pcard-desc">Convert JPG, PNG images to PDF format</div>
-      </div>
-      <div class="pcard" data-cat="convert-to" onclick="openTool('word-to-pdf')">
-        <div class="pcard-icon ic-b">📝</div>
-        <div class="pcard-name">Word to PDF</div>
-        <div class="pcard-desc">Convert DOC and DOCX files to PDF</div>
-      </div>
-      <div class="pcard" data-cat="convert-to" onclick="openTool('excel-to-pdf')">
-        <div class="pcard-icon ic-g">📊</div>
-        <div class="pcard-name">Excel to PDF</div>
-        <div class="pcard-desc">Convert XLSX and XLS to PDF</div>
-      </div>
-      <div class="pcard" data-cat="convert-to" onclick="openTool('ppt-to-pdf')">
-        <div class="pcard-icon ic-o">📽️</div>
-        <div class="pcard-name">PowerPoint to PDF</div>
-        <div class="pcard-desc">Convert PPTX presentations to PDF</div>
-      </div>
-      <div class="pcard" data-cat="convert-to" onclick="openTool('html-to-pdf')">
-        <div class="pcard-icon ic-t">🌐</div>
-        <div class="pcard-name">HTML to PDF</div>
-        <div class="pcard-desc">Convert any web URL to a PDF file</div>
-      </div>
+      <div class="pcard" data-c="cto" onclick="go('images-to-pdf')"><div class="pcard-ic ic-b">🖼️</div><div class="pcard-nm">JPG to PDF</div><div class="pcard-ds">Convert JPG, PNG images to PDF</div></div>
+      <div class="pcard" data-c="cto" onclick="go('word-to-pdf')"><div class="pcard-ic ic-b">📝</div><div class="pcard-nm">Word to PDF</div><div class="pcard-ds">Convert DOC and DOCX files to PDF</div></div>
+      <div class="pcard" data-c="cto" onclick="go('excel-to-pdf')"><div class="pcard-ic ic-g">📊</div><div class="pcard-nm">Excel to PDF</div><div class="pcard-ds">Convert XLSX spreadsheets to PDF</div></div>
+      <div class="pcard" data-c="cto" onclick="go('ppt-to-pdf')"><div class="pcard-ic ic-o">📽️</div><div class="pcard-nm">PowerPoint to PDF</div><div class="pcard-ds">Convert PPTX presentations to PDF</div></div>
+      <div class="pcard" data-c="cto" onclick="go('html-to-pdf')"><div class="pcard-ic ic-t">🌐</div><div class="pcard-nm">HTML to PDF</div><div class="pcard-ds">Convert any website URL to PDF</div></div>
     </div>
 
-    <!-- CONVERT FROM PDF -->
-    <div class="psection-hdr" data-section="convert-from">
-      <h2>Convert from PDF</h2><div class="psection-hdr-line"></div>
-    </div>
+    <!-- CONVERT FROM -->
+    <div class="psec-hdr" data-s="cfr"><span>Convert from PDF</span><hr></div>
     <div class="pgrid">
-      <div class="pcard" data-cat="convert-from" onclick="openTool('pdf-to-images')">
-        <div class="pcard-icon ic-pk">📸</div>
-        <div class="pcard-name">PDF to JPG</div>
-        <div class="pcard-desc">Convert each page to a high quality image</div>
-      </div>
-      <div class="pcard" data-cat="convert-from" onclick="openTool('pdf-to-word')">
-        <div class="pcard-icon ic-b">📄</div>
-        <div class="pcard-name">PDF to Word</div>
-        <div class="pcard-desc">Convert PDF to editable DOC files</div>
-      </div>
-      <div class="pcard" data-cat="convert-from" onclick="openTool('pdf-to-excel')">
-        <div class="pcard-icon ic-g">📉</div>
-        <div class="pcard-name">PDF to Excel</div>
-        <div class="pcard-desc">Extract tables and data to XLSX</div>
-      </div>
-      <div class="pcard" data-cat="convert-from" onclick="openTool('pdf-to-pptx')">
-        <div class="pcard-icon ic-o">🎞️</div>
-        <div class="pcard-name">PDF to PowerPoint</div>
-        <div class="pcard-desc">Turn your PDF into editable slides</div>
-      </div>
-      <div class="pcard" data-cat="convert-from" onclick="openTool('extract-text')">
-        <div class="pcard-icon ic-au">📃</div>
-        <div class="pcard-name">Extract Text</div>
-        <div class="pcard-desc">Copy all text content from a PDF</div>
-      </div>
+      <div class="pcard" data-c="cfr" onclick="go('pdf-to-images')"><div class="pcard-ic ic-pk">📸</div><div class="pcard-nm">PDF to JPG</div><div class="pcard-ds">Convert PDF pages to images</div></div>
+      <div class="pcard" data-c="cfr" onclick="go('pdf-to-word')"><div class="pcard-ic ic-b">📄</div><div class="pcard-nm">PDF to Word</div><div class="pcard-ds">Convert PDF to editable DOC files</div></div>
+      <div class="pcard" data-c="cfr" onclick="go('pdf-to-excel')"><div class="pcard-ic ic-g">📉</div><div class="pcard-nm">PDF to Excel</div><div class="pcard-ds">Extract tables from PDF to XLSX</div></div>
+      <div class="pcard" data-c="cfr" onclick="go('extract-text')"><div class="pcard-ic ic-au">📃</div><div class="pcard-nm">Extract Text</div><div class="pcard-ds">Copy all text content from a PDF</div></div>
     </div>
 
-    <!-- EDIT PDF -->
-    <div class="psection-hdr" data-section="edit">
-      <h2>Edit PDF</h2><div class="psection-hdr-line"></div>
-    </div>
+    <!-- EDIT -->
+    <div class="psec-hdr" data-s="edt"><span>Edit PDF</span><hr></div>
     <div class="pgrid">
-      <div class="pcard" data-cat="edit" onclick="openTool('rotate')">
-        <div class="pcard-icon ic-o">🔄</div>
-        <div class="pcard-name">Rotate PDF</div>
-        <div class="pcard-desc">Rotate one or all PDF pages easily</div>
-      </div>
-      <div class="pcard" data-cat="edit" onclick="openTool('watermark')">
-        <div class="pcard-icon ic-b">💧</div>
-        <div class="pcard-name">Add Watermark</div>
-        <div class="pcard-desc">Stamp a text watermark on your PDF</div>
-      </div>
-      <div class="pcard" data-cat="edit" onclick="openTool('crop')">
-        <div class="pcard-icon ic-p">🔲</div>
-        <div class="pcard-name">Crop PDF</div>
-        <div class="pcard-desc">Adjust page margins and crop PDF</div>
-      </div>
-      <div class="pcard" data-cat="edit" onclick="openTool('scan-to-pdf')">
-        <div class="pcard-icon ic-g">📷</div>
-        <div class="pcard-name">Scan to PDF</div>
-        <div class="pcard-desc">Use camera photos to create a PDF</div>
-      </div>
+      <div class="pcard" data-c="edt" onclick="go('rotate')"><div class="pcard-ic ic-o">🔄</div><div class="pcard-nm">Rotate PDF</div><div class="pcard-ds">Rotate one or all PDF pages</div></div>
+      <div class="pcard" data-c="edt" onclick="go('watermark')"><div class="pcard-ic ic-b">💧</div><div class="pcard-nm">Add Watermark</div><div class="pcard-ds">Stamp a text watermark on PDF</div></div>
     </div>
 
-    <!-- PDF SECURITY -->
-    <div class="psection-hdr" data-section="security">
-      <h2>PDF Security</h2><div class="psection-hdr-line"></div>
+    <!-- SECURITY -->
+    <div class="psec-hdr" data-s="sec"><span>PDF Security</span><hr></div>
+    <div class="pgrid" style="padding-bottom:56px;">
+      <div class="pcard" data-c="sec" onclick="go('unlock')"><div class="pcard-ic ic-g">🔓</div><div class="pcard-nm">Unlock PDF</div><div class="pcard-ds">Remove password protection from PDF</div></div>
+      <div class="pcard" data-c="sec" onclick="go('protect')"><div class="pcard-ic ic-r">🔐</div><div class="pcard-nm">Protect PDF</div><div class="pcard-ds">Encrypt your PDF with a password</div></div>
     </div>
-    <div class="pgrid" style="padding-bottom:60px;">
-      <div class="pcard" data-cat="security" onclick="openTool('unlock')">
-        <div class="pcard-icon ic-g">🔓</div>
-        <div class="pcard-name">Unlock PDF</div>
-        <div class="pcard-desc">Remove password protection from PDF</div>
-      </div>
-      <div class="pcard" data-cat="security" onclick="openTool('protect')">
-        <div class="pcard-icon ic-r">🔐</div>
-        <div class="pcard-name">Protect PDF</div>
-        <div class="pcard-desc">Encrypt your PDF with a strong password</div>
-      </div>
-    </div>
-  </div><!-- END #pdf-home -->
+  </div><!-- /phome -->
 
-  <!-- ══════════════ WORKSPACE ══════════════ -->
-  <div id="pdf-ws">
+  <!-- ══════ WORKSPACE ══════ -->
+  <div id="pws">
     <div class="pws-bar">
-      <button class="pws-back" onclick="showHome()">← All PDF Tools</button>
-      <span class="pws-tool-name" id="pws-name">Tool</span>
+      <button class="pws-back" onclick="goHome()">← All PDF Tools</button>
+      <span class="pws-nm" id="pws-nm">Tool</span>
     </div>
     <div class="pws-body">
       <div class="pws-main" id="pws-main"></div>
@@ -778,476 +558,366 @@ pselect {
     </div>
   </div>
 
-</div><!-- END #pdf-world -->
+</div>
 
-<!-- ════════════════════════════════════════════════════════ JAVASCRIPT -->
 <script>
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-window.MYBBT_LOGGED_IN = {{ 'true' if session.get('user_id') else 'false' }};
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-/* ─── FILTER ─────────────────────── */
-function filterPDF(cat, btn) {
-  document.querySelectorAll('.ppill').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.pcard').forEach(c => {
-    c.style.display = (cat === 'all' || c.dataset.cat === cat) ? 'flex' : 'none';
+/* ─── STATE ─── */
+let cTool=null, mFiles=[], mSort=null, pendingRun=null;
+
+/* ─── HOME / NAV ─── */
+function goHome(){
+  document.getElementById('phome').style.display='block';
+  document.getElementById('pws').classList.remove('on');
+  document.getElementById('pfab').style.display='none';
+  document.querySelectorAll('.pnav-btn').forEach(b=>b.classList.remove('on'));
+  cTool=null; mFiles=[]; if(mSort){try{mSort.destroy();}catch(e){}} mSort=null;
+}
+
+function go(key){
+  const m=TOOLS[key]; if(!m) return;
+  cTool=key;
+  document.getElementById('phome').style.display='none';
+  document.getElementById('pws').classList.add('on');
+  document.getElementById('pws-nm').textContent=m.name;
+  document.querySelectorAll('.pnav-btn').forEach(b=>b.classList.remove('on'));
+  mFiles=[];
+  if(m.multi) buildMulti(key,m);
+  else if(m.url) buildUrl(m);
+  else buildSingle(key,m);
+}
+
+/* ─── FILTER ─── */
+function filt(cat,btn){
+  document.querySelectorAll('.ppill').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.pcard').forEach(c=>{
+    c.style.display=(cat==='all'||c.dataset.c===cat)?'flex':'none';
   });
-  // Show/hide section headers
-  document.querySelectorAll('.psection-hdr').forEach(h => {
-    h.style.display = (cat === 'all' || h.dataset.section === cat) ? 'flex' : 'none';
+  document.querySelectorAll('.psec-hdr').forEach(h=>{
+    h.style.display=(cat==='all'||h.dataset.s===cat)?'flex':'none';
   });
 }
 
-/* ─── NAVIGATION ─────────────────── */
-function showHome() {
-  document.getElementById('pdf-home').style.display = 'block';
-  document.getElementById('pdf-ws').classList.remove('active');
-  document.getElementById('p-add-more').style.display = 'none';
-  currentTool = null; mergeFiles = []; mergeSortable = null;
-  // Reset nav links
-  document.querySelectorAll('.pnav-link').forEach(l => l.classList.remove('active'));
-}
-
-let currentTool = null;
-let pendingAction = null;
-
-const TMETA = {
-  merge:           { name:'Merge PDF',         info:'Drag files to reorder before merging.', multi: true },
-  split:           { name:'Split PDF',          info:'Split your PDF into multiple files.',               api:'/api/pdf/split' },
-  compress:        { name:'Compress PDF',       info:'Reduce file size while maintaining quality.',        api:'/api/pdf/compress' },
-  rotate:          { name:'Rotate PDF',         info:'Rotate your PDF pages.',                            api:'/api/pdf/rotate' },
-  watermark:       { name:'Add Watermark',      info:'Add a text watermark to your PDF.',                 api:'/api/pdf/watermark' },
-  protect:         { name:'Protect PDF',        info:'Encrypt PDF with a secure password.',               api:'/api/pdf/protect' },
-  unlock:          { name:'Unlock PDF',         info:'Remove password protection from PDF.',              api:'/api/pdf/unlock' },
-  'remove-pages':  { name:'Remove Pages',       info:'Enter page numbers to delete.',                     api:'/api/pdf/remove-pages' },
-  extract:         { name:'Extract Pages',      info:'Select which pages to extract.',                    api:'/api/pdf/extract' },
-  organize:        { name:'Organize PDF',       info:'Reorder, rotate, or delete pages.',                 api:'/api/pdf/organize' },
-  'page-numbers':  { name:'Page Numbers',       info:'Add page numbers to your PDF.',                     api:'/api/pdf/page-numbers' },
-  ocr:             { name:'OCR PDF',            info:'Make scanned PDF text searchable.',                  api:'/api/pdf/ocr' },
-  repair:          { name:'Repair PDF',         info:'Fix corrupted or damaged PDFs.',                    api:'/api/pdf/repair' },
-  flatten:         { name:'Flatten PDF',        info:'Remove interactive form fields from PDF.',          api:'/api/pdf/flatten' },
-  crop:            { name:'Crop PDF',           info:'Adjust page margins and crop.',                     api:'/api/pdf/crop' },
-  'scan-to-pdf':   { name:'Scan to PDF',        info:'Convert camera photos to PDF.',                     api:'/api/pdf/scan-to-pdf' },
-  'images-to-pdf': { name:'JPG to PDF',         info:'Drag to reorder your images.',                      multi:true, imgMulti:true, api:'/api/pdf/images-to-pdf' },
-  'word-to-pdf':   { name:'Word to PDF',        info:'Convert DOC or DOCX to PDF.',                       api:'/api/pdf/word-to-pdf', accept:'.doc,.docx' },
-  'excel-to-pdf':  { name:'Excel to PDF',       info:'Convert XLS or XLSX to PDF.',                       api:'/api/pdf/excel-to-pdf', accept:'.xls,.xlsx' },
-  'ppt-to-pdf':    { name:'PowerPoint to PDF',  info:'Convert PPT or PPTX to PDF.',                       api:'/api/pdf/ppt-to-pdf', accept:'.ppt,.pptx' },
-  'html-to-pdf':   { name:'HTML to PDF',        info:'Enter a website URL to convert to PDF.',            url: true, api:'/api/pdf/html-to-pdf' },
-  'pdf-to-images': { name:'PDF to JPG',         info:'Convert each page to a high quality image.',        api:'/api/pdf/to-images' },
-  'pdf-to-word':   { name:'PDF to Word',        info:'Convert PDF to editable Word document.',            api:'/api/pdf/to-word' },
-  'pdf-to-excel':  { name:'PDF to Excel',       info:'Extract tables from PDF to Excel.',                 api:'/api/pdf/to-excel' },
-  'pdf-to-pptx':   { name:'PDF to PowerPoint',  info:'Convert PDF to editable slides.',                   api:'/api/pdf/pdf-to-pptx' },
-  'extract-text':  { name:'Extract Text',       info:'Extract all text from PDF.',                        api:'/api/pdf/extract-text' },
-  'ai-summarize':  { name:'AI Summarizer',      info:'Get AI summary of PDF with Gemini.',                api:'/api/pdf/ai-summarize' },
-  translate:       { name:'Translate PDF',      info:'Translate PDF into another language.',              api:'/api/pdf/translate' },
+/* ─── TOOLS META ─── */
+const TOOLS={
+  merge:          {name:'Merge PDF',        info:'Drag cards to reorder before merging.',      multi:true,  api:'/api/pdf/merge'},
+  split:          {name:'Split PDF',        info:'Split your PDF into separate files.',                      api:'/api/pdf/split'},
+  compress:       {name:'Compress PDF',     info:'Reduce file size while maintaining quality.',              api:'/api/pdf/compress'},
+  rotate:         {name:'Rotate PDF',       info:'Rotate pages of your PDF.',                               api:'/api/pdf/rotate'},
+  watermark:      {name:'Add Watermark',    info:'Add a text watermark to your PDF.',                       api:'/api/pdf/watermark'},
+  protect:        {name:'Protect PDF',      info:'Encrypt your PDF with a strong password.',                api:'/api/pdf/protect'},
+  unlock:         {name:'Unlock PDF',       info:'Remove password protection from PDF.',                    api:'/api/pdf/unlock'},
+  'remove-pages': {name:'Remove Pages',     info:'Enter page numbers to remove.',                           api:'/api/pdf/remove-pages'},
+  extract:        {name:'Extract Pages',    info:'Enter page numbers to extract.',                          api:'/api/pdf/extract'},
+  'page-numbers': {name:'Page Numbers',     info:'Add page numbers to your PDF.',                           api:'/api/pdf/page-numbers'},
+  ocr:            {name:'OCR PDF',          info:'Make scanned PDFs searchable.',                           api:'/api/pdf/ocr'},
+  repair:         {name:'Repair PDF',       info:'Fix corrupted or damaged PDFs.',                          api:'/api/pdf/repair'},
+  'images-to-pdf':{name:'JPG to PDF',       info:'Drag to reorder images before converting.',multi:true, imgMulti:true, api:'/api/pdf/images-to-pdf'},
+  'word-to-pdf':  {name:'Word to PDF',      info:'Convert DOC or DOCX to PDF.',          accept:'.doc,.docx', api:'/api/pdf/word-to-pdf'},
+  'excel-to-pdf': {name:'Excel to PDF',     info:'Convert XLS or XLSX to PDF.',          accept:'.xls,.xlsx', api:'/api/pdf/excel-to-pdf'},
+  'ppt-to-pdf':   {name:'PowerPoint to PDF',info:'Convert PPT or PPTX to PDF.',          accept:'.ppt,.pptx', api:'/api/pdf/ppt-to-pdf'},
+  'html-to-pdf':  {name:'HTML to PDF',      info:'Enter a URL to convert to PDF.',        url:true,           api:'/api/pdf/html-to-pdf'},
+  'pdf-to-images':{name:'PDF to JPG',       info:'Convert each page to an image.',                          api:'/api/pdf/to-images'},
+  'pdf-to-word':  {name:'PDF to Word',      info:'Convert PDF to editable Word.',                           api:'/api/pdf/to-word'},
+  'pdf-to-excel': {name:'PDF to Excel',     info:'Extract tables from PDF to Excel.',                       api:'/api/pdf/to-excel'},
+  'extract-text': {name:'Extract Text',     info:'Extract all text content from PDF.',                      api:'/api/pdf/extract-text'},
 };
 
-function openTool(key) {
-  const m = TMETA[key];
-  if (!m) return;
-  currentTool = key;
+/* ─── LOADER ─── */
+function showL(t){document.getElementById('ploading-txt').textContent=t||'Processing…';document.getElementById('ploading').classList.add('on');}
+function hideL(){document.getElementById('ploading').classList.remove('on');}
 
-  document.getElementById('pdf-home').style.display = 'none';
-  document.getElementById('pdf-ws').classList.add('active');
-  document.getElementById('pws-name').textContent = m.name;
-  document.querySelectorAll('.pnav-link').forEach(l => l.classList.remove('active'));
-  window.scrollTo(0,0);
+/* ─── PAY ─── */
+function openPay(fn){pendingRun=fn;document.getElementById('ppay').classList.add('on');}
+function payNo(){document.getElementById('ppay').classList.remove('on');pendingRun=null;}
+function payOK(){document.getElementById('ppay').classList.remove('on');if(pendingRun){pendingRun();pendingRun=null;}}
 
-  if (m.multi) buildMultiTool(key, m);
-  else if (m.url) buildUrlTool(m);
-  else buildSingleTool(key, m);
+/* ─── RESULT ─── */
+function showRes(el,ok,title,sub,fname){
+  hideL(); if(!el) return;
+  el.style.display='block';
+  el.className='pres '+(ok?'ok':'err');
+  el.innerHTML=`<strong>${ok?'✅':'❌'} ${title}</strong>
+    ${sub?`<small>${sub}</small>`:''}
+    ${ok&&fname?`<br><a class="pdl" href="/download/${fname}" download>⬇ Download</a>`:''}`;
 }
 
-/* ─── LOADER ─────────────────────── */
-function showLoader(t) {
-  document.getElementById('ploader-txt').textContent = t || 'Processing…';
-  document.getElementById('ploader').classList.add('on');
-}
-function hideLoader() { document.getElementById('ploader').classList.remove('on'); }
-
-/* ─── PAYMENT ────────────────────── */
-function openPay(action) { pendingAction = action; document.getElementById('ppay').classList.add('on'); }
-function payCancel() { document.getElementById('ppay').classList.remove('on'); pendingAction = null; }
-function payConfirmed() { document.getElementById('ppay').classList.remove('on'); if (pendingAction) { pendingAction(); pendingAction = null; } }
-
-/* ─── RESULT ─────────────────────── */
-function showResult(el, ok, title, sub, filename) {
-  hideLoader();
-  if (!el) return;
-  el.style.display = 'block';
-  el.className = 'pres ' + (ok ? 'ok' : 'err');
-  el.innerHTML = `
-    <div class="pres-title">${ok ? '✅' : '❌'} ${title}</div>
-    ${sub ? `<div class="pres-sub">${sub}</div>` : ''}
-    ${ok && filename ? `<a class="pres-dl" href="/download/${filename}" download>⬇ Download</a>` : ''}
-  `;
-}
-
-async function callApi(url, fd, resEl, msg) {
-  showLoader(msg || 'Processing…');
-  try {
-    const r = await fetch(url, {method:'POST', body:fd});
-    const d = await r.json();
-    hideLoader();
-    if (d.success) {
-      showResult(resEl, true, d.message || 'Done!',
-        d.reduction ? `Size reduced by ${d.reduction}%` : d.pages ? `${d.pages} pages processed` : '',
-        d.filename || d.file);
+/* ─── API CALL ─── */
+async function callApi(url,fd,resEl,msg){
+  showL(msg);
+  try{
+    const r=await fetch(url,{method:'POST',body:fd});
+    const d=await r.json(); hideL();
+    if(d.success){
+      showRes(resEl,true,d.message||'Done!',
+        d.reduction?`Size reduced by ${d.reduction}%`:d.pages?`${d.pages} pages`:'' ,
+        d.filename||d.file);
     } else {
-      showResult(resEl, false, d.error || 'Something went wrong.', '');
+      showRes(resEl,false,d.error||'Something went wrong.','');
     }
-    return d;
-  } catch(e) {
-    hideLoader();
-    showResult(resEl, false, 'Network error: ' + e.message, '');
-    return null;
-  }
+  } catch(e){ hideL(); showRes(resEl,false,'Network error: '+e.message,''); }
 }
 
-/* ─── DRAG-DROP ──────────────────── */
-function setupDrop(el, onFiles) {
-  el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
-  el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
-  el.addEventListener('drop', e => {
-    e.preventDefault(); el.classList.remove('drag-over');
-    if (e.dataTransfer.files.length) onFiles(Array.from(e.dataTransfer.files));
-  });
+/* ─── DRAG DROP ─── */
+function setupDrop(el,cb){
+  el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('dov');});
+  el.addEventListener('dragleave',()=>el.classList.remove('dov'));
+  el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('dov');if(e.dataTransfer.files.length)cb(Array.from(e.dataTransfer.files));});
 }
 
-/* ─── PDF THUMBNAIL ──────────────── */
-async function renderThumb(file, cid) {
-  try {
-    const buf = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({data:buf}).promise;
-    const page = await pdf.getPage(1);
-    const vp = page.getViewport({scale:1});
-    const sc = Math.min(160/vp.width, 175/vp.height);
-    const svp = page.getViewport({scale:sc});
-    const c = document.getElementById(cid);
-    if (!c) return;
-    c.width = svp.width; c.height = svp.height;
-    await page.render({canvasContext: c.getContext('2d'), viewport: svp}).promise;
-  } catch(e) { console.warn('thumb err', e); }
+/* ─── PDF THUMB ─── */
+async function renderPDFThumb(file,cid){
+  try{
+    const buf=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    const page=await pdf.getPage(1);
+    const vp=page.getViewport({scale:1});
+    const sc=Math.min(150/vp.width,170/vp.height);
+    const svp=page.getViewport({scale:sc});
+    const c=document.getElementById(cid); if(!c) return;
+    c.width=svp.width; c.height=svp.height;
+    await page.render({canvasContext:c.getContext('2d'),viewport:svp}).promise;
+  } catch(e){}
+}
+async function renderImgThumb(file,cid){
+  const url=URL.createObjectURL(file);
+  const img=new Image();
+  img.onload=()=>{
+    const c=document.getElementById(cid); if(!c) return;
+    const sc=Math.min(150/img.width,170/img.height);
+    c.width=img.width*sc; c.height=img.height*sc;
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    URL.revokeObjectURL(url);
+  };
+  img.src=url;
 }
 
-/* ═══════════════════════════════════════════════════
-   MULTI-FILE TOOL (Merge & JPG to PDF)
-   ═══════════════════════════════════════════════════ */
-let mergeFiles = [], mergeSortable = null;
-
-function buildMultiTool(key, m) {
-  mergeFiles = []; mergeSortable = null;
-  const accept = m.imgMulti ? 'image/*' : '.pdf';
-  const isImg = !!m.imgMulti;
-
-  // MAIN
-  document.getElementById('pws-main').innerHTML = `
-    <div class="pdrop" id="pdrop-zone">
-      <input type="file" id="pmulti-inp" accept="${accept}" multiple onchange="onMultiAdd(this.files)"/>
-      <span class="pdrop-emoji">${isImg ? '🖼️' : '📄'}</span>
-      <div class="pdrop-title">Select ${isImg ? 'Image' : 'PDF'} files</div>
-      <div class="pdrop-sub">or drop files here · Drag to reorder</div>
-      <div class="pdrop-btn">Select files</div>
-    </div>
-    <div class="pthumb-grid" id="pthumb-grid" style="display:none;"></div>
-  `;
-  setupDrop(document.getElementById('pdrop-zone'), f => onMultiAdd(f));
-
-  // SIDEBAR
-  const extra = !isImg ? `
-    <div class="popt">
-      <div class="popt-title">Processing Mode</div>
-      <div class="popt-radio" id="pmode-radio">
-        <label class="popt-radio-lbl selected">
-          <input type="radio" name="pmode" value="free" checked onchange="onModeChg(this)"/>
-          <div class="popt-text"><strong>Free (Local)</strong><span>Standard quality, always free</span></div>
-        </label>
-        <label class="popt-radio-lbl">
-          <input type="radio" name="pmode" value="pro" onchange="onModeChg(this)"/>
-          <div class="popt-text"><strong>Advanced — ₹1/task</strong><span>Cloud engine · Maximum quality & speed</span></div>
-        </label>
+/* ════════════════════════════════
+   MULTI-FILE TOOL (Merge / IMG)
+   ════════════════════════════════ */
+function buildMulti(key,m){
+  const accept=m.imgMulti?'image/*':'.pdf';
+  const isImg=!!m.imgMulti;
+  const modeRow=!isImg?`
+    <div class="popt"><div class="popt-ttl">Processing Mode</div>
+      <div class="popt-radios">
+        <label class="popt-lbl on"><input type="radio" name="pmode" value="free" checked onchange="modeChg(this)"/>
+          <div class="popt-txt"><strong>Free (Local)</strong><small>Standard quality, always free</small></div></label>
+        <label class="popt-lbl"><input type="radio" name="pmode" value="pro" onchange="modeChg(this)"/>
+          <div class="popt-txt"><strong>Advanced — ₹1/task</strong><small>Cloud engine · Maximum quality</small></div></label>
       </div>
-    </div>` : '';
+    </div>`:'';
 
-  document.getElementById('pws-side').innerHTML = `
+  document.getElementById('pws-main').innerHTML=`
+    <div class="pdrop" id="pdrop">
+      <input type="file" id="pinp" accept="${accept}" multiple onchange="onAdd(this.files)"/>
+      <span class="pdrop-ico">${isImg?'🖼️':'📄'}</span>
+      <div class="pdrop-ttl">Select ${isImg?'image':'PDF'} files</div>
+      <div class="pdrop-sub">Drop here or click · Drag cards to reorder</div>
+      <div class="pdrop-cta">Select Files</div>
+    </div>
+    <div class="pgthumb" id="pgthumb" style="display:none;"></div>`;
+  setupDrop(document.getElementById('pdrop'),f=>onAdd(f));
+
+  document.getElementById('pws-side').innerHTML=`
     <h2>${m.name}</h2>
-    <div class="pws-side-info">ℹ️ ${m.info}</div>
-    ${extra}
-    <div class="pside-spacer"></div>
-    <div class="pres" id="pmulti-res"></div>
-    <button class="pact-btn" id="pmulti-btn" onclick="doMultiTool('${key}','${m.api||\'\'}',${isImg})" disabled>
-      ${m.name} <span style="font-size:1.2rem">→</span>
-    </button>
-  `;
+    <div class="pws-info">ℹ️ ${m.info}</div>
+    ${modeRow}
+    <div class="pspacer"></div>
+    <div class="pres" id="mres"></div>
+    <button class="pact" id="mbtn" onclick="doMulti('${key}','${m.api}',${isImg})" disabled>
+      ${m.name} →
+    </button>`;
 }
 
-function onMultiAdd(fileList) {
-  Array.from(fileList).forEach(f => mergeFiles.push(f));
-  renderThumbGrid();
-  const btn = document.getElementById('pmulti-btn');
-  if (btn) btn.disabled = mergeFiles.length < (currentTool === 'merge' ? 2 : 1);
+function onAdd(fl){
+  Array.from(fl).forEach(f=>mFiles.push(f));
+  renderGrid();
+  const btn=document.getElementById('mbtn');
+  if(btn) btn.disabled=mFiles.length<(cTool==='merge'?2:1);
 }
 
-function renderThumbGrid() {
-  const drop = document.getElementById('pdrop-zone');
-  const grid = document.getElementById('pthumb-grid');
-  const fab = document.getElementById('p-add-more');
-
-  if (mergeFiles.length === 0) {
-    if (drop) drop.style.display = 'block';
-    if (grid) grid.style.display = 'none';
-    if (fab) fab.style.display = 'none';
+function renderGrid(){
+  const drop=document.getElementById('pdrop');
+  const grid=document.getElementById('pgthumb');
+  const fab=document.getElementById('pfab');
+  if(mFiles.length===0){
+    if(drop)drop.style.display='block';
+    if(grid)grid.style.display='none';
+    if(fab)fab.style.display='none';
     return;
   }
-
-  if (drop) drop.style.display = 'none';
-  if (grid) {
-    grid.style.display = 'grid';
-    grid.innerHTML = mergeFiles.map((f, i) => `
-      <div class="pthumb-card" data-i="${i}">
-        <div class="pthumb-preview" id="prev-wrap-${i}">
-          <canvas id="pcanv-${i}"></canvas>
+  if(drop)drop.style.display='none';
+  if(grid){
+    grid.style.display='grid';
+    grid.innerHTML=mFiles.map((f,i)=>`
+      <div class="ptcard" data-i="${i}">
+        <div class="ptprev"><canvas id="pc${i}"></canvas></div>
+        <div class="ptfooter">
+          <span class="ptnm" title="${f.name}">${f.name}</span>
+          <button class="ptdel" onclick="delFile(${i})">✕</button>
         </div>
-        <div class="pthumb-footer">
-          <span class="pthumb-name" title="${f.name}">${f.name}</span>
-          <button class="pthumb-del" onclick="removeFile(${i})">✕</button>
-        </div>
-      </div>
-    `).join('');
-
-    // Thumbnails
-    mergeFiles.forEach((file, i) => {
-      if (file.type === 'application/pdf') {
-        renderThumb(file, `pcanv-${i}`);
-      } else if (file.type.startsWith('image/')) {
-        const c = document.getElementById(`pcanv-${i}`);
-        if (c) {
-          const url = URL.createObjectURL(file);
-          const img = new Image();
-          img.onload = () => {
-            const sc = Math.min(160/img.width, 175/img.height);
-            c.width = img.width * sc; c.height = img.height * sc;
-            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-            URL.revokeObjectURL(url);
-          };
-          img.src = url;
-        }
-      }
+      </div>`).join('');
+    mFiles.forEach((f,i)=>{
+      if(f.type==='application/pdf') renderPDFThumb(f,`pc${i}`);
+      else if(f.type.startsWith('image/')) renderImgThumb(f,`pc${i}`);
     });
-
-    // Sortable
-    if (mergeSortable) { try { mergeSortable.destroy(); } catch(e){} }
-    mergeSortable = Sortable.create(grid, {
-      animation: 200,
-      ghostClass: 'sortable-ghost',
-      chosenClass: 'sortable-chosen',
-      onEnd: evt => {
-        const moved = mergeFiles.splice(evt.oldIndex, 1)[0];
-        mergeFiles.splice(evt.newIndex, 0, moved);
-      }
+    if(mSort){try{mSort.destroy();}catch(e){}} 
+    mSort=Sortable.create(grid,{
+      animation:180, ghostClass:'sortable-ghost', chosenClass:'sortable-chosen',
+      onEnd:e=>{const mv=mFiles.splice(e.oldIndex,1)[0];mFiles.splice(e.newIndex,0,mv);}
     });
   }
-  if (fab) fab.style.display = 'flex';
+  if(fab)fab.style.display='flex';
 }
 
-function removeFile(i) {
-  mergeFiles.splice(i, 1);
-  renderThumbGrid();
-  const btn = document.getElementById('pmulti-btn');
-  if (btn) btn.disabled = mergeFiles.length < (currentTool === 'merge' ? 2 : 1);
+function delFile(i){
+  mFiles.splice(i,1); renderGrid();
+  const btn=document.getElementById('mbtn');
+  if(btn) btn.disabled=mFiles.length<(cTool==='merge'?2:1);
 }
 
-function triggerAddMore() {
-  const inp = document.createElement('input');
-  inp.type = 'file';
-  inp.accept = currentTool === 'images-to-pdf' ? 'image/*' : '.pdf';
-  inp.multiple = true;
-  inp.onchange = () => onMultiAdd(inp.files);
-  inp.click();
+function addMoreFiles(){
+  const inp=document.createElement('input');
+  inp.type='file'; inp.multiple=true;
+  inp.accept=cTool==='images-to-pdf'?'image/*':'.pdf';
+  inp.onchange=()=>onAdd(inp.files); inp.click();
 }
 
-function onModeChg(r) {
-  document.querySelectorAll('input[name="pmode"]').forEach(x =>
-    x.closest('.popt-radio-lbl').classList.toggle('selected', x.checked)
-  );
+function modeChg(r){
+  document.querySelectorAll(`input[name="${r.name}"]`).forEach(x=>
+    x.closest('.popt-lbl').classList.toggle('on',x.checked));
 }
 
-async function doMultiTool(key, apiUrl, isImg) {
-  if (mergeFiles.length < 1) return;
-  const mode = document.querySelector('input[name="pmode"]:checked')?.value || 'free';
-  const resEl = document.getElementById('pmulti-res');
-
-  const run = async () => {
-    const fd = new FormData();
-    const field = isImg ? 'images' : 'files';
-    mergeFiles.forEach(f => fd.append(field, f));
-    if (!isImg) fd.append('mode', mode);
-    await callApi(apiUrl || '/api/pdf/merge', fd, resEl,
-      mode === 'pro' ? 'Cloud Processing… Please wait' : 'Processing…');
+async function doMulti(key,apiUrl,isImg){
+  if(mFiles.length<1) return;
+  const mode=document.querySelector('input[name="pmode"]:checked')?.value||'free';
+  const resEl=document.getElementById('mres');
+  const run=async()=>{
+    const fd=new FormData();
+    mFiles.forEach(f=>fd.append(isImg?'images':'files',f));
+    if(!isImg) fd.append('mode',mode);
+    await callApi(apiUrl,fd,resEl,mode==='pro'?'Cloud Processing…':'Processing…');
   };
-
-  // Pro mode: MUST go through payment first — run() only called after payConfirmed()
-  if (mode === 'pro') openPay(run); else await run();
+  if(mode==='pro') openPay(run); else await run();
 }
 
-/* ═══════════════════════════════════════════════════
-   SINGLE-FILE TOOL
-   ═══════════════════════════════════════════════════ */
-function buildSingleTool(key, m) {
-  const accept = m.accept || '.pdf';
-
-  // Tool-specific options
-  let opts = '';
-  if (key === 'compress') opts = `<div class="popt"><div class="popt-title">Compression Level</div><div class="popt-radio">
-    <label class="popt-radio-lbl"><input type="radio" name="cq" value="low" onchange="onRadioChg(this)"/><div class="popt-text"><strong>Extreme</strong><span>Smallest file size</span></div></label>
-    <label class="popt-radio-lbl selected"><input type="radio" name="cq" value="medium" checked onchange="onRadioChg(this)"/><div class="popt-text"><strong>Recommended</strong><span>Best balance</span></div></label>
-    <label class="popt-radio-lbl"><input type="radio" name="cq" value="high" onchange="onRadioChg(this)"/><div class="popt-text"><strong>Low Compression</strong><span>Best quality</span></div></label>
+/* ════════════════════════════════
+   SINGLE FILE TOOL
+   ════════════════════════════════ */
+function buildSingle(key,m){
+  const accept=m.accept||'.pdf';
+  let opts='';
+  if(key==='compress') opts=`<div class="popt"><div class="popt-ttl">Compression Level</div><div class="popt-radios">
+    <label class="popt-lbl"><input type="radio" name="cq" value="low" onchange="modeChg(this)"/><div class="popt-txt"><strong>Extreme</strong><small>Smallest file size</small></div></label>
+    <label class="popt-lbl on"><input type="radio" name="cq" value="medium" checked onchange="modeChg(this)"/><div class="popt-txt"><strong>Recommended</strong><small>Best balance</small></div></label>
+    <label class="popt-lbl"><input type="radio" name="cq" value="high" onchange="modeChg(this)"/><div class="popt-txt"><strong>Low Compression</strong><small>Best quality</small></div></label>
   </div></div>`;
-  else if (key === 'rotate') opts = `<div class="popt"><div class="popt-title">Rotation</div><div class="popt-radio">
-    <label class="popt-radio-lbl selected"><input type="radio" name="rot" value="90" checked onchange="onRadioChg(this)"/><div class="popt-text"><strong>90° Clockwise</strong></div></label>
-    <label class="popt-radio-lbl"><input type="radio" name="rot" value="180" onchange="onRadioChg(this)"/><div class="popt-text"><strong>180°</strong></div></label>
-    <label class="popt-radio-lbl"><input type="radio" name="rot" value="270" onchange="onRadioChg(this)"/><div class="popt-text"><strong>90° Counter-clockwise</strong></div></label>
-  </div><div style="margin-top:12px;"><div class="popt-title">Pages</div>
-    <select id="rot-pg" class="pinput" style="margin-top:6px;"><option value="all">All pages</option><option value="first">First page</option></select>
+  else if(key==='rotate') opts=`<div class="popt"><div class="popt-ttl">Rotation Angle</div><div class="popt-radios">
+    <label class="popt-lbl on"><input type="radio" name="rot" value="90" checked onchange="modeChg(this)"/><div class="popt-txt"><strong>90° Clockwise</strong></div></label>
+    <label class="popt-lbl"><input type="radio" name="rot" value="180" onchange="modeChg(this)"/><div class="popt-txt"><strong>180°</strong></div></label>
+    <label class="popt-lbl"><input type="radio" name="rot" value="270" onchange="modeChg(this)"/><div class="popt-txt"><strong>90° Counter-clockwise</strong></div></label>
   </div></div>`;
-  else if (key === 'split') opts = `<div class="popt"><div class="popt-title">Split Mode</div><div class="popt-radio">
-    <label class="popt-radio-lbl selected"><input type="radio" name="spm" value="all" checked onchange="onSplitMode(this)"/><div class="popt-text"><strong>Extract all pages</strong><span>One PDF per page</span></div></label>
-    <label class="popt-radio-lbl"><input type="radio" name="spm" value="range" onchange="onSplitMode(this)"/><div class="popt-text"><strong>By ranges</strong><span>e.g. 1-3, 5, 7</span></div></label>
-  </div><input type="text" class="pinput" id="spm-ranges" placeholder="e.g. 1-3, 5, 7" style="margin-top:12px;display:none;"/></div>`;
-  else if (key === 'protect') opts = `<div class="popt"><div class="popt-title">Password</div><input type="password" class="pinput" id="pp-pwd" placeholder="Enter password" style="margin-top:4px;"/></div>`;
-  else if (key === 'unlock') opts = `<div class="popt"><div class="popt-title">PDF Password (if known)</div><input type="password" class="pinput" id="ul-pwd" placeholder="Leave blank if unknown" style="margin-top:4px;"/></div>`;
-  else if (key === 'watermark') opts = `<div class="popt"><div class="popt-title">Watermark Text</div>
+  else if(key==='split') opts=`<div class="popt"><div class="popt-ttl">Split Mode</div><div class="popt-radios">
+    <label class="popt-lbl on"><input type="radio" name="spm" value="all" checked onchange="splitMd(this)"/><div class="popt-txt"><strong>All Pages</strong><small>One PDF per page</small></div></label>
+    <label class="popt-lbl"><input type="radio" name="spm" value="range" onchange="splitMd(this)"/><div class="popt-txt"><strong>By Ranges</strong><small>e.g. 1-3, 5, 7</small></div></label>
+  </div><input type="text" class="pinput" id="sranges" placeholder="e.g. 1-3, 5, 7" style="margin-top:10px;display:none;"/></div>`;
+  else if(key==='protect') opts=`<div class="popt"><div class="popt-ttl">Password</div><input type="password" class="pinput" id="pp-pwd" placeholder="Set password" style="margin-top:4px;"/></div>`;
+  else if(key==='unlock') opts=`<div class="popt"><div class="popt-ttl">Current Password (if known)</div><input type="password" class="pinput" id="ul-pwd" placeholder="Leave blank if unknown" style="margin-top:4px;"/></div>`;
+  else if(key==='watermark') opts=`<div class="popt"><div class="popt-ttl">Watermark Text</div>
     <input type="text" class="pinput" id="wm-txt" value="CONFIDENTIAL" style="margin-bottom:10px;"/>
-    <div class="popt-title" style="margin-top:10px;">Opacity (%)</div>
+    <div class="popt-ttl" style="margin-top:10px;">Opacity %</div>
     <input type="range" id="wm-op" min="10" max="100" value="30" style="width:100%;accent-color:#c9a84c;margin-top:6px;"/>
   </div>`;
-  else if (key === 'remove-pages' || key === 'extract') opts = `<div class="popt"><div class="popt-title">${key === 'remove-pages' ? 'Pages to Remove' : 'Pages to Extract'}</div>
+  else if(key==='remove-pages'||key==='extract') opts=`<div class="popt"><div class="popt-ttl">${key==='remove-pages'?'Pages to Remove':'Pages to Extract'}</div>
     <input type="text" class="pinput" id="pg-inp" placeholder="e.g. 1, 3, 5-7" style="margin-top:4px;"/>
-    <div style="font-size:.75rem;color:#5f7499;margin-top:8px;">Use commas and ranges like 5-7</div>
+    <small style="font-size:.73rem;color:#3d5070;margin-top:7px;display:block;">Use commas and ranges like 2-5</small>
   </div>`;
 
-  // MAIN
-  document.getElementById('pws-main').innerHTML = `
-    <div class="pdrop" id="pdrop-zone">
-      <input type="file" id="psingle-inp" accept="${accept}" onchange="onSingleSel(this)"/>
-      <span class="pdrop-emoji">${accept==='.pdf'?'📄':'📁'}</span>
-      <div class="pdrop-title">Select file</div>
-      <div class="pdrop-sub">or drop file here</div>
-      <div class="pdrop-btn">Select ${accept==='.pdf'?'PDF':'file'}</div>
+  document.getElementById('pws-main').innerHTML=`
+    <div class="pdrop" id="pdrop">
+      <input type="file" id="sinp" accept="${accept}" onchange="onSingle(this)"/>
+      <span class="pdrop-ico">${accept==='.pdf'?'📄':'📁'}</span>
+      <div class="pdrop-ttl">Select file</div>
+      <div class="pdrop-sub">Drop here or click</div>
+      <div class="pdrop-cta">Select ${accept==='.pdf'?'PDF':'File'}</div>
     </div>
-    <div class="pfile-selected" id="pfile-sel">
-      <span style="font-size:1.8rem;">📄</span>
-      <span class="pfile-selected-name" id="pfile-lbl"></span>
-      <button class="pfile-clear" onclick="clearSingle()">✕</button>
+    <div class="psel" id="psel">
+      <span style="font-size:1.7rem">📄</span>
+      <span class="psel-nm" id="psel-nm"></span>
+      <button class="psel-clr" onclick="clearS()">✕</button>
     </div>
-    <div id="psingle-thumb-wrap" style="display:none;margin-top:20px;background:#0d1525;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.5);">
-      <canvas id="psingle-thumb" style="display:block;max-width:100%;max-height:360px;margin:0 auto;"></canvas>
-    </div>
-  `;
-  setupDrop(document.getElementById('pdrop-zone'), f => { if(f[0]) { document.getElementById('psingle-inp').files = f; onSingleSel({files: f}); } });
+    <div class="pthumb-wrap" id="pthumb-wrap"><canvas id="sthumb"></canvas></div>`;
+  setupDrop(document.getElementById('pdrop'),f=>{if(f[0])onSingleF(f[0]);});
 
-  // SIDEBAR
-  document.getElementById('pws-side').innerHTML = `
+  document.getElementById('pws-side').innerHTML=`
     <h2>${m.name}</h2>
-    <div class="pws-side-info">ℹ️ ${m.info}</div>
+    <div class="pws-info">ℹ️ ${m.info}</div>
     ${opts}
-    <div class="pside-spacer"></div>
-    <div class="pres" id="psingle-res"></div>
-    <button class="pact-btn gold" id="psingle-btn" onclick="doSingleTool('${key}','${m.api}')" disabled>${m.name} →</button>
-  `;
+    <div class="pspacer"></div>
+    <div class="pres" id="sres"></div>
+    <button class="pact gold" id="sbtn" onclick="doSingle('${key}','${m.api}')" disabled>${m.name} →</button>`;
 }
 
-function onSingleSel(input) {
-  const f = Array.isArray(input) ? input[0] : (input.files && input.files[0]);
-  if (!f) return;
-  const drop = document.getElementById('pdrop-zone');
-  const sel = document.getElementById('pfile-sel');
-  const lbl = document.getElementById('pfile-lbl');
-  const btn = document.getElementById('psingle-btn');
-  const tw = document.getElementById('psingle-thumb-wrap');
-  if (drop) drop.style.display = 'none';
-  if (sel) sel.classList.add('show');
-  if (lbl) lbl.textContent = f.name + ' (' + fmt(f.size) + ')';
-  if (btn) btn.disabled = false;
-  if (tw && f.type === 'application/pdf') {
-    tw.style.display = 'block';
-    renderThumb(f, 'psingle-thumb');
+function onSingle(inp){ if(inp.files[0]) onSingleF(inp.files[0]); }
+function onSingleF(f){
+  document.getElementById('pdrop').style.display='none';
+  const sel=document.getElementById('psel'); sel.classList.add('on');
+  document.getElementById('psel-nm').textContent=`${f.name} (${fmt(f.size)})`;
+  const btn=document.getElementById('sbtn'); if(btn) btn.disabled=false;
+  if(f.type==='application/pdf'){
+    const tw=document.getElementById('pthumb-wrap'); tw.style.display='block';
+    renderPDFThumb(f,'sthumb');
   }
 }
-
-function clearSingle() {
-  const inp = document.getElementById('psingle-inp');
-  if (inp) inp.value = '';
-  const sel = document.getElementById('pfile-sel');
-  if (sel) sel.classList.remove('show');
-  const drop = document.getElementById('pdrop-zone');
-  if (drop) drop.style.display = 'block';
-  const btn = document.getElementById('psingle-btn');
-  if (btn) btn.disabled = true;
-  const tw = document.getElementById('psingle-thumb-wrap');
-  if (tw) tw.style.display = 'none';
+function clearS(){
+  const inp=document.getElementById('sinp'); if(inp) inp.value='';
+  document.getElementById('psel').classList.remove('on');
+  document.getElementById('pdrop').style.display='block';
+  const tw=document.getElementById('pthumb-wrap'); if(tw) tw.style.display='none';
+  const btn=document.getElementById('sbtn'); if(btn) btn.disabled=true;
+}
+function splitMd(r){
+  modeChg(r);
+  const ri=document.getElementById('sranges'); if(ri) ri.style.display=r.value==='range'?'block':'none';
+}
+async function doSingle(key,apiUrl){
+  const file=document.getElementById('sinp')?.files[0]; if(!file) return;
+  const fd=new FormData(); fd.append('file',file);
+  if(key==='compress') fd.append('quality',document.querySelector('input[name="cq"]:checked')?.value||'medium');
+  else if(key==='rotate'){fd.append('angle',document.querySelector('input[name="rot"]:checked')?.value||'90'); fd.append('pages','all');}
+  else if(key==='protect'){const p=document.getElementById('pp-pwd')?.value;if(!p)return alert('Enter a password');fd.append('password',p);}
+  else if(key==='unlock') fd.append('password',document.getElementById('ul-pwd')?.value||'');
+  else if(key==='watermark'){fd.append('text',document.getElementById('wm-txt')?.value||'WATERMARK');fd.append('opacity',document.getElementById('wm-op')?.value||'30');}
+  else if(key==='split'){fd.append('split_mode',document.querySelector('input[name="spm"]:checked')?.value||'all');fd.append('page_ranges',document.getElementById('sranges')?.value||'');}
+  else if(key==='remove-pages'||key==='extract'){const pg=document.getElementById('pg-inp')?.value;if(!pg)return alert('Enter page numbers');fd.append('pages',pg);}
+  await callApi(apiUrl,fd,document.getElementById('sres'),'Processing…');
 }
 
-function onRadioChg(r) {
-  const name = r.name;
-  document.querySelectorAll(`input[name="${name}"]`).forEach(x =>
-    x.closest('.popt-radio-lbl').classList.toggle('selected', x.checked)
-  );
-}
-
-function onSplitMode(r) {
-  onRadioChg(r);
-  const ri = document.getElementById('spm-ranges');
-  if (ri) ri.style.display = r.value === 'range' ? 'block' : 'none';
-}
-
-async function doSingleTool(key, apiUrl) {
-  const file = document.getElementById('psingle-inp')?.files[0];
-  if (!file) return;
-  const fd = new FormData();
-  fd.append('file', file);
-
-  if (key === 'compress') fd.append('quality', document.querySelector('input[name="cq"]:checked')?.value || 'medium');
-  else if (key === 'rotate') { fd.append('angle', document.querySelector('input[name="rot"]:checked')?.value||'90'); fd.append('pages', document.getElementById('rot-pg')?.value||'all'); }
-  else if (key === 'protect') { const p=document.getElementById('pp-pwd')?.value; if(!p) return alert('Enter a password'); fd.append('password',p); }
-  else if (key === 'unlock') fd.append('password', document.getElementById('ul-pwd')?.value||'');
-  else if (key === 'watermark') { fd.append('text', document.getElementById('wm-txt')?.value||'WATERMARK'); fd.append('opacity', document.getElementById('wm-op')?.value||'30'); }
-  else if (key === 'split') { fd.append('split_mode', document.querySelector('input[name="spm"]:checked')?.value||'all'); fd.append('page_ranges', document.getElementById('spm-ranges')?.value||''); }
-  else if (key === 'remove-pages' || key === 'extract') { const pg=document.getElementById('pg-inp')?.value; if(!pg) return alert('Enter page numbers'); fd.append('pages',pg); }
-
-  await callApi(apiUrl, fd, document.getElementById('psingle-res'), 'Processing…');
-}
-
-/* ─── URL TOOL ───────────────────── */
-function buildUrlTool(m) {
-  document.getElementById('pws-main').innerHTML = `
-    <div style="width:100%;max-width:560px;background:#0d1525;border:1px solid rgba(201,168,76,.15);border-radius:16px;padding:40px;text-align:center;">
-      <span style="font-size:3rem;display:block;margin-bottom:20px;">🌐</span>
-      <input type="url" class="pinput" id="url-inp" placeholder="https://example.com" style="font-size:1rem;padding:14px 18px;"/>
-    </div>
-  `;
-  document.getElementById('pws-side').innerHTML = `
+/* ─── URL TOOL ─── */
+function buildUrl(m){
+  document.getElementById('pws-main').innerHTML=`
+    <div style="width:100%;max-width:520px;background:#0d1525;border:1px solid rgba(201,168,76,.12);border-radius:14px;padding:38px;text-align:center;">
+      <span style="font-size:3rem;display:block;margin-bottom:18px;">🌐</span>
+      <input type="url" class="pinput" id="url-inp" placeholder="https://example.com" style="font-size:1rem;padding:13px 16px;"/>
+    </div>`;
+  document.getElementById('pws-side').innerHTML=`
     <h2>${m.name}</h2>
-    <div class="pws-side-info">ℹ️ ${m.info}</div>
-    <div class="pside-spacer"></div>
-    <div class="pres" id="url-res"></div>
-    <button class="pact-btn gold" onclick="doUrlTool('${m.api}')">Convert to PDF →</button>
-  `;
+    <div class="pws-info">ℹ️ ${m.info}</div>
+    <div class="pspacer"></div>
+    <div class="pres" id="ures"></div>
+    <button class="pact gold" onclick="doUrl('${m.api}')">Convert to PDF →</button>`;
+}
+async function doUrl(apiUrl){
+  const url=document.getElementById('url-inp')?.value;
+  if(!url) return alert('Enter a URL');
+  const fd=new FormData(); fd.append('url',url);
+  await callApi(apiUrl,fd,document.getElementById('ures'),'Converting…');
 }
 
-async function doUrlTool(apiUrl) {
-  const url = document.getElementById('url-inp')?.value;
-  if (!url) return alert('Please enter a URL');
-  const fd = new FormData();
-  fd.append('url', url);
-  await callApi(apiUrl, fd, document.getElementById('url-res'), 'Converting…');
-}
-
-/* ─── HELPERS ────────────────────── */
-function fmt(b) {
-  if(b<1024) return b+' B';
-  if(b<1048576) return (b/1024).toFixed(1)+' KB';
-  return (b/1048576).toFixed(2)+' MB';
-}
+/* ─── UTILS ─── */
+function fmt(b){if(b<1024)return b+' B';if(b<1048576)return (b/1024).toFixed(1)+' KB';return (b/1048576).toFixed(2)+' MB';}
 </script>
 {% endblock %}
