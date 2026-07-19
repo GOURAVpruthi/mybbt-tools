@@ -599,6 +599,96 @@ footer{background:var(--navy2);border-top:1px solid var(--glass-border);padding:
   </div>
 </section>
 
+<!-- ══════════════════════════════════════════
+     PDF TOOLS PUBLIC SECTION
+     ══════════════════════════════════════════ -->
+<section id="pdf-tools-showcase" style="padding:80px 6%;background:linear-gradient(160deg,rgba(4,13,31,1) 0%,rgba(11,20,45,1) 100%);position:relative;overflow:hidden;">
+  <!-- background grid pattern -->
+  <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(201,168,76,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;"></div>
+  <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.3),transparent);"></div>
+
+  <div style="max-width:1200px;margin:0 auto;position:relative;z-index:1;">
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:56px;" class="anim">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);padding:6px 16px;border-radius:50px;font-size:12px;color:#c9a84c;margin-bottom:20px;letter-spacing:.5px;font-weight:600;">
+        <span style="width:6px;height:6px;background:#c9a84c;border-radius:50%;animation:pulse 2s infinite;"></span>
+        FREE · No Login Required
+      </div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:clamp(2rem,4vw,3rem);font-weight:800;color:#fff;margin-bottom:16px;">
+        Complete <span style="background:linear-gradient(135deg,#c9a84c,#e8c96a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">PDF Toolkit</span>
+      </h2>
+      <p style="color:#8899bb;font-size:1.05rem;max-width:560px;margin:0 auto;line-height:1.7;">
+        Merge, split, compress, convert & secure your PDFs online. No installation. No signup needed. All processing done securely.
+      </p>
+    </div>
+
+    <!-- Tool Cards Grid -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:40px;" class="anim">
+
+      <a href="/pdf-tools" style="text-decoration:none;background:rgba(11,20,40,.8);border:1px solid rgba(239,68,68,.2);border-radius:14px;padding:22px 18px;display:flex;flex-direction:column;align-items:flex-start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;" onmouseover="this.style.borderColor='rgba(239,68,68,.6)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,.5)'" onmouseout="this.style.borderColor='rgba(239,68,68,.2)';this.style.transform='';this.style.boxShadow=''">
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(239,68,68,.12);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:14px;">🔗</div>
+        <div style="font-size:.95rem;font-weight:800;color:#fff;margin-bottom:6px;">Merge PDF</div>
+        <div style="font-size:.78rem;color:#5f7499;line-height:1.5;">Combine multiple PDFs in order</div>
+      </a>
+
+      <a href="/pdf-tools" style="text-decoration:none;background:rgba(11,20,40,.8);border:1px solid rgba(249,115,22,.2);border-radius:14px;padding:22px 18px;display:flex;flex-direction:column;align-items:flex-start;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='rgba(249,115,22,.6)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,.5)'" onmouseout="this.style.borderColor='rgba(249,115,22,.2)';this.style.transform='';this.style.boxShadow=''">
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(249,115,22,.12);color:#f97316;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:14px;">✂️</div>
+        <div style="font-size:.95rem;font-weight:800;color:#fff;margin-bottom:6px;">Split PDF</div>
+        <div style="font-size:.78rem;color:#5f7499;line-height:1.5;">Separate into multiple files</div>
+      </a>
+
+      <a href="/pdf-tools" style="text-decoration:none;background:rgba(11,20,40,.8);border:1px solid rgba(34,197,94,.2);border-radius:14px;padding:22px 18px;display:flex;flex-direction:column;align-items:flex-start;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='rgba(34,197,94,.6)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,.5)'" onmouseout="this.style.borderColor='rgba(34,197,94,.2)';this.style.transform='';this.style.boxShadow=''">
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(34,197,94,.12);color:#22c55e;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:14px;">🗜️</div>
+        <div style="font-size:.95rem;font-weight:800;color:#fff;margin-bottom:6px;">Compress PDF</div>
+        <div style="font-size:.78rem;color:#5f7499;line-height:1.5;">Reduce size without losing quality</div>
+      </a>
+
+      <a href="/pdf-tools" style="text-decoration:none;background:rgba(11,20,40,.8);border:1px solid rgba(59,130,246,.2);border-radius:14px;padding:22px 18px;display:flex;flex-direction:column;align-items:flex-start;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='rgba(59,130,246,.6)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,.5)'" onmouseout="this.style.borderColor='rgba(59,130,246,.2)';this.style.transform='';this.style.boxShadow=''">
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(59,130,246,.12);color:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:14px;">🖼️</div>
+        <div style="font-size:.95rem;font-weight:800;color:#fff;margin-bottom:6px;">JPG to PDF</div>
+        <div style="font-size:.78rem;color:#5f7499;line-height:1.5;">Convert images to PDF</div>
+      </a>
+
+      <a href="/pdf-tools" style="text-decoration:none;background:rgba(11,20,40,.8);border:1px solid rgba(168,85,247,.2);border-radius:14px;padding:22px 18px;display:flex;flex-direction:column;align-items:flex-start;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='rgba(168,85,247,.6)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,.5)'" onmouseout="this.style.borderColor='rgba(168,85,247,.2)';this.style.transform='';this.style.boxShadow=''">
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(168,85,247,.12);color:#a855f7;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:14px;">📝</div>
+        <div style="font-size:.95rem;font-weight:800;color:#fff;margin-bottom:6px;">Word to PDF</div>
+        <div style="font-size:.78rem;color:#5f7499;line-height:1.5;">Convert DOC & DOCX files</div>
+      </a>
+
+      <a href="/pdf-tools" style="text-decoration:none;background:rgba(11,20,40,.8);border:1px solid rgba(20,184,166,.2);border-radius:14px;padding:22px 18px;display:flex;flex-direction:column;align-items:flex-start;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='rgba(20,184,166,.6)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,.5)'" onmouseout="this.style.borderColor='rgba(20,184,166,.2)';this.style.transform='';this.style.boxShadow=''">
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(20,184,166,.12);color:#14b8a6;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:14px;">🔓</div>
+        <div style="font-size:.95rem;font-weight:800;color:#fff;margin-bottom:6px;">Unlock PDF</div>
+        <div style="font-size:.78rem;color:#5f7499;line-height:1.5;">Remove password protection</div>
+      </a>
+
+      <a href="/pdf-tools" style="text-decoration:none;background:rgba(11,20,40,.8);border:1px solid rgba(201,168,76,.2);border-radius:14px;padding:22px 18px;display:flex;flex-direction:column;align-items:flex-start;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='rgba(201,168,76,.6)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,.5)'" onmouseout="this.style.borderColor='rgba(201,168,76,.2)';this.style.transform='';this.style.boxShadow=''">
+        <div style="width:48px;height:48px;border-radius:12px;background:rgba(201,168,76,.12);color:#c9a84c;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:14px;">🔐</div>
+        <div style="font-size:.95rem;font-weight:800;color:#fff;margin-bottom:6px;">Protect PDF</div>
+        <div style="font-size:.78rem;color:#5f7499;line-height:1.5;">Encrypt with password</div>
+      </a>
+
+      <!-- See All card -->
+      <a href="/pdf-tools" style="text-decoration:none;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border:1px dashed rgba(201,168,76,.4);border-radius:14px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;text-align:center;" onmouseover="this.style.background='rgba(201,168,76,.15)';this.style.transform='translateY(-4px)'" onmouseout="this.style.background='linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05))';this.style.transform=''">
+        <div style="font-size:2rem;margin-bottom:10px;">➕</div>
+        <div style="font-size:.95rem;font-weight:800;color:#c9a84c;margin-bottom:4px;">25+ More Tools</div>
+        <div style="font-size:.78rem;color:#5f7499;">Rotate, OCR, Watermark, Convert &amp; more</div>
+      </a>
+    </div>
+
+    <!-- CTA Row -->
+    <div style="text-align:center;" class="anim">
+      <a href="/pdf-tools" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#c9a84c,#e8c96a);color:#040d1f;padding:15px 36px;border-radius:12px;font-weight:800;font-size:1rem;text-decoration:none;transition:all .2s;box-shadow:0 8px 24px rgba(201,168,76,.3);" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 36px rgba(201,168,76,.45)'" onmouseout="this.style.transform='';this.style.boxShadow='0 8px 24px rgba(201,168,76,.3)'">
+        <i class="fas fa-file-pdf"></i>
+        Open PDF Tools — It's Free
+        <i class="fas fa-arrow-right"></i>
+      </a>
+      <div style="margin-top:14px;font-size:.8rem;color:#5f7499;">No account needed · Files deleted after processing · 100% secure</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
 <!-- CTA -->
 <section id="cta-banner">
   <div class="section-wrap">

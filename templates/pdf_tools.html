@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}MYBBT PDF Tools — Complete PDF Suite{% endblock %}
+{% block title %}MYBBT PDF Tools — Free Online PDF Toolkit{% endblock %}
 {% block page_id %}pdf-tools{% endblock %}
 {% block topbar_title %}PDF Tools{% endblock %}
 {% block topbar_breadcrumb %}<span>Tools</span> › PDF Tools{% endblock %}
@@ -536,9 +536,9 @@ pselect {
   <div class="ppay" id="ppay">
     <div class="ppay-box">
       <h3>Advanced Processing</h3>
-      <p>Powered by iLovePDF engine — highest accuracy, speed & quality</p>
+      <p>High-speed cloud engine — maximum accuracy & quality for complex PDFs</p>
       <div class="ppay-amt">₹1</div>
-      <div class="ppay-per">per task · Razorpay secure payment</div>
+      <div class="ppay-per">per task · Secure payment via Razorpay</div>
       <button class="ppay-pay-btn" onclick="payConfirmed()">✔ Pay ₹1 & Process Now</button>
       <button class="ppay-cancel" onclick="payCancel()">Cancel</button>
     </div>
@@ -547,7 +547,7 @@ pselect {
   <!-- ── ADD MORE FAB ── -->
   <button id="p-add-more" title="Add more PDFs" onclick="triggerAddMore()">+</button>
 
-  <!-- ══════════════ iLovePDF NAVBAR ══════════════ -->
+  <!-- ══════════════ MYBBT PDF NAVBAR ══════════════ -->
   <nav class="pnav">
     <a class="pnav-logo" onclick="showHome()" href="javascript:void(0)">
       <div class="pnav-logo-icon">M</div>
@@ -579,7 +579,7 @@ pselect {
     <!-- Hero -->
     <div class="phero">
       <h1>Every tool you need to<br>work with <em>PDFs in one place</em></h1>
-      <p>Merge, split, compress, convert, rotate, unlock and watermark PDFs with just a few clicks. Free + Advanced powered by iLovePDF.</p>
+      <p>Merge, split, compress, convert, rotate, unlock and watermark PDFs with just a few clicks. All tools free to use — Advanced cloud mode available at ₹1/task.</p>
     </div>
 
     <!-- Filter Pills -->
@@ -964,7 +964,7 @@ function buildMultiTool(key, m) {
         </label>
         <label class="popt-radio-lbl">
           <input type="radio" name="pmode" value="pro" onchange="onModeChg(this)"/>
-          <div class="popt-text"><strong>Advanced — ₹1/task</strong><span>iLovePDF engine · Maximum accuracy</span></div>
+          <div class="popt-text"><strong>Advanced — ₹1/task</strong><span>Cloud engine · Maximum quality & speed</span></div>
         </label>
       </div>
     </div>` : '';
@@ -975,7 +975,7 @@ function buildMultiTool(key, m) {
     ${extra}
     <div class="pside-spacer"></div>
     <div class="pres" id="pmulti-res"></div>
-    <button class="pact-btn" id="pmulti-btn" onclick="doMultiTool('${key}','${m.api||''}',${isImg})" disabled>
+    <button class="pact-btn" id="pmulti-btn" onclick="doMultiTool('${key}','${m.api||\'\'}',${isImg})" disabled>
       ${m.name} <span style="font-size:1.2rem">→</span>
     </button>
   `;
@@ -1083,9 +1083,10 @@ async function doMultiTool(key, apiUrl, isImg) {
     mergeFiles.forEach(f => fd.append(field, f));
     if (!isImg) fd.append('mode', mode);
     await callApi(apiUrl || '/api/pdf/merge', fd, resEl,
-      mode === 'pro' ? 'Processing with iLovePDF…' : 'Processing…');
+      mode === 'pro' ? 'Cloud Processing… Please wait' : 'Processing…');
   };
 
+  // Pro mode: MUST go through payment first — run() only called after payConfirmed()
   if (mode === 'pro') openPay(run); else await run();
 }
 

@@ -1099,7 +1099,6 @@ def download_single_file(filename):
 # PDF TOOLS
 # ─────────────────────────────────────────
 @app.route('/pdf-tools')
-@login_required
 def pdf_tools_page():
     return render_template('pdf_tools.html')
 
