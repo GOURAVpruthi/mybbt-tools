@@ -5,7 +5,7 @@ import uuid
 import time
 from werkzeug.utils import secure_filename
 
-ILOVEPDF_PUBLIC_KEY = os.environ.get('ILOVEPDF_PUBLIC_KEY', '') # USER MUST PROVIDE THIS
+ILOVEPDF_PUBLIC_KEY = os.environ.get('ILOVEPDF_PUBLIC_KEY', 'secret_key_f0e4d569bebb335f436dc622b763ca14_Qytuv0bc37628ae14d7f1f9a17dc209bb47af')
 
 class ILovePDFError(Exception):
     pass

@@ -33,48 +33,48 @@
 .pdf-wrapper .hero h1 span{color:var(--primary)}
 .pdf-wrapper .hero p{color:var(--text-muted);font-size:1rem;max-width:480px;margin:0 auto}
 
-/* OVERRIDES FOR DARK MODE */
-.pdf-wrapper .tool-card { background: var(--surface); }
-.pdf-wrapper .options-panel, .pdf-wrapper .result-box, .pdf-wrapper .file-item, .pdf-wrapper .org-toolbar, .pdf-wrapper .org-page-card { background: var(--surface); border-color: var(--border); }
-.pdf-wrapper .upload-box { background: var(--surface); border-color: var(--border); }
-.pdf-wrapper .workspace-nav { background: transparent; border-color: var(--border); }
-.pdf-wrapper .nav-logo { display: none; }
+/* OVERRIDES FOR LIGHT MODE (iLovePDF Style) */
+.pdf-wrapper { background: #f6f5f3; color: #333; min-height: 100vh; }
+.pdf-wrapper .hero { background: #fdfaf8; padding: 60px 24px 40px; text-align: center; border-bottom: none; }
+.pdf-wrapper .hero h1 { font-size: 2.4rem; font-weight: 800; color: #111; margin-bottom: 12px; }
+.pdf-wrapper .hero h1 span { background: none; -webkit-text-fill-color: initial; color: #111; }
+.pdf-wrapper .hero p { color: #555; font-size: 1.1rem; max-width: 700px; margin: 0 auto; line-height: 1.5; }
+.pdf-wrapper .hero-badge { display: none; } /* Hide MYBBT badge to match iLovePDF */
 
-
-/* ─── HERO ───────────────────────────────────────── */
-.hero{background:linear-gradient(135deg,rgba(201,168,76,.12) 0%,rgba(7,19,41,0) 60%);padding:48px 24px 40px;text-align:center;
-  border-bottom:1px solid rgba(201,168,76,0.15)}
-.hero h1{font-size:2rem;font-weight:700;color:var(--text);margin-bottom:10px}
-.hero h1 span{background:linear-gradient(135deg,#c9a84c,#e8c96a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero p{color:var(--text-muted);font-size:1rem;max-width:560px;margin:0 auto}
-.hero .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);padding:5px 14px;border-radius:50px;font-size:11px;color:#c9a84c;margin-bottom:18px;letter-spacing:.5px;font-weight:600;text-transform:uppercase}
+/* CATEGORY FILTERS */
+.filter-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 30px; }
+.filter-pill { padding: 8px 18px; border-radius: 50px; border: 1px solid #ddd; background: #fff; font-size: 14px; font-weight: 600; color: #444; cursor: pointer; transition: all 0.2s; }
+.filter-pill:hover { border-color: #bbb; color: #111; }
+.filter-pill.active { background: #222; color: #fff; border-color: #222; }
 
 /* ─── TOOLS HOME (category grid) ─────────────────── */
-#tools-home{display:block}
-.tools-container{max-width:1100px;margin:0 auto;padding:40px 24px}
-.category-title{font-size:1.1rem;font-weight:700;
-  color:var(--text);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(201,168,76,0.15)}
-.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}
-.tool-card{display:flex;flex-direction:column;align-items:center;padding:32px 20px;border-radius:12px;
-  cursor:pointer;transition:all .3s ease;background:var(--surface);border:1px solid rgba(201,168,76,0.1);text-decoration:none;position:relative;overflow:hidden;text-align:center;}
-.tool-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,.1),transparent);opacity:0;transition:.3s ease}
-.tool-card:hover{background:var(--surface);border-color:rgba(201,168,76,.4);box-shadow:0 12px 30px rgba(0,0,0,.3);
-  transform:translateY(-4px)}
-.tool-card:hover::before{opacity:1}
-.tool-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-  font-size:1.6rem;flex-shrink:0;margin-bottom:16px;transition:.3s}
-.tool-card:hover .tool-icon{transform:scale(1.1)}
-.tool-info{flex:1;min-width:0;width:100%}
-.tool-name{font-size:1.05rem;font-weight:700;color:var(--white);line-height:1.3;margin-bottom:8px}
-.tool-desc{font-size:.8rem;color:var(--text-muted);line-height:1.4}
-/* icon colors - MYBBT theme */
-.ic-red{background:rgba(239,68,68,.1);color:#ef4444}
-.ic-orange{background:rgba(249,115,22,.1);color:#f97316}
-.ic-green{background:rgba(34,197,94,.1);color:#22c55e}
-.ic-blue{background:rgba(59,130,246,.1);color:#3b82f6}
-.ic-purple{background:rgba(168,85,247,.1);color:#a855f7}
-.ic-teal{background:rgba(20,184,166,.1);color:#14b8a6}
-.ic-gold{background:rgba(201,168,76,.15);color:#c9a84c}
+#tools-home { display: block; }
+.tools-container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+.category-section { margin-bottom: 0; }
+.category-title { display: none; } /* Hide category titles in favor of pure grid like iLovePDF */
+
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; padding-bottom: 40px; }
+.tool-card { display: flex; flex-direction: column; align-items: flex-start; padding: 24px 28px; border-radius: 12px;
+  cursor: pointer; transition: all .3s ease; background: #fff; border: 1px solid rgba(0,0,0,0.05); text-decoration: none; position: relative; overflow: hidden; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+.tool-card::before { display: none; }
+.tool-card:hover { border-color: rgba(0,0,0,0.1); box-shadow: 0 12px 30px rgba(0,0,0,0.08); transform: translateY(-3px); }
+
+.tool-icon { width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; flex-shrink: 0; margin-bottom: 18px; transition: .3s; }
+.tool-card:hover .tool-icon { transform: scale(1.05); }
+
+.tool-info { flex: 1; min-width: 0; width: 100%; }
+.tool-name { font-size: 1.15rem; font-weight: 800; color: #111; line-height: 1.3; margin-bottom: 8px; }
+.tool-desc { font-size: .85rem; color: #666; line-height: 1.5; font-weight: 400; }
+
+/* icon colors - iLovePDF theme */
+.ic-red { background: rgba(239,68,68,.1); color: #ef4444; }
+.ic-orange { background: rgba(249,115,22,.1); color: #f97316; }
+.ic-green { background: rgba(34,197,94,.1); color: #22c55e; }
+.ic-blue { background: rgba(59,130,246,.1); color: #3b82f6; }
+.ic-purple { background: rgba(168,85,247,.1); color: #a855f7; }
+.ic-teal { background: rgba(20,184,166,.1); color: #14b8a6; }
+.ic-gold { background: rgba(234,179,8,.1); color: #eab308; }
 
 /* ─── WORKSPACE (tool panel) ────────────────── */
 #tool-workspace{display:none;min-height:100vh;background:var(--background)}
@@ -205,17 +205,24 @@ select:focus{border-color:#c9a84c}
 <!-- ═══ TOOLS HOME ══════════════════════════════════════════ -->
 <div id="tools-home">
   <div class="hero">
-    <div class="hero-badge">⚡ MYBBT PDF Suite</div>
-    <h1>Every tool you need to <span>work with PDFs</span></h1>
-    <p>Professional-grade PDF tools powered by MYBBT. All features included with your account.</p>
+    <h1>Every tool you need to work with PDFs in one place</h1>
+    <p>Every tool you need to use PDFs, at your fingertips. All are 100% FREE and easy to use! Merge, split, compress, convert, rotate, unlock and watermark PDFs with just a few clicks.</p>
+    
+    <div class="filter-pills">
+      <div class="filter-pill active">All</div>
+      <div class="filter-pill">Workflows</div>
+      <div class="filter-pill">Organize PDF</div>
+      <div class="filter-pill">Optimize PDF</div>
+      <div class="filter-pill">Convert PDF</div>
+      <div class="filter-pill">Edit PDF</div>
+      <div class="filter-pill">PDF Security</div>
+    </div>
   </div>
 
   <div class="tools-container">
 
-    <!-- ORGANIZE PDF -->
-    <div class="category-section">
-      <div class="category-title">Organize PDF</div>
-      <div class="tools-grid">
+    <!-- ALL TOOLS GRID -->
+    <div class="tools-grid">
         <div class="tool-card" onclick="openTool('merge')">
           <div class="tool-icon ic-red">🔗</div>
           <div class="tool-info"><div class="tool-name">Merge PDF</div><div class="tool-desc">Combine PDFs in order</div></div>
@@ -244,13 +251,7 @@ select:focus{border-color:#c9a84c}
           <div class="tool-icon ic-red">📷</div>
           <div class="tool-info"><div class="tool-name">Scan to PDF</div><div class="tool-desc">Phone camera → PDF</div></div>
         </div>
-      </div>
-    </div>
 
-    <!-- OPTIMIZE PDF -->
-    <div class="category-section">
-      <div class="category-title">Optimize PDF</div>
-      <div class="tools-grid">
         <div class="tool-card" onclick="openTool('compress')">
           <div class="tool-icon ic-orange">🗜️</div>
           <div class="tool-info"><div class="tool-name">Compress PDF</div><div class="tool-desc">Reduce file size</div></div>
@@ -263,13 +264,7 @@ select:focus{border-color:#c9a84c}
           <div class="tool-icon ic-orange">📋</div>
           <div class="tool-info"><div class="tool-name">Flatten PDF</div><div class="tool-desc">Remove form fields</div></div>
         </div>
-      </div>
-    </div>
 
-    <!-- CONVERT TO PDF -->
-    <div class="category-section">
-      <div class="category-title">Convert to PDF</div>
-      <div class="tools-grid">
         <div class="tool-card" onclick="openTool('images-to-pdf')">
           <div class="tool-icon ic-blue">📸</div>
           <div class="tool-info"><div class="tool-name">JPG to PDF</div><div class="tool-desc">Images → PDF</div></div>
@@ -290,13 +285,7 @@ select:focus{border-color:#c9a84c}
           <div class="tool-icon ic-blue">🌐</div>
           <div class="tool-info"><div class="tool-name">HTML to PDF</div><div class="tool-desc">URL or HTML → PDF</div></div>
         </div>
-      </div>
-    </div>
 
-    <!-- CONVERT FROM PDF -->
-    <div class="category-section">
-      <div class="category-title">Convert from PDF</div>
-      <div class="tools-grid">
         <div class="tool-card" onclick="openTool('pdf-to-images')">
           <div class="tool-icon ic-green">🖼️</div>
           <div class="tool-info"><div class="tool-name">PDF to JPG</div><div class="tool-desc">Extract images</div></div>
@@ -317,13 +306,7 @@ select:focus{border-color:#c9a84c}
           <div class="tool-icon ic-green">📃</div>
           <div class="tool-info"><div class="tool-name">Extract Text</div><div class="tool-desc">Get text from PDF</div></div>
         </div>
-      </div>
-    </div>
 
-    <!-- EDIT PDF -->
-    <div class="category-section">
-      <div class="category-title">Edit PDF</div>
-      <div class="tools-grid">
         <div class="tool-card" onclick="openTool('rotate')">
           <div class="tool-icon ic-purple">🔄</div>
           <div class="tool-info"><div class="tool-name">Rotate PDF</div><div class="tool-desc">Rotate pages</div></div>
@@ -344,13 +327,7 @@ select:focus{border-color:#c9a84c}
           <div class="tool-icon ic-purple">🔍</div>
           <div class="tool-info"><div class="tool-name">Compare PDF</div><div class="tool-desc">Side-by-side diff</div></div>
         </div>
-      </div>
-    </div>
 
-    <!-- PDF SECURITY -->
-    <div class="category-section">
-      <div class="category-title">PDF Security</div>
-      <div class="tools-grid">
         <div class="tool-card" onclick="openTool('unlock')">
           <div class="tool-icon ic-teal">🔓</div>
           <div class="tool-info"><div class="tool-name">Unlock PDF</div><div class="tool-desc">Remove all restrictions</div></div>
@@ -359,13 +336,7 @@ select:focus{border-color:#c9a84c}
           <div class="tool-icon ic-teal">🔐</div>
           <div class="tool-info"><div class="tool-name">Protect PDF</div><div class="tool-desc">Add password</div></div>
         </div>
-      </div>
-    </div>
 
-    <!-- PDF INTELLIGENCE -->
-    <div class="category-section">
-      <div class="category-title">PDF Intelligence</div>
-      <div class="tools-grid">
         <div class="tool-card" onclick="openTool('ai-summarize')">
           <div class="tool-icon" style="background:#fdf4ff;color:#9333ea">🤖</div>
           <div class="tool-info"><div class="tool-name">AI Summarizer</div><div class="tool-desc">Gemini AI summary</div></div>
@@ -374,13 +345,7 @@ select:focus{border-color:#c9a84c}
           <div class="tool-icon" style="background:#fdf4ff;color:#9333ea">🌐</div>
           <div class="tool-info"><div class="tool-name">Translate PDF</div><div class="tool-desc">100+ languages</div></div>
         </div>
-      </div>
-    </div>
 
-    <!-- PDF ADVANCED TOOLS -->
-    <div class="category-section">
-      <div class="category-title">Advanced PDF Tools</div>
-      <div class="tools-grid">
         <div class="tool-card" onclick="openTool('ocr')">
           <div class="tool-icon ic-gold">🔍</div>
           <div class="tool-info"><div class="tool-name">OCR PDF</div><div class="tool-desc">Make scanned PDFs searchable</div></div>
