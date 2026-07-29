@@ -228,6 +228,10 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'corporate-tools-suite-dev-key-change-in-prod')
 CORS(app)
 
+@app.route('/ping')
+def ping():
+    return "OK", 200
+
 # Configuration
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Support for persistent disks on cloud hosts (like Render)
